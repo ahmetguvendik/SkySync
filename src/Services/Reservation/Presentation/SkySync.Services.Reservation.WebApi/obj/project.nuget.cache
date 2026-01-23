@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "xvwj3VT2XKQ=",
+  "success": true,
+  "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Reservation/Presentation/SkySync.Services.Reservation.WebApi/SkySync.Services.Reservation.WebApi.csproj",
+  "expectedPackageFiles": [
+    "/Users/ahmetguvendik/.nuget/packages/microsoft.aspnetcore.openapi/9.0.9/microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}

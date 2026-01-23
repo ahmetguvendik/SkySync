@@ -1,0 +1,6 @@
+@SkySync.Services.Payment.WebApi_HostAddress = http://localhost:5124
+
+GET {{SkySync.Services.Payment.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

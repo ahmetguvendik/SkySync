@@ -1,0 +1,6 @@
+@SkySync.Services.Notification.WebApi_HostAddress = http://localhost:5042
+
+GET {{SkySync.Services.Notification.WebApi_HostAddress}}/weatherforecast
+Accept: application/json
+
+###

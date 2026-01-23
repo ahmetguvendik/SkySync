@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "iXXfM2oD5Q8=",
+  "success": true,
+  "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Presentation/SkySync.Services.Notification.WebApi/SkySync.Services.Notification.WebApi.csproj",
+  "expectedPackageFiles": [
+    "/Users/ahmetguvendik/.nuget/packages/microsoft.aspnetcore.openapi/9.0.9/microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
