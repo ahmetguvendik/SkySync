@@ -1,0 +1,12 @@
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/bin/Debug/net9.0/SkySync.Services.Flight.Domain.deps.json
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/bin/Debug/net9.0/SkySync.Services.Flight.Domain.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/bin/Debug/net9.0/SkySync.Services.Flight.Domain.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/SkySync.Services.Flight.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/SkySync.Services.Flight.Domain.AssemblyInfoInputs.cache
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/SkySync.Services.Flight.Domain.AssemblyInfo.cs
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/SkySync.Services.Flight.Domain.csproj.CoreCompileInputs.cache
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/SkySync.Services.Flight.Domain.sourcelink.json
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/SkySync.Services.Flight.Domain.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/refint/SkySync.Services.Flight.Domain.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/SkySync.Services.Flight.Domain.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Core/SkySync.Services.Flight.Domain/obj/Debug/net9.0/ref/SkySync.Services.Flight.Domain.dll

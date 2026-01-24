@@ -8,6 +8,16 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Infrastructure\SkySync.Services.Flight.Persistence\SkySync.Services.Flight.Persistence.csproj" />
+        <ProjectReference Include="..\..\Core\SkySync.Services.Flight.Application\SkySync.Services.Flight.Application.csproj" />
     </ItemGroup>
 
 </Project>

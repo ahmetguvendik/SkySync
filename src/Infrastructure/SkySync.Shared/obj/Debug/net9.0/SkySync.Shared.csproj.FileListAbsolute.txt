@@ -1,0 +1,12 @@
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/bin/Debug/net9.0/SkySync.Shared.deps.json
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/bin/Debug/net9.0/SkySync.Shared.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/bin/Debug/net9.0/SkySync.Shared.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/SkySync.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/SkySync.Shared.AssemblyInfoInputs.cache
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/SkySync.Shared.AssemblyInfo.cs
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/SkySync.Shared.csproj.CoreCompileInputs.cache
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/SkySync.Shared.sourcelink.json
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/SkySync.Shared.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/refint/SkySync.Shared.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/SkySync.Shared.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/Debug/net9.0/ref/SkySync.Shared.dll

@@ -2,5 +2,10 @@ namespace SkySync.Shared.OutboxTable;
 
 public class OutboxMessage
 {
-    
+    public Guid Id { get; set; } // Birincil anahtar
+    public string Type { get; set; } // Event tipi (örn: "FlightReservedEvent")
+    public string Content { get; set; } // JSON formatında mesaj içeriği
+    public DateTime OccurredOn { get; set; } // Event'in oluşma zamanı
+    public DateTime? ProcessedOn { get; set; } // Ne zaman kuyruğa gönderildi? (Null ise gönderilmedi)
+    public string? Error { get; set; } // Gönderim sırasında bir hata oluştu mu?
 }
