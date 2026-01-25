@@ -5,23 +5,29 @@ using SkySync.Services.Flight.Application.Features.Commands.Flight.Requests;
 using SkySync.Services.Flight.Application.Features.Commands.Flight.Responses;
 using SkySync.Services.Flight.Application.Interfaces;
 using SkySync.Services.Flight.Application.UnitOfWorks;
+using SkySync.Services.Flight.Domain.Entities;
 using SkySync.Shared.Events;
 using SkySync.Shared.OutboxTable;
+using FlightEntity = SkySync.Services.Flight.Domain.Entities.Flight;
+using SeatEntity = SkySync.Services.Flight.Domain.Entities.Seat;
 
 namespace SkySync.Services.Flight.Application.Features.Handlers.Flight.CommandHandlers;
 
 public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandRequest, CreateFlightCommandResponse>
 {
-    private readonly IGenericRepository<OutboxMessage> _outboxRepository;
+    private readonly IOutboxRepository _outboxRepository;
+    private readonly IGenericRepository<FlightEntity> _flightRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateFlightCommandHandler> _logger;
 
     public CreateFlightCommandHandler(
-        IGenericRepository<OutboxMessage> outboxRepository,
+        IOutboxRepository outboxRepository,
+        IGenericRepository<FlightEntity> flightRepository,
         IUnitOfWork unitOfWork,
         ILogger<CreateFlightCommandHandler> logger)
     {
         _outboxRepository = outboxRepository;
+        _flightRepository = flightRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
@@ -35,7 +41,30 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
 
             var flightId = Guid.NewGuid();
 
-            // Outbox pattern: Event oluştur
+            // 1. ADIM: Uçuş Entity'sini Oluştur ve Kaydet
+            var seats = GenerateSeats(flightId, request.BasePrice);
+            var flight = new FlightEntity
+            {
+                Id = flightId,
+                FlightNumber = request.FlightNumber,
+                Departure = request.Departure,
+                Destination = request.Destination,
+                DepartureTime = request.DepartureTime,
+                ArrivalTime = request.ArrivalTime,
+                BasePrice = request.BasePrice,
+                Status = request.Status,
+                Seats = seats
+            };
+
+            // Seats'ların Flight navigation property'sini set et
+            foreach (var seat in seats)
+            {
+                seat.Flight = flight;
+            }
+
+            await _flightRepository.CreateAsync(flight, cancellationToken);
+
+            // 2. ADIM: Outbox Mesajını Oluştur
             var flightCreatedEvent = new FlightCreatedEvent
             {
                 FlightId = flightId,
@@ -63,28 +92,33 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
                 Error = null
             };
 
-            // Sadece OutboxMessage'i kaydet 
             await _outboxRepository.CreateAsync(outboxMessage, cancellationToken);
 
-            // Transaction'ı commit et
+            // 3. ADIM: Hepsini Tek Transaction'da Bitir
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            _logger.LogInformation("Flight creation event added to outbox. FlightId: {FlightId}, FlightNumber: {FlightNumber}",
-                flightId, request.FlightNumber);
+            _logger.LogInformation("Flight created successfully. FlightId: {FlightId}, FlightNumber: {FlightNumber}, Seats: {SeatCount}",
+                flightId, request.FlightNumber, seats.Count);
 
             return new CreateFlightCommandResponse
             {
                 FlightId = flightId,
                 FlightNumber = request.FlightNumber,
                 IsSuccess = true,
-                Message = "Flight creation event added to outbox successfully"
+                Message = "Flight created successfully"
             };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while adding flight creation event to outbox. FlightNumber: {FlightNumber}",
-                request.FlightNumber);
+            var errorMessage = ex.Message;
+            if (ex.InnerException != null)
+            {
+                errorMessage += $" Inner Exception: {ex.InnerException.Message}";
+            }
+
+            _logger.LogError(ex, "Error occurred while creating flight. FlightNumber: {FlightNumber}, Error: {Error}",
+                request.FlightNumber, errorMessage);
 
             // Transaction'ı rollback et
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
@@ -94,8 +128,42 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
                 FlightId = Guid.Empty,
                 FlightNumber = request.FlightNumber,
                 IsSuccess = false,
-                Message = $"Error occurred while adding flight creation event to outbox: {ex.Message}"
+                Message = $"Error occurred while creating flight: {errorMessage}"
             };
         }
+    }
+
+    /// <summary>
+    /// Uçuş için otomatik koltuklar oluşturur.
+    /// Standart uçak yapısı: 30 satır x 6 sütun (A, B, C, D, E, F) = 180 koltuk
+    /// </summary>
+    private static List<SeatEntity> GenerateSeats(Guid flightId, decimal basePrice)
+    {
+        var seats = new List<SeatEntity>();
+        var seatLetters = new[] { "A", "B", "C", "D", "E", "F" };
+        const int totalRows = 30;
+        var now = DateTime.UtcNow;
+
+        for (int row = 1; row <= totalRows; row++)
+        {
+            foreach (var letter in seatLetters)
+            {
+                var seat = new SeatEntity
+                {
+                    Id = Guid.NewGuid(),
+                    FlightId = flightId,
+                    SeatNumber = $"{row}{letter}",
+                    Price = basePrice,
+                    IsReserved = false,
+                    UserId = null,
+                    CreatedTime = now,
+                    ModifiedTime = now,
+                    IsDeleted = false
+                };
+                seats.Add(seat);
+            }
+        }
+
+        return seats;
     }
 }

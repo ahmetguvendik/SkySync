@@ -26,7 +26,7 @@ public class FlightServiceDbContext : DbContext
             entity.Property(f => f.Departure).IsRequired().HasMaxLength(100);
             entity.Property(f => f.Destination).IsRequired().HasMaxLength(100);
             entity.Property(f => f.BasePrice).HasColumnType("decimal(18,2)");
-            entity.Property(f => f.Status).HasConversion<string>().HasMaxLength(50);
+            entity.Property(f => f.Status).HasConversion<int>();
             
             // Relationships
             entity.HasMany(f => f.Seats)
@@ -51,7 +51,10 @@ public class FlightServiceDbContext : DbContext
             entity.Property(o => o.Type).IsRequired().HasMaxLength(255);
             entity.Property(o => o.Content).IsRequired();
             entity.Property(o => o.OccurredOn).IsRequired();
+            entity.Property(o => o.RetryCount).IsRequired().HasDefaultValue(0);
+            entity.Property(o => o.IsFailed).IsRequired().HasDefaultValue(false);
             entity.HasIndex(o => o.ProcessedOn);
+            entity.HasIndex(o => new { o.IsFailed, o.ProcessedOn });
         });
     }
 }

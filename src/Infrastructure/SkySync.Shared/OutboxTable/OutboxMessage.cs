@@ -8,4 +8,6 @@ public class OutboxMessage
     public DateTime OccurredOn { get; set; } // Event'in oluşma zamanı
     public DateTime? ProcessedOn { get; set; } // Ne zaman kuyruğa gönderildi? (Null ise gönderilmedi)
     public string? Error { get; set; } // Gönderim sırasında bir hata oluştu mu?
+    public int RetryCount { get; set; } = 0; // Kaç kez denendi?
+    public bool IsFailed { get; set; } = false; // Max retry sonrası başarısız olarak işaretlendi mi?
 }

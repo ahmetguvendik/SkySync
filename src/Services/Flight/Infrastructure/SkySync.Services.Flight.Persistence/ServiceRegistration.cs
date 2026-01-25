@@ -19,6 +19,7 @@ public static class ServiceRegistration
         
         //Repositories
         collection.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        collection.AddScoped<IOutboxRepository, OutboxRepository>();
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
         
     }

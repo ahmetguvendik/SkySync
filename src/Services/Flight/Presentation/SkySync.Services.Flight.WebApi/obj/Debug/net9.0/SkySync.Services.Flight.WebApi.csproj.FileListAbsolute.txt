@@ -147,3 +147,8 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Microsoft.IdentityModel.Logging.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/System.Diagnostics.DiagnosticSource.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Pipelines.Sockets.Unofficial.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/StackExchange.Redis.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/SkySync.Services.Flight.Infrastructure.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/SkySync.Services.Flight.Infrastructure.pdb

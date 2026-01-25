@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vi/tOJ2Myo0=",
+  "dgSpecHash": "ptNvTE1WdOU=",
   "success": true,
   "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/SkySync.Services.Flight.WebApi.csproj",
   "expectedPackageFiles": [
@@ -25,6 +25,7 @@
     "/Users/ahmetguvendik/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.12/microsoft.extensions.caching.abstractions.9.0.12.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/microsoft.extensions.caching.memory/9.0.12/microsoft.extensions.caching.memory.9.0.12.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/microsoft.extensions.caching.stackexchangeredis/9.0.0/microsoft.extensions.caching.stackexchangeredis.9.0.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/microsoft.extensions.configuration/9.0.0/microsoft.extensions.configuration.9.0.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/microsoft.extensions.configuration.abstractions/9.0.12/microsoft.extensions.configuration.abstractions.9.0.12.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/microsoft.extensions.configuration.fileextensions/9.0.0/microsoft.extensions.configuration.fileextensions.9.0.0.nupkg.sha512",
@@ -47,6 +48,8 @@
     "/Users/ahmetguvendik/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/stackexchange.redis/2.8.16/stackexchange.redis.2.8.16.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/swashbuckle.aspnetcore/6.9.0/swashbuckle.aspnetcore.6.9.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/swashbuckle.aspnetcore.swagger/6.9.0/swashbuckle.aspnetcore.swagger.6.9.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.9.0/swashbuckle.aspnetcore.swaggergen.6.9.0.nupkg.sha512",

@@ -1,4 +1,5 @@
 using System.Reflection;
+using SkySync.Services.Flight.Infrastructure.Cache;
 using SkySync.Services.Flight.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,9 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SkySy
 
 // Add Persistence Services
 builder.Services.AddPersistenceService(builder.Configuration);
+
+// Add Cache Service (Redis)
+builder.Services.AddCacheService(builder.Configuration);
 
 var app = builder.Build();
 
