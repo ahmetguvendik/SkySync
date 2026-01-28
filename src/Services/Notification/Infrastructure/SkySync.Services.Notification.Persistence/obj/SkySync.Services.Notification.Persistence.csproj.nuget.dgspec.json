@@ -4,14 +4,14 @@
     "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/SkySync.Services.Notification.Persistence.csproj": {}
   },
   "projects": {
-    "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/SkySync.Services.Notification.Persistence.csproj": {
+    "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/SkySync.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/SkySync.Services.Notification.Persistence.csproj",
-        "projectName": "SkySync.Services.Notification.Persistence",
-        "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/SkySync.Services.Notification.Persistence.csproj",
+        "projectUniqueName": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/SkySync.Shared.csproj",
+        "projectName": "SkySync.Shared",
+        "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/SkySync.Shared.csproj",
         "packagesPath": "/Users/ahmetguvendik/.nuget/packages/",
-        "outputPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/obj/",
+        "outputPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/ahmetguvendik/.nuget/NuGet/NuGet.Config"
@@ -43,6 +43,221 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Application/SkySync.Services.Notification.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Application/SkySync.Services.Notification.Application.csproj",
+        "projectName": "SkySync.Services.Notification.Application",
+        "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Application/SkySync.Services.Notification.Application.csproj",
+        "packagesPath": "/Users/ahmetguvendik/.nuget/packages/",
+        "outputPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/ahmetguvendik/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/SkySync.Services.Notification.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/SkySync.Services.Notification.Domain.csproj",
+        "projectName": "SkySync.Services.Notification.Domain",
+        "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/SkySync.Services.Notification.Domain.csproj",
+        "packagesPath": "/Users/ahmetguvendik/.nuget/packages/",
+        "outputPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/ahmetguvendik/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/SkySync.Services.Notification.Persistence.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/SkySync.Services.Notification.Persistence.csproj",
+        "projectName": "SkySync.Services.Notification.Persistence",
+        "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/SkySync.Services.Notification.Persistence.csproj",
+        "packagesPath": "/Users/ahmetguvendik/.nuget/packages/",
+        "outputPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Infrastructure/SkySync.Services.Notification.Persistence/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/ahmetguvendik/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/SkySync.Shared.csproj": {
+                "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/SkySync.Shared.csproj"
+              },
+              "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Application/SkySync.Services.Notification.Application.csproj": {
+                "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Application/SkySync.Services.Notification.Application.csproj"
+              },
+              "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/SkySync.Services.Notification.Domain.csproj": {
+                "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/SkySync.Services.Notification.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "MassTransit": {
+              "target": "Package",
+              "version": "[8.5.0, )"
+            },
+            "MassTransit.RabbitMQ": {
+              "target": "Package",
+              "version": "[8.5.0, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Binder": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

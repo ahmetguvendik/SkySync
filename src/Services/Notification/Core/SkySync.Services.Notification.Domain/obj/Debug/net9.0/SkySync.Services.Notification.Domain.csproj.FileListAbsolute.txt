@@ -5,6 +5,7 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/Debug/net9.0/SkySync.Services.Notification.Domain.AssemblyInfoInputs.cache
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/Debug/net9.0/SkySync.Services.Notification.Domain.AssemblyInfo.cs
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/Debug/net9.0/SkySync.Services.Notification.Domain.csproj.CoreCompileInputs.cache
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/Debug/net9.0/SkySync.Services.Notification.Domain.sourcelink.json
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/Debug/net9.0/SkySync.Services.Notification.Domain.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/Debug/net9.0/refint/SkySync.Services.Notification.Domain.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/obj/Debug/net9.0/SkySync.Services.Notification.Domain.pdb

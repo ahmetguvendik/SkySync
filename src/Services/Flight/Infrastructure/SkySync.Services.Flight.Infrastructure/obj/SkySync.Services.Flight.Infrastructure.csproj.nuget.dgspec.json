@@ -248,7 +248,7 @@
             },
             "StackExchange.Redis": {
               "target": "Package",
-              "version": "[2.8.16, )"
+              "version": "[2.10.1, )"
             }
           },
           "imports": [

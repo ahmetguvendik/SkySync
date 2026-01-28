@@ -1,0 +1,50 @@
+using Microsoft.EntityFrameworkCore;
+using SkySync.Shared.OutboxTable;
+
+namespace SkySync.Services.Reservation.Persistence.Contexts;
+
+public class ReservationServiceDbContext : DbContext
+{
+    public ReservationServiceDbContext(DbContextOptions<ReservationServiceDbContext> options) : base(options)
+    {
+    }
+
+    public DbSet<SkySync.Services.Reservation.Domain.Entities.Reservation> Reservations { get; set; }
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Reservation Configuration
+        modelBuilder.Entity<SkySync.Services.Reservation.Domain.Entities.Reservation>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.SeatNumber).IsRequired().HasMaxLength(10);
+            entity.Property(r => r.Price).HasColumnType("decimal(18,2)");
+            entity.Property(r => r.PassengerName).IsRequired().HasMaxLength(100);
+            entity.Property(r => r.PassengerSurname).IsRequired().HasMaxLength(100);
+            entity.Property(r => r.PassengerEmail).IsRequired().HasMaxLength(255);
+            entity.Property(r => r.Status).HasConversion<int>(); // Enum'u integer olarak sakla
+            
+            // Indexes
+            entity.HasIndex(r => r.PassengerEmail);
+            entity.HasIndex(r => r.FlightId);
+            entity.HasIndex(r => r.CorrelationId); // Saga takibi için
+            entity.HasIndex(r => new { r.PassengerEmail, r.IsDeleted });
+        });
+
+        // OutboxMessage Configuration
+        modelBuilder.Entity<OutboxMessage>(entity =>
+        {
+            entity.HasKey(o => o.Id);
+            entity.Property(o => o.Type).IsRequired().HasMaxLength(255);
+            entity.Property(o => o.Content).IsRequired();
+            entity.Property(o => o.OccurredOn).IsRequired();
+            entity.Property(o => o.RetryCount).IsRequired().HasDefaultValue(0);
+            entity.Property(o => o.IsFailed).IsRequired().HasDefaultValue(false);
+            entity.HasIndex(o => o.ProcessedOn);
+            entity.HasIndex(o => new { o.IsFailed, o.ProcessedOn });
+        });
+    }
+}

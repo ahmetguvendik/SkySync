@@ -16,6 +16,9 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SkySy
 // Add Persistence Services
 builder.Services.AddPersistenceService(builder.Configuration);
 
+// Add MassTransit with Consumers
+builder.Services.AddMassTransitService(builder.Configuration);
+
 // Add Cache Service (Redis)
 builder.Services.AddCacheService(builder.Configuration);
 

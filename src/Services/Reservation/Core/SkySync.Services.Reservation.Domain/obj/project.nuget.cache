@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "5Nr6CJTwedA=",
+  "dgSpecHash": "e26xLMMP6I0=",
   "success": true,
   "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Reservation/Core/SkySync.Services.Reservation.Domain/SkySync.Services.Reservation.Domain.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/ahmetguvendik/.nuget/packages/masstransit.abstractions/8.5.0/masstransit.abstractions.8.5.0.nupkg.sha512"
+  ],
   "logs": []
 }

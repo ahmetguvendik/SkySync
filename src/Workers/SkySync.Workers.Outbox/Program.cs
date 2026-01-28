@@ -1,17 +1,24 @@
 using MassTransit;
-using SkySync.Services.Flight.Persistence;
+using FlightPersistence = SkySync.Services.Flight.Persistence;
+using ReservationPersistence = SkySync.Services.Reservation.Persistence;
 using SkySync.Workers.Outbox.Jobs;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 // Add Persistence Services (Flight Service DbContext ve Repositories)
-builder.Services.AddPersistenceService(builder.Configuration);
+FlightPersistence.ServiceRegistration.AddPersistenceService(builder.Services, builder.Configuration);
+
+// Add Persistence Services (Reservation Service DbContext ve Repositories)
+ReservationPersistence.ServiceRegistration.AddPersistenceService(builder.Services, builder.Configuration);
 
 // Add MassTransit with RabbitMQ
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
+        // CRITICAL: .NET 9 uyumluluğu için Newtonsoft JSON serializer kullan
+        cfg.UseNewtonsoftJsonSerializer();
+        
         // CloudAMQP connection string kullan
         var connectionString = builder.Configuration["RabbitMQ:ConnectionString"];
         
@@ -39,8 +46,9 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-// Add Outbox Worker
+// Add Outbox Workers (Flight ve Reservation için ayrı worker'lar)
 builder.Services.AddHostedService<FlightOutboxPublishWorker>();
+builder.Services.AddHostedService<ReservationOutboxPublishWorker>();
 
 var host = builder.Build();
 host.Run();

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkySync.Services.Reservation.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+56ddbecd754658f234f448ed52cd7a1049070e10")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f70cfd4212c7da29976d9b35218a00776678fa1e")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkySync.Services.Reservation.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkySync.Services.Reservation.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

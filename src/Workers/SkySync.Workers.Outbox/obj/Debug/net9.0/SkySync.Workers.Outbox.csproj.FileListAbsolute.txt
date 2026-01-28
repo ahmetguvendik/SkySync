@@ -7,6 +7,7 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Workers.Outbox.pdb
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MassTransit.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MassTransit.Abstractions.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MassTransit.EntityFrameworkCoreIntegration.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MassTransit.RabbitMqTransport.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MediatR.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MediatR.Contracts.dll
@@ -56,14 +57,22 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/System.Threading.RateLimiting.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/runtimes/win/lib/net9.0/System.Diagnostics.EventLog.Messages.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/runtimes/win/lib/net9.0/System.Diagnostics.EventLog.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.SagaStateMachine.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Flight.Application.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Flight.Domain.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Flight.Persistence.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Reservation.Application.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Reservation.Domain.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Reservation.Persistence.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Shared.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Flight.Persistence.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Reservation.Persistence.pdb
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Shared.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.SagaStateMachine.pdb
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Flight.Application.pdb
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Flight.Domain.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Reservation.Application.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Reservation.Domain.pdb
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/obj/Debug/net9.0/SkySync.Workers.Outbox.csproj.AssemblyReference.cache
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/obj/Debug/net9.0/SkySync.Workers.Outbox.GeneratedMSBuildEditorConfig.editorconfig
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/obj/Debug/net9.0/SkySync.Workers.Outbox.AssemblyInfoInputs.cache
@@ -76,3 +85,6 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/obj/Debug/net9.0/SkySync.Workers.Outbox.pdb
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/obj/Debug/net9.0/SkySync.Workers.Outbox.genruntimeconfig.cache
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/obj/Debug/net9.0/ref/SkySync.Workers.Outbox.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MassTransit.Newtonsoft.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Newtonsoft.Json.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Newtonsoft.Json.Bson.dll

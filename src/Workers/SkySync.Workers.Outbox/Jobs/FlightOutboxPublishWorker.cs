@@ -22,7 +22,6 @@ public class FlightOutboxPublishWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<FlightOutboxPublishWorker> _logger;
-    private readonly IPublishEndpoint _publishEndpoint;
     
     // Configuration Constants
     private const int BatchSize = 20; // Her döngüde işlenecek maksimum mesaj sayısı
@@ -32,12 +31,10 @@ public class FlightOutboxPublishWorker : BackgroundService
 
     public FlightOutboxPublishWorker(
         IServiceProvider serviceProvider,
-        ILogger<FlightOutboxPublishWorker> logger,
-        IPublishEndpoint publishEndpoint)
+        ILogger<FlightOutboxPublishWorker> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _publishEndpoint = publishEndpoint;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -64,19 +61,22 @@ public class FlightOutboxPublishWorker : BackgroundService
                     continue;
                 }
 
-                // 2. PARALLEL PROCESSING: Tüm mesajları paralel olarak işle
+                // 2. IPublishEndpoint'i scope'dan al (Scoped service olduğu için)
+                var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+
+                // 3. PARALLEL PROCESSING: Tüm mesajları paralel olarak işle
                 var publishTasks = messagesToProcess.Select(message => 
-                    ProcessMessageAsync(message, outboxRepository, stoppingToken)
+                    ProcessMessageAsync(message, outboxRepository, publishEndpoint, stoppingToken)
                 ).ToArray();
 
                 var results = await Task.WhenAll(publishTasks);
 
-                // 3. Sonuçları topla
+                // 4. Sonuçları topla
                 var processedCount = results.Count(r => r.IsSuccess);
                 var failedCount = results.Count(r => !r.IsSuccess && r.ShouldRetry);
                 var permanentlyFailedCount = results.Count(r => !r.IsSuccess && !r.ShouldRetry);
 
-                // 4. Değişiklikleri kaydet
+                // 5. Değişiklikleri kaydet
                 if (processedCount > 0 || failedCount > 0 || permanentlyFailedCount > 0)
                 {
                     await unitOfWork.SaveChangesAsync(stoppingToken);
@@ -90,7 +90,7 @@ public class FlightOutboxPublishWorker : BackgroundService
                 _logger.LogError(ex, "Outbox mesajları yayınlanırken bir hata oluştu.");
             }
 
-            // 5. Belirli bir süre bekle
+            // 6. Belirli bir süre bekle
             await Task.Delay(TimeSpan.FromSeconds(DelaySeconds), stoppingToken);
         }
     }
@@ -101,6 +101,7 @@ public class FlightOutboxPublishWorker : BackgroundService
     private async Task<MessageProcessResult> ProcessMessageAsync(
         OutboxMessage message,
         IOutboxRepository outboxRepository,
+        IPublishEndpoint publishEndpoint,
         CancellationToken cancellationToken)
     {
         try
@@ -120,7 +121,7 @@ public class FlightOutboxPublishWorker : BackgroundService
             }
 
             // POLYMORPHIC PUBLISH: Runtime'da tipi bul ve yayınla
-            var published = await PublishMessagePolymorphicallyAsync(message, cancellationToken);
+            var published = await PublishMessagePolymorphicallyAsync(message, publishEndpoint, cancellationToken);
 
             if (published)
             {
@@ -179,15 +180,27 @@ public class FlightOutboxPublishWorker : BackgroundService
     /// POLYMORPHIC PUBLISH: Runtime'da event tipini bulup yayınlar (Open/Closed Principle)
     /// Bu yaklaşım sayesinde yeni event tipleri eklerken bu kodu değiştirmene gerek yok.
     /// </summary>
-    private async Task<bool> PublishMessagePolymorphicallyAsync(OutboxMessage message, CancellationToken cancellationToken)
+    private async Task<bool> PublishMessagePolymorphicallyAsync(OutboxMessage message, IPublishEndpoint publishEndpoint, CancellationToken cancellationToken)
     {
         try
         {
             // 1. Event tipinin tam namespace'ini oluştur
             var fullTypeName = $"{EventNamespace}.{message.Type}";
             
-            // 2. Runtime'da tipi bul
+            // 2. Runtime'da tipi bul - Tüm yüklü assembly'lerde ara
             var eventType = Type.GetType(fullTypeName);
+            
+            // Eğer bulunamazsa, tüm yüklü assembly'lerde ara
+            if (eventType == null)
+            {
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    eventType = assembly.GetType(fullTypeName);
+                    if (eventType != null)
+                        break;
+                }
+            }
+            
             if (eventType == null)
             {
                 _logger.LogWarning(
@@ -207,11 +220,15 @@ public class FlightOutboxPublishWorker : BackgroundService
             }
 
             // 4. MassTransit'in object overload'unu kullanarak yayınla
-            // Bu, tip güvenli olmayan ama esnek bir yaklaşımdır
-            await _publishEndpoint.Publish(eventInstance, eventType, cancellationToken);
+            // ✅ SABİT MessageId: OutboxMessage.Id'yi kullan (Idempotency için KRİTİK!)
+            // Bu şekilde aynı OutboxMessage tekrar publish edilse bile AYNI MessageId olur
+            await publishEndpoint.Publish(eventInstance, eventType, ctx =>
+            {
+                ctx.MessageId = message.Id; // ← SENİN SİSTEMİNDEKİ GİBİ!
+            }, cancellationToken);
             
-            _logger.LogDebug(
-                "Event başarıyla yayınlandı. Type: {Type}, MessageId: {MessageId}",
+            _logger.LogInformation(
+                "✅ Event yayınlandı. Type: {Type}, MessageId: {MessageId} (OutboxMessage.Id)",
                 message.Type, message.Id);
             
             return true;

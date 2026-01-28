@@ -92,6 +92,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkySync.Gateway", "src\Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkySync.Shared", "src\Infrastructure\SkySync.Shared\SkySync.Shared.csproj", "{A101F850-4448-4E9E-B3D1-3A512C52E0B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkySync.SagaStateMachine", "src\Infrastructure\SkySync.SagaStateMachine\SkySync.SagaStateMachine.csproj", "{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -390,6 +392,18 @@ Global
 		{A101F850-4448-4E9E-B3D1-3A512C52E0B5}.Release|x64.Build.0 = Release|Any CPU
 		{A101F850-4448-4E9E-B3D1-3A512C52E0B5}.Release|x86.ActiveCfg = Release|Any CPU
 		{A101F850-4448-4E9E-B3D1-3A512C52E0B5}.Release|x86.Build.0 = Release|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Debug|x64.Build.0 = Debug|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Debug|x86.Build.0 = Debug|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Release|x64.ActiveCfg = Release|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Release|x64.Build.0 = Release|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Release|x86.ActiveCfg = Release|Any CPU
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -438,5 +452,6 @@ Global
 		{0767D1A0-A719-43B0-84C5-E0302E06C910} = {970848C9-401D-4202-851C-E43214DEB43A}
 		{DED44D97-0B34-4E26-8E1B-1B60F0798EDE} = {896AC4F0-EAF2-42CE-9839-BF2B275B799B}
 		{A101F850-4448-4E9E-B3D1-3A512C52E0B5} = {896AC4F0-EAF2-42CE-9839-BF2B275B799B}
+		{B94B2DED-E9AF-434B-82CE-DD2E599C9B62} = {896AC4F0-EAF2-42CE-9839-BF2B275B799B}
 	EndGlobalSection
 EndGlobal

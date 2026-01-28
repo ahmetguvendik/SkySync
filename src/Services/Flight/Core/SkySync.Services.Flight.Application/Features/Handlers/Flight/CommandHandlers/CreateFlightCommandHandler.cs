@@ -5,7 +5,6 @@ using SkySync.Services.Flight.Application.Features.Commands.Flight.Requests;
 using SkySync.Services.Flight.Application.Features.Commands.Flight.Responses;
 using SkySync.Services.Flight.Application.Interfaces;
 using SkySync.Services.Flight.Application.UnitOfWorks;
-using SkySync.Services.Flight.Domain.Entities;
 using SkySync.Shared.Events;
 using SkySync.Shared.OutboxTable;
 using FlightEntity = SkySync.Services.Flight.Domain.Entities.Flight;

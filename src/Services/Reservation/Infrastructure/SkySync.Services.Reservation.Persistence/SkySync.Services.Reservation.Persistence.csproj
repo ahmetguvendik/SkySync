@@ -1,9 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit.Newtonsoft" Version="8.5.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
+        <PackageReference Include="MassTransit" Version="8.5.0" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.0" />
+        <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\SkySync.Services.Reservation.Application\SkySync.Services.Reservation.Application.csproj" />
+        <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />
+        <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.SagaStateMachine\SkySync.SagaStateMachine.csproj" />
+    </ItemGroup>
 
 </Project>

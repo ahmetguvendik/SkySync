@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Q9VYRQMS+GM=",
+  "dgSpecHash": "BM4O9vBvBf0=",
   "success": true,
   "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Infrastructure/SkySync.Services.Flight.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -18,8 +18,9 @@
     "/Users/ahmetguvendik/.nuget/packages/microsoft.identitymodel.logging/8.14.0/microsoft.identitymodel.logging.8.14.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/microsoft.identitymodel.tokens/8.14.0/microsoft.identitymodel.tokens.8.14.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
-    "/Users/ahmetguvendik/.nuget/packages/stackexchange.redis/2.8.16/stackexchange.redis.2.8.16.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/stackexchange.redis/2.10.1/stackexchange.redis.2.10.1.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/system.diagnostics.diagnosticsource/10.0.0/system.diagnostics.diagnosticsource.10.0.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/system.io.hashing/9.0.10/system.io.hashing.9.0.10.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512"
   ],
   "logs": []
