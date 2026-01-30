@@ -38,11 +38,23 @@ namespace SkySync.SagaStateMachine.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
+                    b.Property<string>("Departure")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("text");
 
                     b.Property<Guid>("FlightId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("FlightNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("FlightReservedAt")
                         .HasColumnType("timestamp with time zone");
@@ -75,6 +87,9 @@ namespace SkySync.SagaStateMachine.Migrations
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
+
+                    b.Property<Guid?>("TimeoutTokenId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("CorrelationId");
 

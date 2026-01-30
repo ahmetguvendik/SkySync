@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkySync.Services.Notification.Application.Interfaces;
 using SkySync.Shared.Events;
+using SkySync.Shared.InboxPattern;
 
 namespace SkySync.Services.Notification.Persistence.Consumers;
 
@@ -34,106 +35,45 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
     {
         var msg = context.Message;
         var messageId = context.MessageId ?? Guid.NewGuid();
+        var businessKey = msg.FlightId.ToString();
 
         _logger.LogInformation(
             "📩 FlightCreated event received. MessageId: {MessageId}, FlightId: {FlightId}, FlightNumber: {FlightNumber}, Route: {Departure} → {Destination}",
             messageId, msg.FlightId, msg.FlightNumber, msg.Departure, msg.Destination);
 
-        // ✅ IDEMPOTENCY MARKER: Önce inbox'a kaydet (email göndermeden ÖNCE)
-        // Duplicate kontrolü burada yapılıyor (PK + unique index)
-        var businessKey = msg.FlightId.ToString();
-        var markedSuccess = await _inboxService.MarkAsProcessedAsync(
+        var processed = await _inboxService.TryProcessInTransactionAsync(
             messageId,
             nameof(FlightCreatedEvent),
             businessKey,
-            JsonSerializer.Serialize(msg));
+            JsonSerializer.Serialize(msg),
+            async ct => await SendFlightCreatedEmailsAsync(msg, ct),
+            context.CancellationToken);
 
-        if (!markedSuccess)
+        if (!processed)
         {
-            // Duplicate yakalandı (başka consumer zaten işledi/işliyor)
-            _logger.LogWarning(
-                "⏭️  Duplicate event detected, skipping. FlightId: {FlightId}, MessageId: {MessageId}",
-                msg.FlightId, messageId);
+            _logger.LogWarning("⏭️ Duplicate FlightCreated skipped. FlightId: {FlightId}, MessageId: {MessageId}", msg.FlightId, messageId);
+        }
+    }
+
+    private async Task SendFlightCreatedEmailsAsync(FlightCreatedEvent msg, CancellationToken ct)
+    {
+        var adminEmails = GetAdminEmails();
+        _logger.LogInformation("🔍 Admin email count: {Count}, FlightId: {FlightId}", adminEmails.Count, msg.FlightId);
+
+        if (!adminEmails.Any())
+        {
+            _logger.LogWarning("No admin emails configured for flight creation notifications.");
             return;
         }
 
-        _logger.LogInformation(
-            "✅ Event locked for processing. FlightId: {FlightId}, MessageId: {MessageId}",
-            msg.FlightId, messageId);
+        var subject = $"🛫 Yeni Uçuş Eklendi: {msg.FlightNumber}";
+        var body = GenerateEmailBody(msg);
 
-        try
+        foreach (var adminEmail in adminEmails)
         {
-            // Admin email listesi
-            var adminEmails = GetAdminEmails();
-
-            _logger.LogInformation(
-                "🔍 DEBUG: Admin email count: {Count}, Emails: {Emails}, FlightId: {FlightId}",
-                adminEmails.Count,
-                string.Join(", ", adminEmails),
-                msg.FlightId);
-
-            if (!adminEmails.Any())
-            {
-                _logger.LogWarning("No admin emails configured for flight creation notifications.");
-                
-                // Inbox'a kaydet (email yok ama işlendi sayılır)
-                await _inboxService.MarkAsProcessedAsync(
-                    messageId,
-                    nameof(FlightCreatedEvent),
-                    businessKey,
-                    JsonSerializer.Serialize(msg));
-                return;
-            }
-
-            var subject = $"🛫 Yeni Uçuş Eklendi: {msg.FlightNumber}";
-            var body = GenerateEmailBody(msg);
-
-            // Her admin'e email gönder
-            var emailsSent = 0;
-            var emailsFailed = 0;
-
-            foreach (var adminEmail in adminEmails)
-            {
-                try
-                {
-                    _logger.LogInformation(
-                        "📧 DEBUG: Sending email to {Email} for FlightId: {FlightId}",
-                        adminEmail, msg.FlightId);
-
-                    await _emailService.SendEmailAsync(adminEmail, subject, body);
-                    emailsSent++;
-                    _logger.LogInformation("✅ Flight creation notification sent to {Email}", adminEmail);
-                }
-                catch (Exception ex)
-                {
-                    emailsFailed++;
-                    _logger.LogError(ex, "Failed to send flight creation notification to {Email}", adminEmail);
-                    // Hata olsa bile diğer admin'lere göndermeye devam et
-                }
-            }
-
-            _logger.LogInformation(
-                "Flight creation notifications completed. Sent: {Sent}, Failed: {Failed}, MessageId: {MessageId}",
-                emailsSent, emailsFailed, messageId);
-
-            // Not: Inbox'a zaten kayıt yapıldı (idempotency marker olarak)
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex,
-                "Error processing FlightCreated event. MessageId: {MessageId}, FlightId: {FlightId}, FlightNumber: {FlightNumber}",
-                messageId, msg.FlightId, msg.FlightNumber);
-
-            // ❌ INBOX PATTERN: Hatalı olarak kaydet
-            await _inboxService.MarkAsFailedAsync(
-                messageId,
-                nameof(FlightCreatedEvent),
-                businessKey,
-                ex.Message,
-                JsonSerializer.Serialize(msg));
-
-            // Exception'ı tekrar fırlat (MassTransit retry veya DLQ'ya gönderir)
-            throw;
+            ct.ThrowIfCancellationRequested();
+            await _emailService.SendEmailAsync(adminEmail, subject, body);
+            _logger.LogInformation("✅ Flight creation notification sent to {Email}", adminEmail);
         }
     }
 
@@ -287,3 +227,4 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
             </div>";
     }
 }
+

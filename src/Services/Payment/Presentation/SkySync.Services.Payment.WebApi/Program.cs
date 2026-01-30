@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SkySync Payment API", Version = "v1" });
 });
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -27,5 +28,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

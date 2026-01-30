@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SkySync.Services.Notification.Application.Interfaces;
-using SkySync.Services.Notification.Domain.Entities;
 using SkySync.Services.Notification.Persistence.Contexts;
+using SkySync.Shared.InboxPattern;
 
 namespace SkySync.Services.Notification.Persistence.Services;
 
 /// <summary>
-/// Inbox Pattern implementation - PostgreSQL based
-/// Duplicate event handling ve idempotency garantisi
+/// Inbox Pattern – Notification servisi. Duplicate event / idempotency.
+/// Ana akış: <see cref="TryProcessInTransactionAsync"/> (FlightCreated, ReservationConfirmed consumer'ları sadece bunu kullanır).
+/// Diğer metotlar IInboxService sözleşmesi için; Notification tarafında çağrılmaz.
 /// </summary>
 public class InboxService : IInboxService
 {
@@ -21,173 +21,146 @@ public class InboxService : IInboxService
         _logger = logger;
     }
 
-    public async Task<bool> IsProcessedAsync(Guid messageId, CancellationToken cancellationToken = default)
+    // ----- Ana akış (Notification consumer'ları sadece bunu kullanır) -----
+
+    /// <summary>
+    /// Tx başlat → Insert Processing → work() → Update Processed → Commit.
+    /// Hata: Rollback, Inbox'a kayıt yok, rethrow (Nack). Duplicate: false döner, skip.
+    /// </summary>
+    public async Task<bool> TryProcessInTransactionAsync(
+        Guid messageId,
+        string eventType,
+        string businessKey,
+        string? eventPayload,
+        Func<CancellationToken, Task> work,
+        CancellationToken cancellationToken = default)
     {
+        await using var tx = await _context.Database.BeginTransactionAsync(cancellationToken);
+
         try
         {
-            var exists = await _context.InboxMessages
-                .AnyAsync(x => x.MessageId == messageId, cancellationToken);
-
-            if (exists)
+            if (await _context.InboxMessages.AnyAsync(
+                    x => x.EventType == eventType && x.BusinessKey == businessKey, cancellationToken))
             {
-                _logger.LogInformation("Message already processed. MessageId: {MessageId}", messageId);
+                await tx.RollbackAsync(cancellationToken);
+                _logger.LogWarning("Duplicate skipped. EventType: {EventType}, BusinessKey: {BusinessKey}", eventType, businessKey);
+                return false;
             }
 
-            return exists;
+            var inboxMessage = CreateMessage(messageId, eventType, businessKey, eventPayload, InboxStatus.Processing);
+            await _context.InboxMessages.AddAsync(inboxMessage, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await work(cancellationToken);
+
+            inboxMessage.Status = InboxStatus.Processed;
+            await _context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+
+            _logger.LogInformation("Inbox completed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+                messageId, eventType, businessKey);
+            return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking if message is processed. MessageId: {MessageId}", messageId);
-            // Hata durumunda false döndür, işleme devam etsin (at-least-once semantics)
-            return false;
+            await tx.RollbackAsync(cancellationToken);
+            _logger.LogError(ex, "Inbox failed, rolled back. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+                messageId, eventType, businessKey);
+            throw;
         }
     }
 
-    public async Task<bool> IsProcessedByBusinessKeyAsync(
-        string eventType,
-        string businessKey,
-        CancellationToken cancellationToken = default)
+    // ----- IInboxService sözleşmesi (Notification bunları kullanmıyor) -----
+
+    public async Task<bool> IsProcessedByBusinessKeyAsync(string eventType, string businessKey, CancellationToken cancellationToken = default)
     {
         try
         {
-            var exists = await _context.InboxMessages
-                .AnyAsync(x => x.EventType == eventType && x.BusinessKey == businessKey, cancellationToken);
-
-            if (exists)
-            {
-                _logger.LogInformation(
-                    "Event already processed by business key. EventType: {EventType}, BusinessKey: {BusinessKey}",
-                    eventType, businessKey);
-            }
-
-            return exists;
+            return await _context.InboxMessages.AnyAsync(
+                x => x.EventType == eventType && x.BusinessKey == businessKey, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                "Error checking if event is processed by business key. EventType: {EventType}, BusinessKey: {BusinessKey}",
-                eventType, businessKey);
-            // Hata durumunda false döndür, işleme devam etsin
+            _logger.LogError(ex, "IsProcessedByBusinessKey failed. EventType: {EventType}, BusinessKey: {BusinessKey}", eventType, businessKey);
             return false;
         }
     }
 
     public async Task<bool> MarkAsProcessedAsync(
-        Guid messageId,
-        string eventType,
-        string businessKey,
-        string? eventPayload = null, 
-        CancellationToken cancellationToken = default)
+        Guid messageId, string eventType, string businessKey, string? eventPayload = null, CancellationToken cancellationToken = default)
     {
         try
         {
-            var inboxMessage = new InboxMessage
-            {
-                MessageId = messageId,
-                BusinessKey = businessKey,
-                EventType = eventType,
-                ProcessedAt = DateTime.UtcNow,
-                Status = "Processed",
-                EventPayload = eventPayload,
-                RetryCount = 0
-            };
-
-            await _context.InboxMessages.AddAsync(inboxMessage, cancellationToken);
+            await _context.InboxMessages.AddAsync(
+                CreateMessage(messageId, eventType, businessKey, eventPayload, InboxStatus.Processed), cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation(
-                "✅ Message marked as processed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+            _logger.LogInformation("Marked processed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
                 messageId, eventType, businessKey);
-
-            return true; // Başarılı
+            return true;
         }
         catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key") == true)
         {
-            // Duplicate key error - başka bir instance zaten eklemiş (race condition)
-            _logger.LogWarning(
-                "⚠️ Event already exists in inbox (race condition - duplicate detected). EventType: {EventType}, BusinessKey: {BusinessKey}",
-                eventType, businessKey);
-
-            return false; // Duplicate!
+            _logger.LogWarning("Duplicate (race). EventType: {EventType}, BusinessKey: {BusinessKey}", eventType, businessKey);
+            return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, 
-                "❌ Error marking message as processed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+            _logger.LogError(ex, "MarkAsProcessed failed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
                 messageId, eventType, businessKey);
-
-            return false; // Hata
+            return false;
         }
     }
 
     public async Task MarkAsFailedAsync(
-        Guid messageId,
-        string eventType,
-        string businessKey,
-        string errorMessage, 
-        string? eventPayload = null,
+        Guid messageId, string eventType, string businessKey, string errorMessage, string? eventPayload = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            var inboxMessage = new InboxMessage
-            {
-                MessageId = messageId,
-                BusinessKey = businessKey,
-                EventType = eventType,
-                ProcessedAt = DateTime.UtcNow,
-                Status = "Failed",
-                EventPayload = eventPayload,
-                ErrorMessage = errorMessage,
-                RetryCount = 0
-            };
-
-            await _context.InboxMessages.AddAsync(inboxMessage, cancellationToken);
+            var m = CreateMessage(messageId, eventType, businessKey, eventPayload, InboxStatus.Failed);
+            m.ErrorMessage = errorMessage;
+            await _context.InboxMessages.AddAsync(m, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
-            _logger.LogWarning(
-                "Message marked as failed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}, Error: {Error}",
+            _logger.LogWarning("Marked failed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}, Error: {Error}",
                 messageId, eventType, businessKey, errorMessage);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, 
-                "Error marking message as failed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+            _logger.LogError(ex, "MarkAsFailed write failed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
                 messageId, eventType, businessKey);
         }
     }
 
     public async Task MarkAsSkippedAsync(
-        Guid messageId,
-        string eventType,
-        string businessKey,
-        CancellationToken cancellationToken = default)
+        Guid messageId, string eventType, string businessKey, string? eventPayload = null, CancellationToken cancellationToken = default)
     {
         try
         {
-            // Duplicate olduğu için skip edildi, ama inbox'a kaydet (tracking için)
-            var inboxMessage = new InboxMessage
-            {
-                MessageId = messageId,
-                BusinessKey = businessKey,
-                EventType = eventType,
-                ProcessedAt = DateTime.UtcNow,
-                Status = "Skipped",
-                RetryCount = 0
-            };
-
-            await _context.InboxMessages.AddAsync(inboxMessage, cancellationToken);
+            await _context.InboxMessages.AddAsync(
+                CreateMessage(messageId, eventType, businessKey, eventPayload, InboxStatus.Skipped), cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation(
-                "Message marked as skipped (duplicate). MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+            _logger.LogInformation("Marked skipped. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
                 messageId, eventType, businessKey);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, 
-                "Error marking message as skipped. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+            _logger.LogError(ex, "MarkAsSkipped failed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
                 messageId, eventType, businessKey);
         }
+    }
+
+    private static InboxMessage CreateMessage(
+        Guid messageId, string eventType, string businessKey, string? eventPayload, InboxStatus status)
+    {
+        return new InboxMessage
+        {
+            MessageId = messageId,
+            EventType = eventType,
+            BusinessKey = businessKey,
+            EventPayload = eventPayload,
+            Status = status,
+            ProcessedAt = DateTime.UtcNow,
+            RetryCount = 0
+        };
     }
 }

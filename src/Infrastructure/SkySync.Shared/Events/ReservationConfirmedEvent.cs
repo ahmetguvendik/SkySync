@@ -15,4 +15,9 @@ public class ReservationConfirmedEvent
     public string PassengerSurname { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public DateTime ConfirmedAt { get; set; }
+    
+    // Yolcuya giden mail için uçuş bilgileri
+    public string FlightNumber { get; set; } = string.Empty;
+    public string Departure { get; set; } = string.Empty;
+    public string Destination { get; set; } = string.Empty;
 }

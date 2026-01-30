@@ -91,21 +91,26 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// HTTPS Redirect - Only in Production (prevents CORS preflight issues in dev)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // MIDDLEWARE ORDER IS CRITICAL!
-// 1. Correlation ID Middleware (MUST BE FIRST - creates IDs for all downstream)
-app.UseCorrelationId();
 
-// 2. Request Logging (uses IDs from CorrelationIdMiddleware)
-app.UseMiddleware<RequestLoggingMiddleware>();
-
-// 3. Request/Response Transformation
-app.UseMiddleware<RequestTransformationMiddleware>();
-
-// CORS - Environment'a göre
+// 1. CORS - MUST BE EARLY (before other middleware that might reject preflight)
 var corsPolicy = app.Environment.IsDevelopment() ? "Development" : "Production";
 app.UseCors(corsPolicy);
+
+// 2. Correlation ID Middleware (creates IDs for all downstream)
+app.UseCorrelationId();
+
+// 3. Request Logging (uses IDs from CorrelationIdMiddleware)
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+// 4. Request/Response Transformation
+app.UseMiddleware<RequestTransformationMiddleware>();
 
 // 3. RATE LIMITING
 app.UseIpRateLimiting();

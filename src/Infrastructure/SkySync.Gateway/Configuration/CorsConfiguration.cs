@@ -9,12 +9,18 @@ public static class CorsConfiguration
     {
         services.AddCors(options =>
         {
-            // Development: Allow All
+            // Development: Allow localhost origins with credentials
             options.AddPolicy("Development", policy =>
             {
-                policy.AllowAnyOrigin()
+                policy.WithOrigins(
+                        "http://localhost:5173",  // Vite/React default
+                        "http://localhost:3000",  // React/Next.js default
+                        "http://localhost:4200",  // Angular default
+                        "http://localhost:8080"   // Vue default
+                      )
                       .AllowAnyMethod()
-                      .AllowAnyHeader();
+                      .AllowAnyHeader()
+                      .AllowCredentials();
             });
 
             // Production: Restricted

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SkySync.Shared.InboxPattern;
 using SkySync.Shared.OutboxTable;
 
 namespace SkySync.Services.Reservation.Persistence.Contexts;
@@ -11,6 +12,7 @@ public class ReservationServiceDbContext : DbContext
 
     public DbSet<SkySync.Services.Reservation.Domain.Entities.Reservation> Reservations { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
+    public DbSet<InboxMessage> InboxMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +47,24 @@ public class ReservationServiceDbContext : DbContext
             entity.Property(o => o.IsFailed).IsRequired().HasDefaultValue(false);
             entity.HasIndex(o => o.ProcessedOn);
             entity.HasIndex(o => new { o.IsFailed, o.ProcessedOn });
+        });
+
+        // InboxMessage Configuration - Idempotency for status consumers
+        modelBuilder.Entity<InboxMessage>(entity =>
+        {
+            entity.HasKey(i => i.MessageId);
+            entity.Property(i => i.BusinessKey).IsRequired().HasMaxLength(255);
+            entity.Property(i => i.EventType).IsRequired().HasMaxLength(255);
+            entity.Property(i => i.ProcessedAt).IsRequired();
+            entity.Property(i => i.Status).HasConversion<string>().IsRequired().HasMaxLength(50);
+            entity.Property(i => i.EventPayload).HasColumnType("text");
+            entity.Property(i => i.ErrorMessage).HasMaxLength(1000);
+            entity.Property(i => i.RetryCount).IsRequired().HasDefaultValue(0);
+            entity.HasIndex(i => i.EventType);
+            entity.HasIndex(i => i.ProcessedAt);
+            entity.HasIndex(i => new { i.EventType, i.ProcessedAt });
+            entity.HasIndex(i => i.Status);
+            entity.HasIndex(i => new { i.EventType, i.BusinessKey }).IsUnique();
         });
     }
 }

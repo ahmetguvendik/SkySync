@@ -62,6 +62,60 @@ namespace SkySync.Services.Payment.Persistence.Migrations
 
                     b.ToTable("PaymentTransactions");
                 });
+
+            modelBuilder.Entity("SkySync.Shared.InboxPattern.InboxMessage", b =>
+                {
+                    b.Property<Guid>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BusinessKey")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("EventPayload")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RetryCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Processed");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("EventType");
+
+                    b.HasIndex("ProcessedAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("EventType", "BusinessKey")
+                        .IsUnique();
+
+                    b.HasIndex("EventType", "ProcessedAt");
+
+                    b.ToTable("InboxMessages");
+                });
 #pragma warning restore 612, 618
         }
     }

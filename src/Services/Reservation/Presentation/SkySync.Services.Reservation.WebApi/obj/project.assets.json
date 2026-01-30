@@ -85,6 +85,24 @@
           }
         }
       },
+      "MassTransit.Quartz/8.5.0": {
+        "type": "package",
+        "dependencies": {
+          "MassTransit": "8.5.0",
+          "Quartz": "3.14.0",
+          "Quartz.Extensions.Hosting": "3.14.0"
+        },
+        "compile": {
+          "lib/net9.0/MassTransit.QuartzIntegration.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/MassTransit.QuartzIntegration.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "MassTransit.RabbitMQ/8.5.0": {
         "type": "package",
         "dependencies": {
@@ -1035,6 +1053,57 @@
           }
         }
       },
+      "Quartz/3.14.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "2.1.1"
+        },
+        "compile": {
+          "lib/net9.0/Quartz.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/Quartz.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Quartz.Extensions.DependencyInjection/3.14.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Options": "9.0.0",
+          "Quartz": "3.14.0"
+        },
+        "compile": {
+          "lib/net9.0/Quartz.Extensions.DependencyInjection.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/Quartz.Extensions.DependencyInjection.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Quartz.Extensions.Hosting/3.14.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Hosting.Abstractions": "9.0.0",
+          "Quartz.Extensions.DependencyInjection": "3.14.0"
+        },
+        "compile": {
+          "lib/net9.0/Quartz.Extensions.Hosting.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/Quartz.Extensions.Hosting.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "RabbitMQ.Client/7.1.2": {
         "type": "package",
         "dependencies": {
@@ -1428,9 +1497,12 @@
           "MassTransit": "8.5.0",
           "MassTransit.EntityFrameworkCore": "8.5.0",
           "MassTransit.Newtonsoft": "8.5.0",
+          "MassTransit.Quartz": "8.5.0",
           "MassTransit.RabbitMQ": "8.5.0",
           "Microsoft.EntityFrameworkCore": "9.0.1",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.2",
+          "Quartz": "3.14.0",
+          "Quartz.Extensions.Hosting": "3.14.0",
           "SkySync.SagaStateMachine": "1.0.0",
           "SkySync.Services.Reservation.Application": "1.0.0",
           "SkySync.Shared": "1.0.0"
@@ -1550,6 +1622,27 @@
         "lib/netstandard2.0/MassTransit.Newtonsoft.xml",
         "masstransit.newtonsoft.8.5.0.nupkg.sha512",
         "masstransit.newtonsoft.nuspec",
+        "mt-logo-small.png"
+      ]
+    },
+    "MassTransit.Quartz/8.5.0": {
+      "sha512": "fb4E2/4naWkmF1wqB4nEDDgermcxfKnQcCy8j+CgNETED/hQc95XzU0k/LrizgW7PE/VyfXCZawKx7sCSr5F+Q==",
+      "type": "package",
+      "path": "masstransit.quartz/8.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NuGet.README.md",
+        "lib/net472/MassTransit.QuartzIntegration.dll",
+        "lib/net472/MassTransit.QuartzIntegration.xml",
+        "lib/net8.0/MassTransit.QuartzIntegration.dll",
+        "lib/net8.0/MassTransit.QuartzIntegration.xml",
+        "lib/net9.0/MassTransit.QuartzIntegration.dll",
+        "lib/net9.0/MassTransit.QuartzIntegration.xml",
+        "lib/netstandard2.0/MassTransit.QuartzIntegration.dll",
+        "lib/netstandard2.0/MassTransit.QuartzIntegration.xml",
+        "masstransit.quartz.8.5.0.nupkg.sha512",
+        "masstransit.quartz.nuspec",
         "mt-logo-small.png"
       ]
     },
@@ -3598,6 +3691,67 @@
         "npgsql.entityframeworkcore.postgresql.9.0.2.nupkg.sha512",
         "npgsql.entityframeworkcore.postgresql.nuspec",
         "postgresql.png"
+      ]
+    },
+    "Quartz/3.14.0": {
+      "sha512": "j8mY6S0FWbtuEFbStUEZAkkGpZLbSuTT0us1w0DUQqhi+vwg/7XXS36TeH3o34zZoqYGyXvk6jrKnW/p6kS8sg==",
+      "type": "package",
+      "path": "quartz/3.14.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net462/Quartz.dll",
+        "lib/net462/Quartz.xml",
+        "lib/net472/Quartz.dll",
+        "lib/net472/Quartz.xml",
+        "lib/net8.0/Quartz.dll",
+        "lib/net8.0/Quartz.xml",
+        "lib/net9.0/Quartz.dll",
+        "lib/net9.0/Quartz.xml",
+        "lib/netstandard2.0/Quartz.dll",
+        "lib/netstandard2.0/Quartz.xml",
+        "quartz-logo-small.png",
+        "quartz.3.14.0.nupkg.sha512",
+        "quartz.nuspec",
+        "quick-start.md"
+      ]
+    },
+    "Quartz.Extensions.DependencyInjection/3.14.0": {
+      "sha512": "CUY9ZaUsmnl8YxPcl3eXmg/1UVWv1NdyATKGaBjfxf8MYH36vgCoerv7aCSjM/oRbdiaBwNnPfNgHMzxUu1p1g==",
+      "type": "package",
+      "path": "quartz.extensions.dependencyinjection/3.14.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net8.0/Quartz.Extensions.DependencyInjection.dll",
+        "lib/net8.0/Quartz.Extensions.DependencyInjection.xml",
+        "lib/net9.0/Quartz.Extensions.DependencyInjection.dll",
+        "lib/net9.0/Quartz.Extensions.DependencyInjection.xml",
+        "lib/netstandard2.0/Quartz.Extensions.DependencyInjection.dll",
+        "lib/netstandard2.0/Quartz.Extensions.DependencyInjection.xml",
+        "microsoft-di-integration.md",
+        "quartz-logo-small.png",
+        "quartz.extensions.dependencyinjection.3.14.0.nupkg.sha512",
+        "quartz.extensions.dependencyinjection.nuspec"
+      ]
+    },
+    "Quartz.Extensions.Hosting/3.14.0": {
+      "sha512": "kbxBND5Nift+qwOud8cjywoLvjcQX+aLt6R7qQcQVg8w84NUNjTsjzZ5zIod9vz7ricSvIaQXGVbhpm7X6yVQA==",
+      "type": "package",
+      "path": "quartz.extensions.hosting/3.14.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "hosted-services-integration.md",
+        "lib/net8.0/Quartz.Extensions.Hosting.dll",
+        "lib/net8.0/Quartz.Extensions.Hosting.xml",
+        "lib/net9.0/Quartz.Extensions.Hosting.dll",
+        "lib/net9.0/Quartz.Extensions.Hosting.xml",
+        "lib/netstandard2.0/Quartz.Extensions.Hosting.dll",
+        "lib/netstandard2.0/Quartz.Extensions.Hosting.xml",
+        "quartz-logo-small.png",
+        "quartz.extensions.hosting.3.14.0.nupkg.sha512",
+        "quartz.extensions.hosting.nuspec"
       ]
     },
     "RabbitMQ.Client/7.1.2": {

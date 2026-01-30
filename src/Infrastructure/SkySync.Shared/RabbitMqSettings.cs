@@ -11,4 +11,8 @@ public static class RabbitMqSettings
 
     // Payment Service Queues
     public const string PaymentProcessQueue = "payment-process-queue";
+
+    // Notification Service Queues
+    public const string NotificationReservationConfirmedQueue = "notification-confirmed-queue";
+    public const string NotificationFlightCreatedQueue = "notification-flight-created-queue";
 }

@@ -6,6 +6,8 @@ using SkySync.Services.Notification.Application.Interfaces;
 using SkySync.Services.Notification.Persistence.Consumers;
 using SkySync.Services.Notification.Persistence.Contexts;
 using SkySync.Services.Notification.Persistence.Services;
+using SkySync.Shared;
+using SkySync.Shared.InboxPattern;
 
 namespace SkySync.Services.Notification.Persistence;
 
@@ -33,13 +35,15 @@ public static class ServiceRegistration
                 var rabbitMqConnectionString = configuration["RabbitMQ:ConnectionString"];
                 cfg.Host(rabbitMqConnectionString);
 
-                cfg.ReceiveEndpoint("notification-confirmed-queue", e =>
+                cfg.ReceiveEndpoint(RabbitMqSettings.NotificationReservationConfirmedQueue, e =>
                 {
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
                     e.ConfigureConsumer<ReservationConfirmedConsumer>(context);
                 });
 
-                cfg.ReceiveEndpoint("notification-flight-created-queue", e =>
+                cfg.ReceiveEndpoint(RabbitMqSettings.NotificationFlightCreatedQueue, e =>
                 {
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
                     e.ConfigureConsumer<FlightCreatedConsumer>(context);
                 });
             });

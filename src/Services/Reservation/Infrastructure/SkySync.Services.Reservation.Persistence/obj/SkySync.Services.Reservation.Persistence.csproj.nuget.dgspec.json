@@ -60,6 +60,12 @@
               "target": "Package",
               "version": "[9.0.1, )"
             },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.1, )"
+            },
             "Microsoft.Extensions.Logging.Abstractions": {
               "target": "Package",
               "version": "[9.0.1, )"
@@ -347,6 +353,10 @@
               "target": "Package",
               "version": "[8.5.0, )"
             },
+            "MassTransit.Quartz": {
+              "target": "Package",
+              "version": "[8.5.0, )"
+            },
             "MassTransit.RabbitMQ": {
               "target": "Package",
               "version": "[8.5.0, )"
@@ -358,6 +368,14 @@
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[9.0.2, )"
+            },
+            "Quartz": {
+              "target": "Package",
+              "version": "[3.14.0, )"
+            },
+            "Quartz.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[3.14.0, )"
             }
           },
           "imports": [

@@ -88,3 +88,7 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MassTransit.Newtonsoft.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Newtonsoft.Json.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Newtonsoft.Json.Bson.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/MassTransit.QuartzIntegration.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Quartz.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Quartz.Extensions.DependencyInjection.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Quartz.Extensions.Hosting.dll

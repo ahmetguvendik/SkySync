@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SkySync.Services.Notification.Domain.Entities;
+using SkySync.Shared.InboxPattern;
 
 namespace SkySync.Services.Notification.Persistence.Contexts;
 
@@ -13,7 +13,7 @@ public class NotificationServiceDbContext : DbContext
     }
 
     /// <summary>
-    /// Inbox Messages - Duplicate event handling için
+    /// Inbox Messages - Duplicate event handling için (Shared'dan)
     /// </summary>
     public DbSet<InboxMessage> InboxMessages { get; set; }
 
@@ -38,9 +38,9 @@ public class NotificationServiceDbContext : DbContext
                 .IsRequired();
 
             entity.Property(i => i.Status)
+                .HasConversion<string>()
                 .IsRequired()
-                .HasMaxLength(50)
-                .HasDefaultValue("Processed");
+                .HasMaxLength(50);
 
             entity.Property(i => i.EventPayload)
                 .HasColumnType("text");

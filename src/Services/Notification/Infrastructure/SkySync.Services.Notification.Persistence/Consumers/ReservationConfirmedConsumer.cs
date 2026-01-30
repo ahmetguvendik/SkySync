@@ -2,6 +2,7 @@ using System.Text.Json;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using SkySync.Services.Notification.Application.Interfaces;
+using SkySync.Shared.InboxPattern;
 using SkySync.Shared.Events;
 
 namespace SkySync.Services.Notification.Persistence.Consumers;
@@ -29,70 +30,48 @@ public class ReservationConfirmedConsumer : IConsumer<ReservationConfirmedEvent>
     {
         var msg = context.Message;
         var messageId = context.MessageId ?? Guid.NewGuid();
+        var businessKey = msg.ReservationId.ToString();
 
         _logger.LogInformation(
             "📩 ReservationConfirmed event received. MessageId: {MessageId}, Email: {Email}, ReservationId: {ReservationId}",
             messageId, msg.PassengerEmail, msg.ReservationId);
 
-        // ✅ IDEMPOTENCY MARKER: Önce inbox'a kaydet (email göndermeden ÖNCE)
-        var businessKey = msg.ReservationId.ToString();
-        var markedSuccess = await _inboxService.MarkAsProcessedAsync(
+        var processed = await _inboxService.TryProcessInTransactionAsync(
             messageId,
             nameof(ReservationConfirmedEvent),
             businessKey,
-            JsonSerializer.Serialize(msg));
+            JsonSerializer.Serialize(msg),
+            async ct => await SendReservationConfirmedEmailAsync(msg, ct),
+            context.CancellationToken);
 
-        if (!markedSuccess)
+        if (!processed)
         {
-            // Duplicate yakalandı (başka consumer zaten işledi/işliyor)
-            _logger.LogWarning(
-                "⏭️  Duplicate event detected, skipping. ReservationId: {ReservationId}, MessageId: {MessageId}",
-                msg.ReservationId, messageId);
-            return;
+            _logger.LogWarning("⏭️ Duplicate ReservationConfirmed skipped. ReservationId: {ReservationId}, MessageId: {MessageId}", msg.ReservationId, messageId);
         }
+    }
 
-        _logger.LogInformation(
-            "✅ Event locked for processing. ReservationId: {ReservationId}, MessageId: {MessageId}",
-            msg.ReservationId, messageId);
-
-        try
-        {
-            var subject = "SkySync - Biletiniz Hazır!";
-            var body = $@"
+    private async Task SendReservationConfirmedEmailAsync(ReservationConfirmedEvent msg, CancellationToken ct)
+    {
+        var subject = "SkySync - Biletiniz Hazır!";
+        var routeLine =
+            !string.IsNullOrWhiteSpace(msg.FlightNumber) &&
+            !string.IsNullOrWhiteSpace(msg.Departure) &&
+            !string.IsNullOrWhiteSpace(msg.Destination)
+                ? $"<li>Uçuş: {msg.FlightNumber} - {msg.Departure} → {msg.Destination}</li>"
+                : string.Empty;
+        var body = $@"
                 <h1>Sayın {msg.PassengerName} {msg.PassengerSurname},</h1>
                 <p>Rezervasyonunuz başarıyla tamamlanmıştır.</p>
                 <p><strong>Uçuş Bilgileri:</strong></p>
                 <ul>
-                    <li>Rezervasyon ID: {msg.ReservationId}</li>
-                    <li>Uçuş ID: {msg.FlightId}</li>
+                    {routeLine}
                     <li>Koltuk: {msg.SeatNumber}</li>
                     <li>Tutar: {msg.Price} TL</li>
                 </ul>
                 <p>Bizi tercih ettiğiniz için teşekkür ederiz!</p>
                 <p><em>SkySync Ekibi</em></p>";
 
-            await _emailService.SendEmailAsync(msg.PassengerEmail, subject, body);
-
-            _logger.LogInformation("Reservation confirmation email sent to {Email}", msg.PassengerEmail);
-
-            // Not: Inbox'a zaten kayıt yapıldı (idempotency marker olarak)
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex,
-                "Error sending reservation confirmation email. MessageId: {MessageId}, Email: {Email}, ReservationId: {ReservationId}",
-                messageId, msg.PassengerEmail, msg.ReservationId);
-
-            // ❌ INBOX PATTERN: Hatalı olarak kaydet
-            await _inboxService.MarkAsFailedAsync(
-                messageId,
-                nameof(ReservationConfirmedEvent),
-                businessKey,
-                ex.Message,
-                JsonSerializer.Serialize(msg));
-
-            // Exception'ı tekrar fırlat (MassTransit retry veya DLQ'ya gönderir)
-            throw;
-        }
+        await _emailService.SendEmailAsync(msg.PassengerEmail, subject, body);
+        _logger.LogInformation("Reservation confirmation email sent to {Email}", msg.PassengerEmail);
     }
 }

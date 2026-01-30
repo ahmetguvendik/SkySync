@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkySync.Services.Flight.Application.DTOs;
 using SkySync.Services.Flight.Application.Features.Queries.Flight.Requests;
@@ -36,7 +37,7 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
     {
         try
         {
-            // CACHE ASIDE PATTERN: Önce cache'e bak
+            // CACHE ASIDE PATTERN: Önce cachee bak
             var cachedFlights = await _cacheService.GetAsync<List<FlightDto>>(CacheKey, cancellationToken);
             
             if (cachedFlights != null && cachedFlights.Any())
@@ -79,8 +80,13 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
                 // Lock alındı veya alınamadı ama cache hala boş - DB'den al
                 _logger.LogInformation("Cache miss. Fetching flights from database...");
                 
-                // DB'den uçuşları al (Soft delete kontrolü ile)
-                var flights = await _flightRepository.GetAllAsync(cancellationToken);
+                // DB'den uçuşları al (Soft delete kontrolü + Seats navigation dahil)
+                var flights = await _flightRepository
+                    .GetQueryable()
+                    .Include(f => f.Seats)
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+
                 var activeFlights = flights.Where(f => !f.IsDeleted).ToList();
 
                 // Domain entity'den DTO'ya manuel mapping

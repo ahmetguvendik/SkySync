@@ -18,16 +18,23 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
     private readonly IGenericRepository<FlightEntity> _flightRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateFlightCommandHandler> _logger;
+    private readonly ICacheService _cacheService;
+
+    // Flights listesi cache key'i - GetAllFlightsQueryHandler ile aynı olmalı
+    // Orada: private const string CacheKey = "flights:all";
+    private const string FlightsCacheKey = "flights:all";
 
     public CreateFlightCommandHandler(
         IOutboxRepository outboxRepository,
         IGenericRepository<FlightEntity> flightRepository,
         IUnitOfWork unitOfWork,
+        ICacheService cacheService,
         ILogger<CreateFlightCommandHandler> logger)
     {
         _outboxRepository = outboxRepository;
         _flightRepository = flightRepository;
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -100,6 +107,19 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
             _logger.LogInformation("Flight created successfully. FlightId: {FlightId}, FlightNumber: {FlightNumber}, Seats: {SeatCount}",
                 flightId, request.FlightNumber, seats.Count);
 
+            // 4. ADIM: Cache Invalidasyonu (Cache-Aside Pattern için kritik!)
+            try
+            {
+                await _cacheService.RemoveAsync(FlightsCacheKey, cancellationToken);
+                _logger.LogInformation("Flight cache invalidated for key {Key}", FlightsCacheKey);
+            }
+            catch (Exception cacheEx)
+            {
+                // Cache hatası uçuş oluşturmayı bozmamalı, sadece logla
+                _logger.LogWarning(cacheEx,
+                    "Failed to invalidate flight cache for key {Key}", FlightsCacheKey);
+            }
+
             return new CreateFlightCommandResponse
             {
                 FlightId = flightId,
@@ -135,16 +155,27 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
     /// <summary>
     /// Uçuş için otomatik koltuklar oluşturur.
     /// Standart uçak yapısı: 30 satır x 6 sütun (A, B, C, D, E, F) = 180 koltuk
+    /// 
+    /// PREMIUM FİYATLANDIRMA:
+    /// - İlk 10 sıra (1A-10F): Premium Class - BasePrice * 1.5
+    /// - Son 20 sıra (11A-30F): Economy Class - BasePrice
     /// </summary>
     private static List<SeatEntity> GenerateSeats(Guid flightId, decimal basePrice)
     {
         var seats = new List<SeatEntity>();
         var seatLetters = new[] { "A", "B", "C", "D", "E", "F" };
         const int totalRows = 30;
+        const int premiumRows = 10; // İlk 10 sıra Premium
+        const decimal premiumMultiplier = 1.5m; // %50 daha pahalı
         var now = DateTime.UtcNow;
 
         for (int row = 1; row <= totalRows; row++)
         {
+            // İlk 10 sıra Premium, geri kalanı Economy
+            var seatPrice = row <= premiumRows 
+                ? basePrice * premiumMultiplier  // Premium Class
+                : basePrice;                      // Economy Class
+
             foreach (var letter in seatLetters)
             {
                 var seat = new SeatEntity
@@ -152,7 +183,7 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
                     Id = Guid.NewGuid(),
                     FlightId = flightId,
                     SeatNumber = $"{row}{letter}",
-                    Price = basePrice,
+                    Price = seatPrice,
                     IsReserved = false,
                     UserId = null,
                     CreatedTime = now,

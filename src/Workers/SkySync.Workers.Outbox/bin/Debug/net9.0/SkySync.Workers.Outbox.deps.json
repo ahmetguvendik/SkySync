@@ -71,6 +71,19 @@
           }
         }
       },
+      "MassTransit.Quartz/8.5.0": {
+        "dependencies": {
+          "MassTransit": "8.5.0",
+          "Quartz": "3.14.0",
+          "Quartz.Extensions.Hosting": "3.14.0"
+        },
+        "runtime": {
+          "lib/net9.0/MassTransit.QuartzIntegration.dll": {
+            "assemblyVersion": "8.5.0.0",
+            "fileVersion": "8.5.0.0"
+          }
+        }
+      },
       "MassTransit.RabbitMQ/8.5.0": {
         "dependencies": {
           "MassTransit": "8.5.0",
@@ -635,6 +648,42 @@
           }
         }
       },
+      "Quartz/3.14.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.0"
+        },
+        "runtime": {
+          "lib/net9.0/Quartz.dll": {
+            "assemblyVersion": "3.14.0.0",
+            "fileVersion": "3.14.0.0"
+          }
+        }
+      },
+      "Quartz.Extensions.DependencyInjection/3.14.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.12",
+          "Quartz": "3.14.0"
+        },
+        "runtime": {
+          "lib/net9.0/Quartz.Extensions.DependencyInjection.dll": {
+            "assemblyVersion": "3.14.0.0",
+            "fileVersion": "3.14.0.0"
+          }
+        }
+      },
+      "Quartz.Extensions.Hosting/3.14.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Hosting.Abstractions": "9.0.9",
+          "Quartz.Extensions.DependencyInjection": "3.14.0"
+        },
+        "runtime": {
+          "lib/net9.0/Quartz.Extensions.Hosting.dll": {
+            "assemblyVersion": "3.14.0.0",
+            "fileVersion": "3.14.0.0"
+          }
+        }
+      },
       "RabbitMQ.Client/7.1.2": {
         "dependencies": {
           "System.IO.Pipelines": "8.0.0",
@@ -705,6 +754,7 @@
       "SkySync.Services.Flight.Application/1.0.0": {
         "dependencies": {
           "MediatR": "14.0.0",
+          "Microsoft.EntityFrameworkCore": "9.0.12",
           "SkySync.Services.Flight.Domain": "1.0.0",
           "SkySync.Shared": "1.0.0"
         },
@@ -770,9 +820,12 @@
           "MassTransit": "8.5.0",
           "MassTransit.EntityFrameworkCore": "8.5.0",
           "MassTransit.Newtonsoft": "8.5.0",
+          "MassTransit.Quartz": "8.5.0",
           "MassTransit.RabbitMQ": "8.5.0",
           "Microsoft.EntityFrameworkCore": "9.0.12",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
+          "Quartz": "3.14.0",
+          "Quartz.Extensions.Hosting": "3.14.0",
           "SkySync.SagaStateMachine": "1.0.0",
           "SkySync.Services.Reservation.Application": "1.0.0",
           "SkySync.Shared": "1.0.0"
@@ -827,6 +880,13 @@
       "sha512": "sha512-+UqdXWyiiaJyu4WE13wIQflPwjX71a0uuFILoUQgad2No9AHb6ZDogejr/htzKsMgrbnGH0fiiLoZNW5+f7RDA==",
       "path": "masstransit.newtonsoft/8.5.0",
       "hashPath": "masstransit.newtonsoft.8.5.0.nupkg.sha512"
+    },
+    "MassTransit.Quartz/8.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fb4E2/4naWkmF1wqB4nEDDgermcxfKnQcCy8j+CgNETED/hQc95XzU0k/LrizgW7PE/VyfXCZawKx7sCSr5F+Q==",
+      "path": "masstransit.quartz/8.5.0",
+      "hashPath": "masstransit.quartz.8.5.0.nupkg.sha512"
     },
     "MassTransit.RabbitMQ/8.5.0": {
       "type": "package",
@@ -1149,6 +1209,27 @@
       "sha512": "sha512-mw5vcY2IEc7L+IeGrxpp/J5OSnCcjkjAgJYCm/eD52wpZze8zsSifdqV7zXslSMmfJG2iIUGZyo3KuDtEFKwMQ==",
       "path": "npgsql.entityframeworkcore.postgresql/9.0.4",
       "hashPath": "npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512"
+    },
+    "Quartz/3.14.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-j8mY6S0FWbtuEFbStUEZAkkGpZLbSuTT0us1w0DUQqhi+vwg/7XXS36TeH3o34zZoqYGyXvk6jrKnW/p6kS8sg==",
+      "path": "quartz/3.14.0",
+      "hashPath": "quartz.3.14.0.nupkg.sha512"
+    },
+    "Quartz.Extensions.DependencyInjection/3.14.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CUY9ZaUsmnl8YxPcl3eXmg/1UVWv1NdyATKGaBjfxf8MYH36vgCoerv7aCSjM/oRbdiaBwNnPfNgHMzxUu1p1g==",
+      "path": "quartz.extensions.dependencyinjection/3.14.0",
+      "hashPath": "quartz.extensions.dependencyinjection.3.14.0.nupkg.sha512"
+    },
+    "Quartz.Extensions.Hosting/3.14.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kbxBND5Nift+qwOud8cjywoLvjcQX+aLt6R7qQcQVg8w84NUNjTsjzZ5zIod9vz7ricSvIaQXGVbhpm7X6yVQA==",
+      "path": "quartz.extensions.hosting/3.14.0",
+      "hashPath": "quartz.extensions.hosting.3.14.0.nupkg.sha512"
     },
     "RabbitMQ.Client/7.1.2": {
       "type": "package",
