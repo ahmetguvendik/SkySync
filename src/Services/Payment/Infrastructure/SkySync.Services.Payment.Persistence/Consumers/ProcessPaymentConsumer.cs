@@ -59,9 +59,8 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
 
         try
         {
-            // YENİ AKIŞ: Authorize işlemi (para çekilmez, sadece rezerve)
-            // Ödeme İşlemini Simüle Et (5000 TL üzeri fail olsun)
-            bool isSuccess = msg.Amount < 5000;
+            // Ödeme simülasyonu: 2000 TL üzeri red
+            bool isSuccess = msg.Amount <= 2000;
             var authorizationId = Guid.NewGuid().ToString(); // Payment gateway'den gelen authorization ID
 
             var paymentTransaction = new PaymentTransaction
@@ -72,7 +71,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
                 Amount = msg.Amount,
                 Status = isSuccess ? PaymentStatus.Pending : PaymentStatus.Failed, // Authorize için Pending
                 ExternalTransactionId = authorizationId,
-                ErrorMessage = isSuccess ? null : "Yetersiz bakiye veya limit aşımı.",
+                ErrorMessage = isSuccess ? null : "2000 TL limit aşımı. Tutar: " + msg.Amount + " TL",
                 CreatedDate = DateTime.UtcNow
             };
 
@@ -85,14 +84,15 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
                     "✅ Payment authorized (not captured yet). ReservationId: {ResId}, AuthorizationId: {AuthId}",
                     msg.ReservationId, authorizationId);
 
-                // YENİ: PaymentAuthorizedEvent publish et (para çekilmedi, sadece authorize)
-                await context.Publish(new PaymentAuthorizedEvent
+                // Saga PaymentCompletedEvent bekliyor - authorize başarılı = ödeme tamamlandı
+                await context.Publish(new PaymentCompletedEvent
                 {
                     CorrelationId = msg.CorrelationId,
                     ReservationId = msg.ReservationId,
                     Amount = msg.Amount,
-                    AuthorizationId = authorizationId,
-                    AuthorizedAt = DateTime.UtcNow
+                    PaymentMethod = "Card",
+                    TransactionId = authorizationId,
+                    CompletedAt = DateTime.UtcNow
                 });
             }
             else

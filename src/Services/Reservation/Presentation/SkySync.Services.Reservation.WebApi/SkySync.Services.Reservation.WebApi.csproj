@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+        <PackageReference Include="Steeltoe.Discovery.Eureka" Version="4.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
           <PrivateAssets>all</PrivateAssets>

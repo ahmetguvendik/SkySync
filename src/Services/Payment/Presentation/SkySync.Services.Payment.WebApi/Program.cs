@@ -1,6 +1,6 @@
 using Microsoft.OpenApi.Models;
+using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Payment.Persistence;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,9 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SkySync Payment API", Version = "v1" });
 });
 builder.Services.AddHealthChecks();
+
+// Eureka Service Discovery - Register with Eureka
+builder.Services.AddEurekaDiscoveryClient();
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
 using System.Reflection;
+using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Flight.Infrastructure.Cache;
 using SkySync.Services.Flight.Persistence;
 
@@ -22,6 +23,9 @@ builder.Services.AddMassTransitService(builder.Configuration);
 
 // Add Cache Service (Redis)
 builder.Services.AddCacheService(builder.Configuration);
+
+// Eureka Service Discovery - Register with Eureka
+builder.Services.AddEurekaDiscoveryClient();
 
 var app = builder.Build();
 

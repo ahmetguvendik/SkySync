@@ -1,4 +1,5 @@
 using System.Reflection;
+using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Reservation.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,9 @@ builder.Services.AddPersistenceService(builder.Configuration);
 
 // Add MassTransit with RabbitMQ and Saga State Machine
 builder.Services.AddMassTransitService(builder.Configuration);
+
+// Eureka Service Discovery - Register with Eureka
+builder.Services.AddEurekaDiscoveryClient();
 
 var app = builder.Build();
 
