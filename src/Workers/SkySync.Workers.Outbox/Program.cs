@@ -1,7 +1,8 @@
 using MassTransit;
 using FlightPersistence = SkySync.Services.Flight.Persistence;
 using ReservationPersistence = SkySync.Services.Reservation.Persistence;
-using SkySync.Workers.Outbox.Jobs;
+using SkySync.Workers.Outbox.Jobs.Flight;
+using SkySync.Workers.Outbox.Jobs.Reservation;
 
 var builder = Host.CreateApplicationBuilder(args);
 
