@@ -8,10 +8,10 @@ using SkySync.SagaStateMachine.StateDbContexts;
 using SkySync.SagaStateMachine.StateInstances;
 using SkySync.SagaStateMachine.StateMachines;
 using SkySync.Services.Reservation.Application.Interfaces;
+using SkySync.Services.Reservation.Persistence.Services;
 using SkySync.Services.Reservation.Application.UnitOfWorks;
 using SkySync.Services.Reservation.Persistence.Contexts;
 using SkySync.Services.Reservation.Persistence.Repositories;
-using SkySync.Services.Reservation.Persistence.Services;
 using SkySync.Services.Reservation.Persistence.UnitOfWorks;
 using SkySync.Shared;
 using SkySync.Shared.Commands;
@@ -33,6 +33,9 @@ public static class ServiceRegistration
         collection.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         collection.AddScoped<IOutboxRepository, OutboxRepository>();
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Read model – yolcu rezervasyonları + FlightNumber (FlightSummary join)
+        collection.AddScoped<IPassengerReservationsRepository, PassengerReservationsRepository>();
 
         // Inbox — status consumer idempotency
         collection.AddScoped<IInboxService, InboxService>();
@@ -78,6 +81,8 @@ public static class ServiceRegistration
             x.AddConsumer<ReservationSeatFailedStatusConsumer>();
             x.AddConsumer<ReservationPaymentFailedStatusConsumer>();
             x.AddConsumer<ReservationTimedOutStatusConsumer>();
+            // Flight read model – FlightCreatedEvent ile FlightSummary güncellenir
+            x.AddConsumer<FlightCreatedConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
@@ -113,6 +118,12 @@ public static class ServiceRegistration
                     e.ConfigureConsumer<ReservationSeatFailedStatusConsumer>(context);
                     e.ConfigureConsumer<ReservationPaymentFailedStatusConsumer>(context);
                     e.ConfigureConsumer<ReservationTimedOutStatusConsumer>(context);
+                });
+
+                // Flight read model – FlightCreatedEvent (Notification ile aynı event, farklı queue)
+                cfg.ReceiveEndpoint(RabbitMqSettings.ReservationFlightCreatedQueue, e =>
+                {
+                    e.ConfigureConsumer<FlightCreatedConsumer>(context);
                 });
             });
         });

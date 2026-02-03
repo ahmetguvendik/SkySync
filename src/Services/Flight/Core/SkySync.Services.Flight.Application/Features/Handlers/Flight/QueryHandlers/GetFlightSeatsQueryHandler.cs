@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkySync.Services.Flight.Application.DTOs;
 using SkySync.Services.Flight.Application.Features.Queries.Flight.Requests;
@@ -39,8 +40,10 @@ public class GetFlightSeatsQueryHandler : IRequestHandler<GetFlightSeatsQueryReq
         try
         {
             // 1. Uçuşun var olup olmadığını kontrol et
-            var allFlights = await _flightRepository.GetAllAsync(cancellationToken);
-            var flight = allFlights.FirstOrDefault(f => f.Id == request.FlightId && !f.IsDeleted);
+            var flight = await _flightRepository
+                .GetQueryable()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(f => f.Id == request.FlightId && !f.IsDeleted, cancellationToken);
 
             if (flight == null)
             {
@@ -48,13 +51,13 @@ public class GetFlightSeatsQueryHandler : IRequestHandler<GetFlightSeatsQueryReq
                 throw new KeyNotFoundException($"Flight with id {request.FlightId} not found");
             }
 
-            // 2. Uçuşa ait tüm koltukları getir (Soft delete kontrolü ile)
-            // NOT: Cache kullanmıyoruz çünkü koltuk durumu çok dinamik
-            var allSeats = await _seatRepository.GetAllAsync(cancellationToken);
-            var seats = allSeats
+            // 2. Uçuşa ait koltukları doğrudan veritabanında filtrele
+            var seats = await _seatRepository
+                .GetQueryable()
+                .AsNoTracking()
                 .Where(s => s.FlightId == request.FlightId && !s.IsDeleted)
-                .OrderBy(s => s.SeatNumber) // Koltuk numarasına göre sırala (1A, 1B, 2A...)
-                .ToList();
+                .OrderBy(s => s.SeatNumber)
+                .ToListAsync(cancellationToken);
 
             // 3. Domain entity'den DTO'ya map et
             var seatDtos = seats.Select(s => new SeatDto

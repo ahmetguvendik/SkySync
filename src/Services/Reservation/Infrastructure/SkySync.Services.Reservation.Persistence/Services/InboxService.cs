@@ -6,8 +6,8 @@ using SkySync.Shared.InboxPattern;
 namespace SkySync.Services.Reservation.Persistence.Services;
 
 /// <summary>
-/// Inbox – Reservation servisi. Status consumer'ları için duplicate event önleme.
-/// ReservationConfirmed, SeatFailed, PaymentFailed, TimedOut consumer'ları MarkAsProcessedAsync kullanır.
+/// Inbox – Reservation servisi. Status consumer'ları MarkAsProcessedAsync kullanır.
+/// FlightCreatedConsumer gibi tx gerektiren işler TryProcessInTransactionAsync kullanır.
 /// </summary>
 public class InboxService : IInboxService
 {
@@ -89,9 +89,52 @@ public class InboxService : IInboxService
         }
     }
 
-    public Task<bool> TryProcessInTransactionAsync(Guid messageId, string eventType, string businessKey,
-        string? eventPayload, Func<CancellationToken, Task> work, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException("Transactional Inbox yalnızca Notification serviste kullanılıyor.");
+    /// <summary>
+    /// Tx başlat → Insert Processing → work() → Update Processed → Commit.
+    /// FlightCreatedConsumer FlightSummary upsert'ini bu tx içinde yapar.
+    /// </summary>
+    public async Task<bool> TryProcessInTransactionAsync(
+        Guid messageId,
+        string eventType,
+        string businessKey,
+        string? eventPayload,
+        Func<CancellationToken, Task> work,
+        CancellationToken cancellationToken = default)
+    {
+        await using var tx = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            if (await _context.InboxMessages.AnyAsync(
+                    x => x.EventType == eventType && x.BusinessKey == businessKey, cancellationToken))
+            {
+                await tx.RollbackAsync(cancellationToken);
+                _logger.LogWarning("Duplicate skipped. EventType: {EventType}, BusinessKey: {BusinessKey}", eventType, businessKey);
+                return false;
+            }
+
+            var inboxMessage = CreateMessage(messageId, eventType, businessKey, eventPayload, InboxStatus.Processing);
+            await _context.InboxMessages.AddAsync(inboxMessage, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await work(cancellationToken);
+
+            inboxMessage.Status = InboxStatus.Processed;
+            await _context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+
+            _logger.LogInformation("Inbox completed. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+                messageId, eventType, businessKey);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            _logger.LogError(ex, "Inbox failed, rolled back. MessageId: {MessageId}, EventType: {EventType}, BusinessKey: {BusinessKey}",
+                messageId, eventType, businessKey);
+            throw;
+        }
+    }
 
     private static InboxMessage CreateMessage(Guid messageId, string eventType, string businessKey, string? eventPayload, InboxStatus status)
     {

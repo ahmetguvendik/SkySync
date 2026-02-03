@@ -22,10 +22,64 @@ namespace SkySync.Services.Flight.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Aircraft", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("SeatCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Aircraft");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111101"),
+                            Name = "Boeing 737-800",
+                            SeatCount = 180
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111102"),
+                            Name = "Airbus A320",
+                            SeatCount = 150
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111103"),
+                            Name = "Boeing 777-300",
+                            SeatCount = 250
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111104"),
+                            Name = "Embraer E190",
+                            SeatCount = 100
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111105"),
+                            Name = "ATR 72",
+                            SeatCount = 72
+                        });
+                });
+
             modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Flight", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AircraftId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("ArrivalTime")
@@ -65,6 +119,8 @@ namespace SkySync.Services.Flight.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AircraftId");
 
                     b.ToTable("Flights");
                 });
@@ -142,10 +198,8 @@ namespace SkySync.Services.Flight.Persistence.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("Processed");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("MessageId");
 
@@ -204,6 +258,17 @@ namespace SkySync.Services.Flight.Persistence.Migrations
                     b.HasIndex("IsFailed", "ProcessedOn");
 
                     b.ToTable("OutboxMessages");
+                });
+
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Flight", b =>
+                {
+                    b.HasOne("SkySync.Services.Flight.Domain.Entities.Aircraft", "Aircraft")
+                        .WithMany()
+                        .HasForeignKey("AircraftId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Aircraft");
                 });
 
             modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Seat", b =>

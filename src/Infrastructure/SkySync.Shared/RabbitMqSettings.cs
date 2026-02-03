@@ -15,4 +15,7 @@ public static class RabbitMqSettings
     // Notification Service Queues
     public const string NotificationReservationConfirmedQueue = "notification-confirmed-queue";
     public const string NotificationFlightCreatedQueue = "notification-flight-created-queue";
+
+    // Reservation Service – Flight read model (FlightCreatedEvent consumer)
+    public const string ReservationFlightCreatedQueue = "reservation-flight-created-queue";
 }

@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using SkySync.Services.Reservation.Persistence.Contexts;
+using SkySync.Services.Flight.Persistence.Contexts;
 
 #nullable disable
 
-namespace SkySync.Services.Reservation.Persistence.Migrations
+namespace SkySync.Services.Flight.Persistence.Migrations
 {
-    [DbContext(typeof(ReservationServiceDbContext))]
-    partial class ReservationServiceDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(FlightServiceDbContext))]
+    [Migration("20260203175336_AddAircraftAndFlightAircraftId")]
+    partial class AddAircraftAndFlightAircraftId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,16 +25,77 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SkySync.Services.Reservation.Domain.Entities.FlightSummary", b =>
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Aircraft", b =>
                 {
-                    b.Property<Guid>("FlightId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("SeatCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Aircraft");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111101"),
+                            Name = "Boeing 737-800",
+                            SeatCount = 180
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111102"),
+                            Name = "Airbus A320",
+                            SeatCount = 150
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111103"),
+                            Name = "Boeing 777-300",
+                            SeatCount = 250
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111104"),
+                            Name = "Embraer E190",
+                            SeatCount = 100
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111105"),
+                            Name = "ATR 72",
+                            SeatCount = 72
+                        });
+                });
+
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Flight", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AircraftId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("ArrivalTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<decimal>("BasePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Departure")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -39,6 +103,7 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Destination")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -47,21 +112,26 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("FlightId");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
-                    b.ToTable("FlightSummaries");
+                    b.HasKey("Id");
+
+                    b.HasIndex("AircraftId");
+
+                    b.ToTable("Flights");
                 });
 
-            modelBuilder.Entity("SkySync.Services.Reservation.Domain.Entities.Reservation", b =>
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Seat", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CorrelationId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedTime")
@@ -73,23 +143,11 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsReserved")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("ModifiedTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PassengerEmail")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("PassengerName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("PassengerSurname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -99,20 +157,15 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CorrelationId");
+                    b.HasIndex("FlightId", "SeatNumber")
+                        .IsUnique();
 
-                    b.HasIndex("FlightId");
-
-                    b.HasIndex("PassengerEmail");
-
-                    b.HasIndex("PassengerEmail", "IsDeleted");
-
-                    b.ToTable("Reservations");
+                    b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("SkySync.Shared.InboxPattern.InboxMessage", b =>
@@ -208,6 +261,33 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
                     b.HasIndex("IsFailed", "ProcessedOn");
 
                     b.ToTable("OutboxMessages");
+                });
+
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Flight", b =>
+                {
+                    b.HasOne("SkySync.Services.Flight.Domain.Entities.Aircraft", "Aircraft")
+                        .WithMany()
+                        .HasForeignKey("AircraftId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Aircraft");
+                });
+
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Seat", b =>
+                {
+                    b.HasOne("SkySync.Services.Flight.Domain.Entities.Flight", "Flight")
+                        .WithMany("Seats")
+                        .HasForeignKey("FlightId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Flight");
+                });
+
+            modelBuilder.Entity("SkySync.Services.Flight.Domain.Entities.Flight", b =>
+                {
+                    b.Navigation("Seats");
                 });
 #pragma warning restore 612, 618
         }

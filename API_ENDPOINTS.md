@@ -160,11 +160,80 @@
 
 ---
 
+## Identity Service
+**Base URL:** `http://localhost:5000/api/auth` (Gateway üzerinden)
+
+### Endpoints
+
+#### 1. Kayıt Ol
+- **Method:** `POST`
+- **Path:** `/api/auth/register`
+- **Description:** Yeni kullanıcı kaydı (JWT oluşturmaz, sadece kullanıcı ekler)
+- **Request Body:**
+```json
+{
+  "email": "ahmet@example.com",
+  "password": "Passw0rd!",
+  "firstName": "Ahmet",
+  "lastName": "Güvendik"
+}
+```
+- **Response:** `201 Created`
+```json
+{
+  "userId": "guid",
+  "isSuccess": true,
+  "message": "User created successfully"
+}
+```
+
+#### 2. Giriş Yap
+- **Method:** `POST`
+- **Path:** `/api/auth/login`
+- **Description:** JWT token döner; Gateway üzerinden diğer servis çağrılarında kullanılabilir
+- **Request Body:**
+```json
+{
+  "email": "ahmet@example.com",
+  "password": "Passw0rd!"
+}
+```
+- **Response:** `200 OK`
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresAt": "2026-02-03T14:00:00Z",
+  "user": {
+    "id": "guid",
+    "email": "ahmet@example.com",
+    "firstName": "Ahmet",
+    "lastName": "Güvendik"
+  }
+}
+```
+
+#### 3. Profil Bilgisi
+- **Method:** `GET`
+- **Path:** `/api/auth/profile`
+- **Description:** Kullanıcı profilini getirir; **Authorization: Bearer {token}** header'ı zorunlu
+- **Response:** `200 OK`
+```json
+{
+  "id": "guid",
+  "email": "ahmet@example.com",
+  "firstName": "Ahmet",
+  "lastName": "Güvendik",
+  "createdAt": "2026-01-20T09:00:00Z"
+}
+```
+
+---
+
 ## Payment Service
 **Base URL:** `http://localhost:5000/api/payment` (Gateway üzerinden)
 
 ### Endpoints
-- Henüz implement edilmedi (Saga'dan `ProcessPaymentCommand` consume edilecek)
+- HTTP endpoint bulunmuyor. Payment servisi yalnızca RabbitMQ üzerinden `ProcessPaymentCommand` consume eder, `PaymentAuthorizedEvent` veya `PaymentFailedEvent` publish eder.
 
 ---
 
@@ -172,7 +241,7 @@
 **Base URL:** `http://localhost:5000/api/notification` (Gateway üzerinden)
 
 ### Endpoints
-- Henüz implement edilmedi (Saga'dan `ReservationConfirmedEvent` consume edilecek)
+- HTTP endpoint bulunmuyor. Notification servisi `FlightCreatedEvent` ve `ReservationConfirmedEvent` tüketerek e-posta bildirimi gönderir (Transactional Inbox).
 
 ---
 

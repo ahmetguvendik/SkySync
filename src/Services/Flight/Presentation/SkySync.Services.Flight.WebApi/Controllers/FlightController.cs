@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SkySync.Services.Flight.Application.Features.Commands.Flight.Requests;
 using SkySync.Services.Flight.Application.Features.Commands.Flight.Responses;
 using SkySync.Services.Flight.Application.Features.Queries.Flight.Requests;
+using SkySync.Services.Flight.Application.Features.Queries.Flight.Responses;
 
 namespace SkySync.Services.Flight.WebApi.Controllers;
 
@@ -44,6 +45,24 @@ public class FlightController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while creating flight");
+            return StatusCode(500, new { message = "An error occurred while processing your request" });
+        }
+    }
+
+    /// <summary>
+    /// Uçuş oluştururken seçilebilecek uçak listesi (koltuk sayıları farklı demo uçaklar)
+    /// </summary>
+    [HttpGet("aircrafts")]
+    public async Task<IActionResult> GetAircrafts(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _mediator.Send(new GetAircraftsQueryRequest(), cancellationToken);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching aircrafts");
             return StatusCode(500, new { message = "An error occurred while processing your request" });
         }
     }

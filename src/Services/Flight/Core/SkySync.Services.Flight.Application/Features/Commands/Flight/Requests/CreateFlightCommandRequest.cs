@@ -6,6 +6,7 @@ namespace SkySync.Services.Flight.Application.Features.Commands.Flight.Requests;
 
 public class CreateFlightCommandRequest : IRequest<CreateFlightCommandResponse>
 {
+    public Guid AircraftId { get; set; }
     public string FlightNumber { get; set; }
     public string Departure { get; set; }
     public string Destination { get; set; }

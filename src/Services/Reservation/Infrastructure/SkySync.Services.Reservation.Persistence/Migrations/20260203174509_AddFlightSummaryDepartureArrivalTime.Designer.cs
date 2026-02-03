@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SkySync.Services.Reservation.Persistence.Contexts;
@@ -11,9 +12,11 @@ using SkySync.Services.Reservation.Persistence.Contexts;
 namespace SkySync.Services.Reservation.Persistence.Migrations
 {
     [DbContext(typeof(ReservationServiceDbContext))]
-    partial class ReservationServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260203174509_AddFlightSummaryDepartureArrivalTime")]
+    partial class AddFlightSummaryDepartureArrivalTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

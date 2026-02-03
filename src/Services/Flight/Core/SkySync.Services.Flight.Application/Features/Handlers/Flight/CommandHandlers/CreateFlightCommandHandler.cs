@@ -16,23 +16,24 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
 {
     private readonly IOutboxRepository _outboxRepository;
     private readonly IGenericRepository<FlightEntity> _flightRepository;
+    private readonly IAircraftRepository _aircraftRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateFlightCommandHandler> _logger;
     private readonly ICacheService _cacheService;
 
-    // Flights listesi cache key'i - GetAllFlightsQueryHandler ile aynı olmalı
-    // Orada: private const string CacheKey = "flights:all";
     private const string FlightsCacheKey = "flights:all";
 
     public CreateFlightCommandHandler(
         IOutboxRepository outboxRepository,
         IGenericRepository<FlightEntity> flightRepository,
+        IAircraftRepository aircraftRepository,
         IUnitOfWork unitOfWork,
         ICacheService cacheService,
         ILogger<CreateFlightCommandHandler> logger)
     {
         _outboxRepository = outboxRepository;
         _flightRepository = flightRepository;
+        _aircraftRepository = aircraftRepository;
         _unitOfWork = unitOfWork;
         _cacheService = cacheService;
         _logger = logger;
@@ -42,16 +43,29 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
     {
         try
         {
+            var aircraft = await _aircraftRepository.GetByIdAsync(request.AircraftId, cancellationToken);
+            if (aircraft == null)
+            {
+                return new CreateFlightCommandResponse
+                {
+                    FlightId = Guid.Empty,
+                    FlightNumber = request.FlightNumber,
+                    IsSuccess = false,
+                    Message = $"Aircraft not found. AircraftId: {request.AircraftId}"
+                };
+            }
+
             // Transaction başlat
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var flightId = Guid.NewGuid();
 
-            // 1. ADIM: Uçuş Entity'sini Oluştur ve Kaydet
-            var seats = GenerateSeats(flightId, request.BasePrice);
+            // 1. ADIM: Seçilen uçağın koltuk sayısına göre koltuklar oluştur
+            var seats = GenerateSeats(flightId, request.BasePrice, aircraft.SeatCount);
             var flight = new FlightEntity
             {
                 Id = flightId,
+                AircraftId = request.AircraftId,
                 FlightNumber = request.FlightNumber,
                 Departure = request.Departure,
                 Destination = request.Destination,
@@ -153,31 +167,31 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
     }
 
     /// <summary>
-    /// Uçuş için otomatik koltuklar oluşturur.
-    /// Standart uçak yapısı: 30 satır x 6 sütun (A, B, C, D, E, F) = 180 koltuk
-    /// 
-    /// PREMIUM FİYATLANDIRMA:
-    /// - İlk 10 sıra (1A-10F): Premium Class - BasePrice * 1.5
-    /// - Son 20 sıra (11A-30F): Economy Class - BasePrice
+    /// Uçuş için seçilen uçağın koltuk sayısına göre koltuklar oluşturur.
+    /// Sıra x sütun (1A, 1B, ... 1F, 2A, ...) – sütun sayısı 6 (A-F).
+    /// İlk 10 sıra Premium (BasePrice * 1.5), geri kalan Economy.
     /// </summary>
-    private static List<SeatEntity> GenerateSeats(Guid flightId, decimal basePrice)
+    private static List<SeatEntity> GenerateSeats(Guid flightId, decimal basePrice, int seatCount)
     {
         var seats = new List<SeatEntity>();
         var seatLetters = new[] { "A", "B", "C", "D", "E", "F" };
-        const int totalRows = 30;
-        const int premiumRows = 10; // İlk 10 sıra Premium
-        const decimal premiumMultiplier = 1.5m; // %50 daha pahalı
+        const int seatsPerRow = 6;
+        const int premiumRows = 10;
+        const decimal premiumMultiplier = 1.5m;
         var now = DateTime.UtcNow;
 
-        for (int row = 1; row <= totalRows; row++)
+        int generated = 0;
+        int row = 1;
+        while (generated < seatCount)
         {
-            // İlk 10 sıra Premium, geri kalanı Economy
-            var seatPrice = row <= premiumRows 
-                ? basePrice * premiumMultiplier  // Premium Class
-                : basePrice;                      // Economy Class
+            var seatPrice = row <= premiumRows
+                ? basePrice * premiumMultiplier
+                : basePrice;
 
             foreach (var letter in seatLetters)
             {
+                if (generated >= seatCount) break;
+
                 var seat = new SeatEntity
                 {
                     Id = Guid.NewGuid(),
@@ -191,7 +205,9 @@ public class CreateFlightCommandHandler : IRequestHandler<CreateFlightCommandReq
                     IsDeleted = false
                 };
                 seats.Add(seat);
+                generated++;
             }
+            row++;
         }
 
         return seats;

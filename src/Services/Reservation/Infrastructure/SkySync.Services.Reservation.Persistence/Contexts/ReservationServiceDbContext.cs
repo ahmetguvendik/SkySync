@@ -11,6 +11,7 @@ public class ReservationServiceDbContext : DbContext
     }
 
     public DbSet<SkySync.Services.Reservation.Domain.Entities.Reservation> Reservations { get; set; }
+    public DbSet<SkySync.Services.Reservation.Domain.Entities.FlightSummary> FlightSummaries { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     public DbSet<InboxMessage> InboxMessages { get; set; }
 
@@ -34,6 +35,18 @@ public class ReservationServiceDbContext : DbContext
             entity.HasIndex(r => r.FlightId);
             entity.HasIndex(r => r.CorrelationId); // Saga takibi için
             entity.HasIndex(r => new { r.PassengerEmail, r.IsDeleted });
+        });
+
+        // FlightSummary read model (FlightCreated/FlightUpdated event'leri ile beslenir)
+        modelBuilder.Entity<SkySync.Services.Reservation.Domain.Entities.FlightSummary>(entity =>
+        {
+            entity.HasKey(f => f.FlightId);
+            entity.Property(f => f.FlightNumber).IsRequired().HasMaxLength(50);
+            entity.Property(f => f.Departure).HasMaxLength(100);
+            entity.Property(f => f.Destination).HasMaxLength(100);
+            entity.Property(f => f.DepartureTime).IsRequired();
+            entity.Property(f => f.ArrivalTime).IsRequired();
+            entity.Property(f => f.UpdatedAt).IsRequired();
         });
 
         // OutboxMessage Configuration

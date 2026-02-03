@@ -4,6 +4,8 @@ namespace SkySync.Services.Flight.Domain.Entities;
 
 public class Flight : BaseEntity
 {
+    public Guid AircraftId { get; set; }
+    public Aircraft? Aircraft { get; set; }
     public string FlightNumber { get; set; }
     public string Departure { get; set; }
     public string Destination { get; set; }

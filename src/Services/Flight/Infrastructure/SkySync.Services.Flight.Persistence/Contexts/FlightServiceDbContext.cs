@@ -11,6 +11,7 @@ public class FlightServiceDbContext : DbContext
         
     }
 
+    public DbSet<SkySync.Services.Flight.Domain.Entities.Aircraft> Aircraft { get; set; }
     public DbSet<SkySync.Services.Flight.Domain.Entities.Flight> Flights { get; set; }
     public DbSet<SkySync.Services.Flight.Domain.Entities.Seat> Seats { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
@@ -24,6 +25,48 @@ public class FlightServiceDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Aircraft Configuration (demo uçak listesi – seed ile doldurulur)
+        modelBuilder.Entity<SkySync.Services.Flight.Domain.Entities.Aircraft>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.Name).IsRequired().HasMaxLength(100);
+            entity.Property(a => a.SeatCount).IsRequired();
+
+            // 5 demo uçak – farklı koltuk sayıları
+            entity.HasData(
+                new SkySync.Services.Flight.Domain.Entities.Aircraft
+                {
+                    Id = new Guid("11111111-1111-1111-1111-111111111101"),
+                    Name = "Boeing 737-800",
+                    SeatCount = 180
+                },
+                new SkySync.Services.Flight.Domain.Entities.Aircraft
+                {
+                    Id = new Guid("11111111-1111-1111-1111-111111111102"),
+                    Name = "Airbus A320",
+                    SeatCount = 150
+                },
+                new SkySync.Services.Flight.Domain.Entities.Aircraft
+                {
+                    Id = new Guid("11111111-1111-1111-1111-111111111103"),
+                    Name = "Boeing 777-300",
+                    SeatCount = 250
+                },
+                new SkySync.Services.Flight.Domain.Entities.Aircraft
+                {
+                    Id = new Guid("11111111-1111-1111-1111-111111111104"),
+                    Name = "Embraer E190",
+                    SeatCount = 100
+                },
+                new SkySync.Services.Flight.Domain.Entities.Aircraft
+                {
+                    Id = new Guid("11111111-1111-1111-1111-111111111105"),
+                    Name = "ATR 72",
+                    SeatCount = 72
+                }
+            );
+        });
+
         // Flight Configuration
         modelBuilder.Entity<SkySync.Services.Flight.Domain.Entities.Flight>(entity =>
         {
@@ -33,7 +76,12 @@ public class FlightServiceDbContext : DbContext
             entity.Property(f => f.Destination).IsRequired().HasMaxLength(100);
             entity.Property(f => f.BasePrice).HasColumnType("decimal(18,2)");
             entity.Property(f => f.Status).HasConversion<int>();
-            
+
+            entity.HasOne(f => f.Aircraft)
+                .WithMany()
+                .HasForeignKey(f => f.AircraftId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Relationships
             entity.HasMany(f => f.Seats)
                 .WithOne(s => s.Flight)
