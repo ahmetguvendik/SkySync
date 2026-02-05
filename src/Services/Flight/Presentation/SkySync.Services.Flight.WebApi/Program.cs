@@ -1,5 +1,6 @@
 using System.Reflection;
 using FluentValidation;
+using Serilog;
 using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Flight.Application.Behaviors;
 using SkySync.Services.Flight.Application.Validators;
@@ -7,6 +8,15 @@ using SkySync.Services.Flight.Infrastructure.Cache;
 using SkySync.Services.Flight.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog: Configuration'dan oku, ServiceName ile zenginleştir, Console + Seq
+builder.Host.UseSerilog((ctx, lc) => lc
+    .ReadFrom.Configuration(ctx.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithProperty("ServiceName", "Flight")
+    .WriteTo.Console()
+    .WriteTo.Seq(ctx.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341"));
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -45,9 +55,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
+        diagnosticContext.Set("RequestPath", httpContext.Request.Path.Value);
+        diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
+    };
+});
+
 app.UseAuthorization();
 
-// ValidationException -> 400 Bad Request; diğer hatalar 500
+// Tutarlı hata response: message, code (opsiyonel), errors (validasyon)
 app.UseExceptionHandler(appError =>
 {
     appError.Run(async context =>
@@ -57,13 +78,18 @@ app.UseExceptionHandler(appError =>
         if (exception is ValidationException validationException)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            var errors = validationException.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
-            await context.Response.WriteAsJsonAsync(new { errors });
+            var errors = validationException.Errors.Select(e => new { propertyName = e.PropertyName, errorMessage = e.ErrorMessage }).ToList();
+            await context.Response.WriteAsJsonAsync(new { message = "Validasyon hatası.", errors });
+        }
+        else if (exception is KeyNotFoundException keyEx)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(new { message = keyEx.Message ?? "Kayıt bulunamadı.", code = "NOT_FOUND" });
         }
         else
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync(new { message = "An error occurred." });
+            await context.Response.WriteAsJsonAsync(new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
         }
     });
 });

@@ -92,3 +92,5 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Quartz.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Quartz.Extensions.DependencyInjection.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Quartz.Extensions.Hosting.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/FluentValidation.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/FluentValidation.DependencyInjectionExtensions.dll

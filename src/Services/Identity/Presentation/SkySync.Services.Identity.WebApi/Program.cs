@@ -1,11 +1,23 @@
 using System.Reflection;
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Steeltoe.Discovery.Eureka;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Steeltoe.Discovery.Eureka;
+using SkySync.Services.Identity.Application.Behaviors;
+using SkySync.Services.Identity.Application.Validators;
 using SkySync.Services.Identity.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, lc) => lc
+    .ReadFrom.Configuration(ctx.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithProperty("ServiceName", "Identity")
+    .WriteTo.Console()
+    .WriteTo.Seq(ctx.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341"));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -17,6 +29,10 @@ builder.Services.AddHealthChecks();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SkySync.Services.Identity.Application.Features.Commands.Auth.Requests.RegisterCommandRequest).Assembly));
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandRequestValidator>();
+builder.Services.AddTransient(typeof(MediatR.IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 builder.Services.AddPersistenceServices(builder.Configuration);
 
@@ -56,8 +72,45 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
+        diagnosticContext.Set("RequestPath", httpContext.Request.Path.Value);
+        diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
+    };
+});
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Tutarlı hata response: message, code (opsiyonel), errors (validasyon)
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+        var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+        if (exception is ValidationException validationException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            var errors = validationException.Errors.Select(e => new { propertyName = e.PropertyName, errorMessage = e.ErrorMessage }).ToList();
+            await context.Response.WriteAsJsonAsync(new { message = "Validasyon hatası.", errors });
+        }
+        else if (exception is KeyNotFoundException keyEx)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(new { message = keyEx.Message ?? "Kayıt bulunamadı.", code = "NOT_FOUND" });
+        }
+        else
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsJsonAsync(new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
+        }
+    });
+});
+
 app.MapControllers();
 app.MapHealthChecks("/health");
 

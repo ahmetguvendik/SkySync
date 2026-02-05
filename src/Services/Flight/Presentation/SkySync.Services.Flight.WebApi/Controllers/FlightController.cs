@@ -40,12 +40,12 @@ public class FlightController : ControllerBase
                 return CreatedAtAction(nameof(CreateFlight), new { id = response.FlightId }, response);
             }
 
-            return BadRequest(response);
+            return BadRequest(new { message = response.Message, code = "FLIGHT_CREATE_FAILED" });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while creating flight");
-            return StatusCode(500, new { message = "An error occurred while processing your request" });
+            return StatusCode(500, new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
         }
     }
 
@@ -63,7 +63,7 @@ public class FlightController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while fetching aircrafts");
-            return StatusCode(500, new { message = "An error occurred while processing your request" });
+            return StatusCode(500, new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
         }
     }
 
@@ -84,7 +84,7 @@ public class FlightController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while fetching flights");
-            return StatusCode(500, new { message = "An error occurred while processing your request" });
+            return StatusCode(500, new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
         }
     }
 
@@ -105,12 +105,12 @@ public class FlightController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             _logger.LogWarning(ex, "Flight not found. FlightId: {FlightId}", flightId);
-            return NotFound(new { message = $"Flight with id {flightId} not found" });
+            return NotFound(new { message = ex.Message ?? "Uçuş bulunamadı.", code = "FLIGHT_NOT_FOUND" });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while fetching flight seats. FlightId: {FlightId}", flightId);
-            return StatusCode(500, new { message = "An error occurred while processing your request" });
+            return StatusCode(500, new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
         }
     }
 }

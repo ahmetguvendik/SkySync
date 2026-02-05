@@ -39,12 +39,12 @@ public class ReservationController : ControllerBase
                 return CreatedAtAction(nameof(CreateReservation), new { id = response.ReservationId }, response);
             }
 
-            return BadRequest(response);
+            return BadRequest(new { message = response.Message, code = "RESERVATION_CREATE_FAILED" });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while creating reservation");
-            return StatusCode(500, new { message = "An error occurred while processing your request" });
+            return StatusCode(500, new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
         }
     }
 
@@ -64,7 +64,7 @@ public class ReservationController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while fetching passenger reservations. Email: {Email}", passengerEmail);
-            return StatusCode(500, new { message = "An error occurred while processing your request" });
+            return StatusCode(500, new { message = "Bir hata oluştu. Lütfen tekrar deneyin.", code = "INTERNAL_ERROR" });
         }
     }
 }

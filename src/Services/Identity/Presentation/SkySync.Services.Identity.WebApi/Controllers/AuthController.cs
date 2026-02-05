@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
         var response = await _mediator.Send(request, cancellationToken);
 
         if (!response.IsSuccess)
-            return BadRequest(new { message = response.Message });
+            return BadRequest(new { message = response.Message, code = "REGISTER_FAILED" });
 
         return CreatedAtAction(nameof(Register), new { userId = response.UserId }, response);
     }
@@ -46,12 +46,12 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginCommandRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
-            return BadRequest(new { message = "Email ve şifre gerekli." });
+            return BadRequest(new { message = "Email ve şifre gerekli.", code = "VALIDATION_ERROR" });
 
         var response = await _mediator.Send(request, cancellationToken);
 
         if (!response.IsSuccess)
-            return Unauthorized(new { message = response.Message });
+            return Unauthorized(new { message = response.Message, code = "LOGIN_FAILED" });
 
         return Ok(new
         {
@@ -70,13 +70,13 @@ public class AuthController : ControllerBase
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
+            return Unauthorized(new { message = "Yetkisiz erişim.", code = "UNAUTHORIZED" });
 
         var query = new GetProfileQueryRequest { UserId = userId };
         var response = await _mediator.Send(query, cancellationToken);
 
         if (response == null)
-            return NotFound();
+            return NotFound(new { message = "Kullanıcı bulunamadı.", code = "USER_NOT_FOUND" });
 
         return Ok(response);
     }

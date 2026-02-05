@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "RkB3PTCwOY4=",
+  "dgSpecHash": "6FFQA62E8Zs=",
   "success": true,
   "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Infrastructure/SkySync.Services.Flight.Infrastructure.csproj",
   "expectedPackageFiles": [
+    "/Users/ahmetguvendik/.nuget/packages/fluentvalidation/11.11.0/fluentvalidation.11.11.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/fluentvalidation.dependencyinjectionextensions/11.11.0/fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/mediatr/14.0.0/mediatr.14.0.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/microsoft.entityframeworkcore/9.0.0/microsoft.entityframeworkcore.9.0.0.nupkg.sha512",

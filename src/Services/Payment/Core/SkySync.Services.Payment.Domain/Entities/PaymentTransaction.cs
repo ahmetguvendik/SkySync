@@ -7,7 +7,7 @@ public class PaymentTransaction : BaseEntity
     public Guid ReservationId { get; set; }
     public Guid CorrelationId { get; set; }
     public decimal Amount { get; set; }
-    public PaymentStatus Status { get; set; } = PaymentStatus.Pending; // Success, Failed, Pending
+    public PaymentStatus Status { get; set; } 
     public string? ErrorMessage { get; set; }
     public string? ExternalTransactionId { get; set; } // Bankadan dönen ID
 }

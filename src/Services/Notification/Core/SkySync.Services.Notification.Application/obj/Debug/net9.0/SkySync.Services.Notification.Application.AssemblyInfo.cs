@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkySync.Services.Notification.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75efd854fbb564f77a44b259d0b7d7b1114224b0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9bd748f02f3d4eb9d58e4d4d234a338585711792")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkySync.Services.Notification.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkySync.Services.Notification.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

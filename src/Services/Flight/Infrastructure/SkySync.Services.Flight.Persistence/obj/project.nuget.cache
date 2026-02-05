@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "aSrVn2GUnmk=",
+  "dgSpecHash": "9i26g+gbyJU=",
   "success": true,
   "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/SkySync.Services.Flight.Persistence.csproj",
   "expectedPackageFiles": [
+    "/Users/ahmetguvendik/.nuget/packages/fluentvalidation/11.11.0/fluentvalidation.11.11.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/fluentvalidation.dependencyinjectionextensions/11.11.0/fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/masstransit/8.5.0/masstransit.8.5.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/masstransit.abstractions/8.5.0/masstransit.abstractions.8.5.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/masstransit.rabbitmq/8.5.0/masstransit.rabbitmq.8.5.0.nupkg.sha512",

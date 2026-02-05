@@ -52,9 +52,9 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
-            "Polly": {
+            "Steeltoe.Discovery.Eureka": {
               "target": "Package",
-              "version": "[8.6.5, )"
+              "version": "[4.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
