@@ -9,6 +9,9 @@
 
     <ItemGroup>
         <PackageReference Include="MassTransit" Version="8.5.0" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.15.0-beta.1" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
         <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.0" />
         <PackageReference Include="MassTransit.Newtonsoft" Version="8.5.0" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.0" />

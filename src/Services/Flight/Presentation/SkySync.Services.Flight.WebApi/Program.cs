@@ -1,9 +1,14 @@
+using System.Collections.Generic;
 using System.Reflection;
 using FluentValidation;
+using MassTransit.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Flight.Application.Behaviors;
 using SkySync.Services.Flight.Application.Validators;
+using StackExchange.Redis;
 using SkySync.Services.Flight.Infrastructure.Cache;
 using SkySync.Services.Flight.Persistence;
 
@@ -38,11 +43,40 @@ builder.Services.AddPersistenceService(builder.Configuration);
 // Add MassTransit with Consumers
 builder.Services.AddMassTransitService(builder.Configuration);
 
+// Redis - Multiplexer'ı OpenTelemetry Redis instrumentation için başta oluşturuyoruz
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis")
+    ?? builder.Configuration["Redis:ConnectionString"]
+    ?? "localhost:6379";
+var redis = ConnectionMultiplexer.Connect(redisConnectionString);
+
 // Add Cache Service (Redis)
-builder.Services.AddCacheService(builder.Configuration);
+builder.Services.AddCacheService(builder.Configuration, redis);
 
 // Eureka Service Discovery - Register with Eureka
 builder.Services.AddEurekaDiscoveryClient();
+
+// OpenTelemetry - Distributed Tracing (Jaeger'a trace gönderir)
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource
+        .AddService(
+            builder.Configuration["OpenTelemetry:ServiceName"] ?? "SkySync-Flight",
+            serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0",
+            serviceInstanceId: Environment.MachineName)
+        .AddAttributes(new Dictionary<string, object> { ["deployment.environment"] = builder.Environment.EnvironmentName }))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()      // Gelen HTTP istekleri
+            .AddHttpClientInstrumentation()      // Giden HTTP çağrıları (RabbitMQ vb.)
+            .AddEntityFrameworkCoreInstrumentation()  // EF Core sorguları
+            .AddRedisInstrumentation(redis)      // Redis GET/SET/LOCK vb. - cache hit/miss görünür
+            .AddSource(DiagnosticHeaders.DefaultListenerName)  // MassTransit mesaj trace
+            .AddOtlpExporter(options =>
+            {
+                var endpoint = builder.Configuration["OpenTelemetry:Endpoint"] ?? "http://localhost:4317";
+                options.Endpoint = new Uri(endpoint);
+            });
+    });
 
 var app = builder.Build();
 

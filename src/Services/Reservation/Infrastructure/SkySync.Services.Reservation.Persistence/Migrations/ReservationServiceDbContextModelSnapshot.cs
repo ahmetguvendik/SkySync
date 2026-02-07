@@ -196,6 +196,12 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
 
+                    b.Property<string>("Traceparent")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tracestate")
+                        .HasColumnType("text");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(255)

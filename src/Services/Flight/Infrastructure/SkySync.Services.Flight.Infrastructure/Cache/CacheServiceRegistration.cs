@@ -7,26 +7,28 @@ namespace SkySync.Services.Flight.Infrastructure.Cache;
 
 public static class CacheServiceRegistration
 {
-    public static void AddCacheService(this IServiceCollection services, IConfiguration configuration)
+    /// <summary>
+    /// Redis cache servisini ekler. multiplexer verilirse aynı bağlantı kullanılır (OpenTelemetry Redis instrumentation için gerekli).
+    /// </summary>
+    public static void AddCacheService(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IConnectionMultiplexer? multiplexer = null)
     {
-        var redisConnectionString = configuration.GetConnectionString("Redis") 
-                                    ?? configuration["Redis:ConnectionString"] 
+        var redisConnectionString = configuration.GetConnectionString("Redis")
+                                    ?? configuration["Redis:ConnectionString"]
                                     ?? "localhost:6379";
 
-        // Redis Connection Multiplexer (Distributed Lock için)
-        services.AddSingleton<IConnectionMultiplexer>(sp =>
-        {
-            return ConnectionMultiplexer.Connect(redisConnectionString);
-        });
+        var redis = multiplexer ?? ConnectionMultiplexer.Connect(redisConnectionString);
 
-        // Redis Distributed Cache
+        services.AddSingleton<IConnectionMultiplexer>(redis);
+
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = redisConnectionString;
+            options.ConnectionMultiplexerFactory = () => Task.FromResult(redis);
             options.InstanceName = "SkySync:";
         });
 
-        // Cache Service
         services.AddScoped<ICacheService, RedisCacheService>();
     }
 }

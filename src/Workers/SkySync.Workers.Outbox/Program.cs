@@ -1,4 +1,8 @@
+using System.Collections.Generic;
 using MassTransit;
+using MassTransit.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using FlightPersistence = SkySync.Services.Flight.Persistence;
 using ReservationPersistence = SkySync.Services.Reservation.Persistence;
 using SkySync.Workers.Outbox.Jobs.Flight;
@@ -46,6 +50,25 @@ builder.Services.AddMassTransit(x =>
         cfg.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource
+        .AddService(
+            builder.Configuration["OpenTelemetry:ServiceName"] ?? "SkySync-OutboxWorker",
+            serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "1.0.0",
+            serviceInstanceId: Environment.MachineName)
+        .AddAttributes(new Dictionary<string, object> { ["deployment.environment"] = builder.Environment.EnvironmentName }))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddSource(DiagnosticHeaders.DefaultListenerName)  // MassTransit mesaj trace
+            .AddEntityFrameworkCoreInstrumentation()  // Outbox DB okuma
+            .AddOtlpExporter(options =>
+            {
+                var endpoint = builder.Configuration["OpenTelemetry:Endpoint"] ?? "http://localhost:4317";
+                options.Endpoint = new Uri(endpoint);
+            });
+    });
 
 // Add Outbox Workers (Flight ve Reservation için ayrı worker'lar)
 builder.Services.AddHostedService<FlightOutboxPublishWorker>();

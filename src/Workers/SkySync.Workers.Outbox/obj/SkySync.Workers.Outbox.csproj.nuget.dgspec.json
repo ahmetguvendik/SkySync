@@ -713,6 +713,18 @@
             "Microsoft.Extensions.Hosting": {
               "target": "Package",
               "version": "[9.0.9, )"
+            },
+            "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
+              "target": "Package",
+              "version": "[1.15.0, )"
+            },
+            "OpenTelemetry.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[1.15.0, )"
+            },
+            "OpenTelemetry.Instrumentation.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[1.15.0-beta.1, )"
             }
           },
           "imports": [

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using MassTransit;
+using MassTransit.Logging;
 using Microsoft.Extensions.Logging;
 using SkySync.Shared.OutboxTable;
 
@@ -55,6 +56,9 @@ internal static class OutboxPublishHelper
             await publishEndpoint.Publish(eventInstance, eventType, ctx =>
             {
                 ctx.MessageId = message.Id; // Idempotency için sabit MessageId
+                // MassTransit MT-Activity-Id - Consumer aynı trace'e devam eder (DiagnosticHeaders.ActivityId)
+                if (!string.IsNullOrEmpty(message.Traceparent))
+                    ctx.Headers.Set(DiagnosticHeaders.ActivityId, message.Traceparent);
             }, cancellationToken);
 
             logger.LogInformation(

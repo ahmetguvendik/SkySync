@@ -10,4 +10,9 @@ public class OutboxMessage
     public string? Error { get; set; } // Gönderim sırasında bir hata oluştu mu?
     public int RetryCount { get; set; } = 0; // Kaç kez denendi?
     public bool IsFailed { get; set; } = false; // Max retry sonrası başarısız olarak işaretlendi mi?
+
+    /// <summary>W3C traceparent - Distributed tracing için (OpenTelemetry)</summary>
+    public string? Traceparent { get; set; }
+    /// <summary>W3C tracestate - Distributed tracing için (OpenTelemetry)</summary>
+    public string? Tracestate { get; set; }
 }

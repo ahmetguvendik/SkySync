@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "7uLHS1jZijw=",
+  "dgSpecHash": "89eoVOurEXo=",
   "success": true,
   "projectFilePath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/SkySync.Workers.Outbox.csproj",
   "expectedPackageFiles": [
@@ -57,6 +57,12 @@
     "/Users/ahmetguvendik/.nuget/packages/newtonsoft.json.bson/1.0.3/newtonsoft.json.bson.1.0.3.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/opentelemetry/1.15.0/opentelemetry.1.15.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/opentelemetry.api/1.15.0/opentelemetry.api.1.15.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/opentelemetry.api.providerbuilderextensions/1.15.0/opentelemetry.api.providerbuilderextensions.1.15.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/opentelemetry.exporter.opentelemetryprotocol/1.15.0/opentelemetry.exporter.opentelemetryprotocol.1.15.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/opentelemetry.extensions.hosting/1.15.0/opentelemetry.extensions.hosting.1.15.0.nupkg.sha512",
+    "/Users/ahmetguvendik/.nuget/packages/opentelemetry.instrumentation.entityframeworkcore/1.15.0-beta.1/opentelemetry.instrumentation.entityframeworkcore.1.15.0-beta.1.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/quartz/3.14.0/quartz.3.14.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/quartz.extensions.dependencyinjection/3.14.0/quartz.extensions.dependencyinjection.3.14.0.nupkg.sha512",
     "/Users/ahmetguvendik/.nuget/packages/quartz.extensions.hosting/3.14.0/quartz.extensions.hosting.3.14.0.nupkg.sha512",

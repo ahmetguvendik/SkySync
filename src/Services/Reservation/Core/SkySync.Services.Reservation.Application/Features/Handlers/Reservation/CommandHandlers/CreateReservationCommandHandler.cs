@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -109,7 +110,8 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
             // Event'i JSON'a çevir
             var eventContent = JsonSerializer.Serialize(reservationStartedEvent);
 
-            // OutboxMessage oluştur
+            // OutboxMessage oluştur - Trace context (distributed tracing için)
+            var activity = Activity.Current;
             var outboxMessage = new OutboxMessage
             {
                 Id = Guid.NewGuid(),
@@ -119,7 +121,9 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
                 ProcessedOn = null,
                 Error = null,
                 RetryCount = 0,
-                IsFailed = false
+                IsFailed = false,
+                Traceparent = activity?.Id,
+                Tracestate = activity?.TraceStateString
             };
 
             await _outboxRepository.CreateAsync(outboxMessage, cancellationToken);

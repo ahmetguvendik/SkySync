@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using AspNetCoreRateLimit;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Steeltoe.Discovery.Eureka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -61,6 +64,26 @@ builder.Services.AddHealthChecks();
 
 // -------------------- EUREKA --------------------
 builder.Services.AddEurekaDiscoveryClient();
+
+// -------------------- OPENTELEMETRY --------------------
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource
+        .AddService(
+            builder.Configuration["OpenTelemetry:ServiceName"] ?? "SkySync-Gateway",
+            serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "1.0.0",
+            serviceInstanceId: Environment.MachineName)
+        .AddAttributes(new Dictionary<string, object> { ["deployment.environment"] = builder.Environment.EnvironmentName }))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(options =>
+            {
+                var endpoint = builder.Configuration["OpenTelemetry:Endpoint"] ?? "http://localhost:4317";
+                options.Endpoint = new Uri(endpoint);
+            });
+    });
 
 var app = builder.Build();
 

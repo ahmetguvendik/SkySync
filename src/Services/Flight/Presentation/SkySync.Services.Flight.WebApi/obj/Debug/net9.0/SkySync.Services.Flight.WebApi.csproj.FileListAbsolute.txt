@@ -187,3 +187,12 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Serilog.Sinks.Debug.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Serilog.Sinks.File.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Serilog.Sinks.Seq.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Api.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Api.ProviderBuilderExtensions.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Exporter.OpenTelemetryProtocol.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Extensions.Hosting.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Instrumentation.AspNetCore.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Instrumentation.EntityFrameworkCore.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Instrumentation.Http.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Instrumentation.StackExchangeRedis.dll

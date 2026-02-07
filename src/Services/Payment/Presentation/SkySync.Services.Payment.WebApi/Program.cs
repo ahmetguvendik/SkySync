@@ -1,4 +1,9 @@
+using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.OpenApi.Models;
+using MassTransit.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Payment.Persistence;
@@ -29,6 +34,27 @@ builder.Services.AddHealthChecks();
 
 // Eureka Service Discovery - Register with Eureka
 builder.Services.AddEurekaDiscoveryClient();
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource
+        .AddService(
+            builder.Configuration["OpenTelemetry:ServiceName"] ?? "SkySync-Payment",
+            serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0",
+            serviceInstanceId: Environment.MachineName)
+        .AddAttributes(new Dictionary<string, object> { ["deployment.environment"] = builder.Environment.EnvironmentName }))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddSource(DiagnosticHeaders.DefaultListenerName)  // MassTransit mesaj trace
+            .AddOtlpExporter(options =>
+            {
+                var endpoint = builder.Configuration["OpenTelemetry:Endpoint"] ?? "http://localhost:4317";
+                options.Endpoint = new Uri(endpoint);
+            });
+    });
 
 var app = builder.Build();
 
