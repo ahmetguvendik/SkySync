@@ -19,8 +19,7 @@
           "OpenTelemetry.Instrumentation.Http": "1.15.0",
           "OpenTelemetry.Instrumentation.StackExchangeRedis": "1.15.0-beta.1",
           "Serilog.AspNetCore": "8.0.3",
-          "Serilog.Enrichers.Environment": "3.0.1",
-          "Serilog.Sinks.Seq": "8.0.0",
+          "SkySync.Infrastructure.Logging": "1.0.0",
           "SkySync.Services.Flight.Application": "1.0.0",
           "SkySync.Services.Flight.Infrastructure": "1.0.0",
           "SkySync.Services.Flight.Persistence": "1.0.0",
@@ -1017,22 +1016,22 @@
           }
         }
       },
-      "Serilog/4.0.0": {
+      "Serilog/4.1.0": {
         "runtime": {
           "lib/net8.0/Serilog.dll": {
-            "assemblyVersion": "4.0.0.0",
-            "fileVersion": "4.0.0.0"
+            "assemblyVersion": "4.1.0.0",
+            "fileVersion": "4.1.0.0"
           }
         }
       },
       "Serilog.AspNetCore/8.0.3": {
         "dependencies": {
           "Microsoft.Extensions.Logging": "9.0.12",
-          "Serilog": "4.0.0",
+          "Serilog": "4.1.0",
           "Serilog.Extensions.Hosting": "8.0.0",
           "Serilog.Formatting.Compact": "2.0.0",
           "Serilog.Settings.Configuration": "8.0.4",
-          "Serilog.Sinks.Console": "5.0.0",
+          "Serilog.Sinks.Console": "6.0.0",
           "Serilog.Sinks.Debug": "2.0.0",
           "Serilog.Sinks.File": "5.0.0"
         },
@@ -1045,7 +1044,7 @@
       },
       "Serilog.Enrichers.Environment/3.0.1": {
         "dependencies": {
-          "Serilog": "4.0.0"
+          "Serilog": "4.1.0"
         },
         "runtime": {
           "lib/net8.0/Serilog.Enrichers.Environment.dll": {
@@ -1059,7 +1058,7 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "9.0.8",
           "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
-          "Serilog": "4.0.0",
+          "Serilog": "4.1.0",
           "Serilog.Extensions.Logging": "8.0.0"
         },
         "runtime": {
@@ -1072,7 +1071,7 @@
       "Serilog.Extensions.Logging/8.0.0": {
         "dependencies": {
           "Microsoft.Extensions.Logging": "9.0.12",
-          "Serilog": "4.0.0"
+          "Serilog": "4.1.0"
         },
         "runtime": {
           "lib/net8.0/Serilog.Extensions.Logging.dll": {
@@ -1083,7 +1082,7 @@
       },
       "Serilog.Formatting.Compact/2.0.0": {
         "dependencies": {
-          "Serilog": "4.0.0"
+          "Serilog": "4.1.0"
         },
         "runtime": {
           "lib/net7.0/Serilog.Formatting.Compact.dll": {
@@ -1096,7 +1095,7 @@
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "9.0.8",
           "Microsoft.Extensions.DependencyModel": "9.0.12",
-          "Serilog": "4.0.0"
+          "Serilog": "4.1.0"
         },
         "runtime": {
           "lib/net8.0/Serilog.Settings.Configuration.dll": {
@@ -1105,20 +1104,20 @@
           }
         }
       },
-      "Serilog.Sinks.Console/5.0.0": {
+      "Serilog.Sinks.Console/6.0.0": {
         "dependencies": {
-          "Serilog": "4.0.0"
+          "Serilog": "4.1.0"
         },
         "runtime": {
-          "lib/net7.0/Serilog.Sinks.Console.dll": {
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.0.0"
+          "lib/net8.0/Serilog.Sinks.Console.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.0.0"
           }
         }
       },
       "Serilog.Sinks.Debug/2.0.0": {
         "dependencies": {
-          "Serilog": "4.0.0"
+          "Serilog": "4.1.0"
         },
         "runtime": {
           "lib/netstandard2.1/Serilog.Sinks.Debug.dll": {
@@ -1129,7 +1128,7 @@
       },
       "Serilog.Sinks.File/5.0.0": {
         "dependencies": {
-          "Serilog": "4.0.0"
+          "Serilog": "4.1.0"
         },
         "runtime": {
           "lib/net5.0/Serilog.Sinks.File.dll": {
@@ -1140,7 +1139,7 @@
       },
       "Serilog.Sinks.Seq/8.0.0": {
         "dependencies": {
-          "Serilog": "4.0.0",
+          "Serilog": "4.1.0",
           "Serilog.Sinks.File": "5.0.0"
         },
         "runtime": {
@@ -1390,6 +1389,26 @@
       },
       "System.Threading.Channels/7.0.0": {},
       "System.Threading.RateLimiting/8.0.0": {},
+      "SkySync.Infrastructure.Logging/1.0.0": {
+        "dependencies": {
+          "MassTransit": "8.5.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.12",
+          "Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "9.0.8",
+          "Serilog": "4.1.0",
+          "Serilog.AspNetCore": "8.0.3",
+          "Serilog.Enrichers.Environment": "3.0.1",
+          "Serilog.Settings.Configuration": "8.0.4",
+          "Serilog.Sinks.Console": "6.0.0",
+          "Serilog.Sinks.Seq": "8.0.0"
+        },
+        "runtime": {
+          "SkySync.Infrastructure.Logging.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "SkySync.Services.Flight.Application/1.0.0": {
         "dependencies": {
           "FluentValidation": "11.11.0",
@@ -1435,6 +1454,7 @@
           "Microsoft.EntityFrameworkCore": "9.0.12",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.12",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
+          "SkySync.Infrastructure.Logging": "1.0.0",
           "SkySync.Services.Flight.Application": "1.0.0",
           "SkySync.Services.Flight.Domain": "1.0.0",
           "SkySync.Shared": "1.0.0"
@@ -1959,12 +1979,12 @@
       "path": "rabbitmq.client/7.1.2",
       "hashPath": "rabbitmq.client.7.1.2.nupkg.sha512"
     },
-    "Serilog/4.0.0": {
+    "Serilog/4.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-2jDkUrSh5EofOp7Lx5Zgy0EB+7hXjjxE2ktTb1WVQmU00lDACR2TdROGKU0K1pDTBSJBN1PqgYpgOZF8mL7NJw==",
-      "path": "serilog/4.0.0",
-      "hashPath": "serilog.4.0.0.nupkg.sha512"
+      "sha512": "sha512-u1aZI8HZ62LWlq5dZLFwm6jMax/sUwnWZSw5lkPsCt518cJBxFKoNmc7oSxe5aA5BgSkzy9rzwFGR/i/acnSPw==",
+      "path": "serilog/4.1.0",
+      "hashPath": "serilog.4.1.0.nupkg.sha512"
     },
     "Serilog.AspNetCore/8.0.3": {
       "type": "package",
@@ -2008,12 +2028,12 @@
       "path": "serilog.settings.configuration/8.0.4",
       "hashPath": "serilog.settings.configuration.8.0.4.nupkg.sha512"
     },
-    "Serilog.Sinks.Console/5.0.0": {
+    "Serilog.Sinks.Console/6.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-IZ6bn79k+3SRXOBpwSOClUHikSkp2toGPCZ0teUkscv4dpDg9E2R2xVsNkLmwddE4OpNVO3N0xiYsAH556vN8Q==",
-      "path": "serilog.sinks.console/5.0.0",
-      "hashPath": "serilog.sinks.console.5.0.0.nupkg.sha512"
+      "sha512": "sha512-fQGWqVMClCP2yEyTXPIinSr5c+CBGUvBybPxjAGcf7ctDhadFhrQw03Mv8rJ07/wR5PDfFjewf2LimvXCDzpbA==",
+      "path": "serilog.sinks.console/6.0.0",
+      "hashPath": "serilog.sinks.console.6.0.0.nupkg.sha512"
     },
     "Serilog.Sinks.Debug/2.0.0": {
       "type": "package",
@@ -2231,6 +2251,11 @@
       "sha512": "sha512-7mu9v0QDv66ar3DpGSZHg9NuNcxDaaAcnMULuZlaTpP9+hwXhrxNGsF5GmLkSHxFdb5bBc1TzeujsRgTrPWi+Q==",
       "path": "system.threading.ratelimiting/8.0.0",
       "hashPath": "system.threading.ratelimiting.8.0.0.nupkg.sha512"
+    },
+    "SkySync.Infrastructure.Logging/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "SkySync.Services.Flight.Application/1.0.0": {
       "type": "project",

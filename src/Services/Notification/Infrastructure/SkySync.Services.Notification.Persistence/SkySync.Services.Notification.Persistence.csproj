@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Infrastructure.Logging\SkySync.Infrastructure.Logging.csproj" />
       <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />
       <ProjectReference Include="..\..\Core\SkySync.Services.Notification.Application\SkySync.Services.Notification.Application.csproj" />
       <ProjectReference Include="..\..\Core\SkySync.Services.Notification.Domain\SkySync.Services.Notification.Domain.csproj" />

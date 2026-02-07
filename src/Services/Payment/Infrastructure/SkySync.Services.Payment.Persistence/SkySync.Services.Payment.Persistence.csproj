@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Core\SkySync.Services.Payment.Domain\SkySync.Services.Payment.Domain.csproj" />
+      <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Infrastructure.Logging\SkySync.Infrastructure.Logging.csproj" />
       <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />
     </ItemGroup>
 

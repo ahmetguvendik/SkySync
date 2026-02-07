@@ -1,4 +1,5 @@
 using MassTransit;
+using SkySync.Infrastructure.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,7 @@ public static class ServiceRegistration
             {
                 var rabbitMqConnectionString = configuration["RabbitMQ:ConnectionString"];
                 cfg.Host(rabbitMqConnectionString);
+                cfg.UseConsumeFilter(typeof(CorrelationIdConsumeFilter<>), context);
 
                 cfg.ReceiveEndpoint(RabbitMqSettings.NotificationReservationConfirmedQueue, e =>
                 {

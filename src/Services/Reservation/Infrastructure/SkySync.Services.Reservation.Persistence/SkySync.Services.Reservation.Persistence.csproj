@@ -20,6 +20,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Core\SkySync.Services.Reservation.Application\SkySync.Services.Reservation.Application.csproj" />
+        <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Infrastructure.Logging\SkySync.Infrastructure.Logging.csproj" />
         <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />
         <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.SagaStateMachine\SkySync.SagaStateMachine.csproj" />
     </ItemGroup>

@@ -33,10 +33,10 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
         var messageId = context.MessageId ?? Guid.NewGuid();
 
         _logger.LogInformation(
-            "💰 Payment command received. MessageId: {MessageId}, ReservationId: {ResId}, Amount: {Amount}",
+            "Payment command received. MessageId: {MessageId}, ReservationId: {ReservationId}, Amount: {Amount}",
             messageId, msg.ReservationId, msg.Amount);
 
-        // ✅ INBOX PATTERN - Idempotency Marker (CRITICAL for payments!)
+        // INBOX PATTERN - Idempotency Marker (CRITICAL for payments)
         var businessKey = msg.ReservationId.ToString();
         var markedSuccess = await _inboxService.MarkAsProcessedAsync(
             messageId,
@@ -48,13 +48,13 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
         {
             // Duplicate payment attempt blocked!
             _logger.LogWarning(
-                "🛑 Duplicate payment blocked! ReservationId: {ResId}, MessageId: {MessageId}",
+                "Duplicate payment blocked. ReservationId: {ReservationId}, MessageId: {MessageId}",
                 msg.ReservationId, messageId);
             return;
         }
 
         _logger.LogInformation(
-            "✅ Payment locked for processing. ReservationId: {ResId}, MessageId: {MessageId}",
+            "Payment locked for processing. ReservationId: {ReservationId}, MessageId: {MessageId}",
             msg.ReservationId, messageId);
 
         try
@@ -81,7 +81,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
             if (isSuccess)
             {
                 _logger.LogInformation(
-                    "✅ Payment authorized (not captured yet). ReservationId: {ResId}, AuthorizationId: {AuthId}",
+                    "Payment authorized. ReservationId: {ReservationId}, AuthorizationId: {AuthorizationId}",
                     msg.ReservationId, authorizationId);
 
                 // Saga PaymentCompletedEvent bekliyor - authorize başarılı = ödeme tamamlandı
@@ -97,7 +97,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
             }
             else
             {
-                _logger.LogWarning("❌ Payment authorization failed! ReservationId: {ResId}", msg.ReservationId);
+                _logger.LogWarning("Payment authorization failed. ReservationId: {ReservationId}", msg.ReservationId);
 
                 await context.Publish(new PaymentFailedEvent
                 {
@@ -112,7 +112,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "❌ Payment processing failed. ReservationId: {ResId}, MessageId: {MessageId}",
+                "Payment processing failed. ReservationId: {ReservationId}, MessageId: {MessageId}",
                 msg.ReservationId, messageId);
 
             await _inboxService.MarkAsFailedAsync(

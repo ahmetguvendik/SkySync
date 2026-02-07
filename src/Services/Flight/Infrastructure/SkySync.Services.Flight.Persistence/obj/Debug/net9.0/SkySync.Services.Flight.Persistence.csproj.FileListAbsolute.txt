@@ -18,3 +18,5 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/obj/Debug/net9.0/refint/SkySync.Services.Flight.Persistence.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/obj/Debug/net9.0/SkySync.Services.Flight.Persistence.pdb
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/obj/Debug/net9.0/ref/SkySync.Services.Flight.Persistence.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/bin/Debug/net9.0/SkySync.Infrastructure.Logging.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/bin/Debug/net9.0/SkySync.Infrastructure.Logging.pdb

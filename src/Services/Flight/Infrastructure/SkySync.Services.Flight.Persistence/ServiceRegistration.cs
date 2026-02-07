@@ -1,4 +1,5 @@
 using MassTransit;
+using SkySync.Infrastructure.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +44,7 @@ public static class ServiceRegistration
             {
                 var connectionString = configuration["RabbitMQ:ConnectionString"];
                 cfg.Host(connectionString);
+                cfg.UseConsumeFilter(typeof(CorrelationIdConsumeFilter<>), context);
 
                 cfg.ReceiveEndpoint(RabbitMqSettings.FlightReserveSeatQueue, e =>
                 {

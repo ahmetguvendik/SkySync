@@ -8,6 +8,7 @@ using OpenTelemetry.Trace;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using SkySync.Infrastructure.Logging;
 using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Identity.Application.Behaviors;
 using SkySync.Services.Identity.Application.Validators;
@@ -15,13 +16,7 @@ using SkySync.Services.Identity.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((ctx, lc) => lc
-    .ReadFrom.Configuration(ctx.Configuration)
-    .Enrich.FromLogContext()
-    .Enrich.WithEnvironmentName()
-    .Enrich.WithProperty("ServiceName", "Identity")
-    .WriteTo.Console()
-    .WriteTo.Seq(ctx.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341"));
+builder.Host.UseSerilog((ctx, lc) => SerilogConfiguration.Configure(ctx, lc, "Identity"));
 
 builder.Services.AddControllers();
 builder.Services.AddApiVersioning(options =>
@@ -87,7 +82,14 @@ builder.Services.AddOpenTelemetry()
     .WithTracing(tracing =>
     {
         tracing
-            .AddAspNetCoreInstrumentation()
+            .AddAspNetCoreInstrumentation(o =>
+            {
+                o.EnrichWithHttpRequest = (activity, httpRequest) =>
+                {
+                    if (httpRequest.HttpContext != null)
+                        OpenTelemetryUserEnrichment.EnrichActivityWithUser(activity, httpRequest.HttpContext);
+                };
+            })
             .AddHttpClientInstrumentation()
             .AddEntityFrameworkCoreInstrumentation()
             .AddOtlpExporter(options =>
@@ -106,6 +108,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCorrelationIdLogContext();
+
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";

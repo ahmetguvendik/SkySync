@@ -200,3 +200,5 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Http.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Mvc.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Mvc.ApiExplorer.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/SkySync.Infrastructure.Logging.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/SkySync.Infrastructure.Logging.pdb

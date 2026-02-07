@@ -1202,7 +1202,7 @@
           }
         }
       },
-      "Serilog/4.0.0": {
+      "Serilog/4.1.0": {
         "type": "package",
         "compile": {
           "lib/net8.0/Serilog.dll": {
@@ -1328,18 +1328,18 @@
           }
         }
       },
-      "Serilog.Sinks.Console/5.0.0": {
+      "Serilog.Sinks.Console/6.0.0": {
         "type": "package",
         "dependencies": {
-          "Serilog": "3.1.0"
+          "Serilog": "4.0.0"
         },
         "compile": {
-          "lib/net7.0/Serilog.Sinks.Console.dll": {
+          "lib/net8.0/Serilog.Sinks.Console.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Serilog.Sinks.Console.dll": {
+          "lib/net8.0/Serilog.Sinks.Console.dll": {
             "related": ".xml"
           }
         }
@@ -1850,6 +1850,31 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
+      "SkySync.Infrastructure.Logging/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "MassTransit": "8.5.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "9.0.0",
+          "Serilog": "4.1.0",
+          "Serilog.AspNetCore": "8.0.3",
+          "Serilog.Enrichers.Environment": "3.0.1",
+          "Serilog.Settings.Configuration": "8.0.4",
+          "Serilog.Sinks.Console": "6.0.0",
+          "Serilog.Sinks.Seq": "8.0.0"
+        },
+        "compile": {
+          "bin/placeholder/SkySync.Infrastructure.Logging.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SkySync.Infrastructure.Logging.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "SkySync.Services.Payment.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
@@ -1868,6 +1893,7 @@
           "MassTransit.RabbitMQ": "8.5.0",
           "Microsoft.EntityFrameworkCore": "9.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.0",
+          "SkySync.Infrastructure.Logging": "1.0.0",
           "SkySync.Services.Payment.Domain": "1.0.0",
           "SkySync.Shared": "1.0.0"
         },
@@ -4278,10 +4304,10 @@
         "rabbitmq.client.nuspec"
       ]
     },
-    "Serilog/4.0.0": {
-      "sha512": "2jDkUrSh5EofOp7Lx5Zgy0EB+7hXjjxE2ktTb1WVQmU00lDACR2TdROGKU0K1pDTBSJBN1PqgYpgOZF8mL7NJw==",
+    "Serilog/4.1.0": {
+      "sha512": "u1aZI8HZ62LWlq5dZLFwm6jMax/sUwnWZSw5lkPsCt518cJBxFKoNmc7oSxe5aA5BgSkzy9rzwFGR/i/acnSPw==",
       "type": "package",
-      "path": "serilog/4.0.0",
+      "path": "serilog/4.1.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4297,7 +4323,7 @@
         "lib/net8.0/Serilog.xml",
         "lib/netstandard2.0/Serilog.dll",
         "lib/netstandard2.0/Serilog.xml",
-        "serilog.4.0.0.nupkg.sha512",
+        "serilog.4.1.0.nupkg.sha512",
         "serilog.nuspec"
       ]
     },
@@ -4443,10 +4469,10 @@
         "serilog.settings.configuration.nuspec"
       ]
     },
-    "Serilog.Sinks.Console/5.0.0": {
-      "sha512": "IZ6bn79k+3SRXOBpwSOClUHikSkp2toGPCZ0teUkscv4dpDg9E2R2xVsNkLmwddE4OpNVO3N0xiYsAH556vN8Q==",
+    "Serilog.Sinks.Console/6.0.0": {
+      "sha512": "fQGWqVMClCP2yEyTXPIinSr5c+CBGUvBybPxjAGcf7ctDhadFhrQw03Mv8rJ07/wR5PDfFjewf2LimvXCDzpbA==",
       "type": "package",
-      "path": "serilog.sinks.console/5.0.0",
+      "path": "serilog.sinks.console/6.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4456,17 +4482,13 @@
         "lib/net462/Serilog.Sinks.Console.xml",
         "lib/net471/Serilog.Sinks.Console.dll",
         "lib/net471/Serilog.Sinks.Console.xml",
-        "lib/net5.0/Serilog.Sinks.Console.dll",
-        "lib/net5.0/Serilog.Sinks.Console.xml",
         "lib/net6.0/Serilog.Sinks.Console.dll",
         "lib/net6.0/Serilog.Sinks.Console.xml",
-        "lib/net7.0/Serilog.Sinks.Console.dll",
-        "lib/net7.0/Serilog.Sinks.Console.xml",
+        "lib/net8.0/Serilog.Sinks.Console.dll",
+        "lib/net8.0/Serilog.Sinks.Console.xml",
         "lib/netstandard2.0/Serilog.Sinks.Console.dll",
         "lib/netstandard2.0/Serilog.Sinks.Console.xml",
-        "lib/netstandard2.1/Serilog.Sinks.Console.dll",
-        "lib/netstandard2.1/Serilog.Sinks.Console.xml",
-        "serilog.sinks.console.5.0.0.nupkg.sha512",
+        "serilog.sinks.console.6.0.0.nupkg.sha512",
         "serilog.sinks.console.nuspec"
       ]
     },
@@ -5178,6 +5200,11 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "SkySync.Infrastructure.Logging/1.0.0": {
+      "type": "project",
+      "path": "../../../../Infrastructure/SkySync.Infrastructure.Logging/SkySync.Infrastructure.Logging.csproj",
+      "msbuildProject": "../../../../Infrastructure/SkySync.Infrastructure.Logging/SkySync.Infrastructure.Logging.csproj"
+    },
     "SkySync.Services.Payment.Domain/1.0.0": {
       "type": "project",
       "path": "../../Core/SkySync.Services.Payment.Domain/SkySync.Services.Payment.Domain.csproj",
@@ -5204,8 +5231,7 @@
       "OpenTelemetry.Instrumentation.EntityFrameworkCore >= 1.15.0-beta.1",
       "OpenTelemetry.Instrumentation.Http >= 1.15.0",
       "Serilog.AspNetCore >= 8.0.3",
-      "Serilog.Enrichers.Environment >= 3.0.1",
-      "Serilog.Sinks.Seq >= 8.0.0",
+      "SkySync.Infrastructure.Logging >= 1.0.0",
       "SkySync.Services.Payment.Persistence >= 1.0.0",
       "SkySync.Shared >= 1.0.0",
       "Steeltoe.Discovery.Eureka >= 4.0.0",
@@ -5237,6 +5263,9 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
+            "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Infrastructure.Logging/SkySync.Infrastructure.Logging.csproj": {
+              "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Infrastructure.Logging/SkySync.Infrastructure.Logging.csproj"
+            },
             "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/SkySync.Shared.csproj": {
               "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Infrastructure/SkySync.Shared/SkySync.Shared.csproj"
             },
@@ -5295,14 +5324,6 @@
           "Serilog.AspNetCore": {
             "target": "Package",
             "version": "[8.0.3, )"
-          },
-          "Serilog.Enrichers.Environment": {
-            "target": "Package",
-            "version": "[3.0.1, )"
-          },
-          "Serilog.Sinks.Seq": {
-            "target": "Package",
-            "version": "[8.0.0, )"
           },
           "Steeltoe.Discovery.Eureka": {
             "target": "Package",

@@ -33,7 +33,7 @@ public class ReservationConfirmedConsumer : IConsumer<ReservationConfirmedEvent>
         var businessKey = msg.ReservationId.ToString();
 
         _logger.LogInformation(
-            "📩 ReservationConfirmed event received. MessageId: {MessageId}, Email: {Email}, ReservationId: {ReservationId}",
+            "ReservationConfirmed event received. MessageId: {MessageId}, Email: {Email}, ReservationId: {ReservationId}",
             messageId, msg.PassengerEmail, msg.ReservationId);
 
         var processed = await _inboxService.TryProcessInTransactionAsync(
@@ -46,7 +46,7 @@ public class ReservationConfirmedConsumer : IConsumer<ReservationConfirmedEvent>
 
         if (!processed)
         {
-            _logger.LogWarning("⏭️ Duplicate ReservationConfirmed skipped. ReservationId: {ReservationId}, MessageId: {MessageId}", msg.ReservationId, messageId);
+            _logger.LogWarning("Duplicate ReservationConfirmed skipped. ReservationId: {ReservationId}, MessageId: {MessageId}", msg.ReservationId, messageId);
         }
     }
 

@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SkySync.Services.Identity.Application.Features.Commands.Auth.Requests;
 using SkySync.Services.Identity.Application.Features.Commands.Auth.Responses;
 using SkySync.Services.Identity.Application.Interfaces;
@@ -13,17 +14,20 @@ public class LoginCommandHandler : IRequestHandler<LoginCommandRequest, LoginCom
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<LoginCommandHandler> _logger;
 
     public LoginCommandHandler(
         IUserRepository userRepository,
         IPasswordHasher passwordHasher,
         ITokenService tokenService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<LoginCommandHandler> logger)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
         _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task<LoginCommandResponse> Handle(LoginCommandRequest request, CancellationToken cancellationToken)
@@ -32,6 +36,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommandRequest, LoginCom
 
         if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
         {
+            _logger.LogWarning("Login failed. Email: {Email}", request.Email);
             return new LoginCommandResponse
             {
                 IsSuccess = false,
@@ -53,6 +58,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommandRequest, LoginCom
         };
 
         var token = _tokenService.GenerateToken(user.Id, user.Email, user.Role, claims);
+
+        _logger.LogInformation("User logged in successfully. UserId: {UserId}, Email: {Email}", user.Id, user.Email);
 
         return new LoginCommandResponse
         {

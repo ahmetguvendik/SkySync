@@ -8,5 +8,7 @@
     <Import Project="$(NuGetPackageRoot)microsoft.extensions.logging.abstractions/9.0.8/buildTransitive/net8.0/Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.logging.abstractions/9.0.8/buildTransitive/net8.0/Microsoft.Extensions.Logging.Abstractions.targets')" />
     <Import Project="$(NuGetPackageRoot)steeltoe.common.certificates/4.0.0/buildTransitive/net8.0/Steeltoe.Common.Certificates.targets" Condition="Exists('$(NuGetPackageRoot)steeltoe.common.certificates/4.0.0/buildTransitive/net8.0/Steeltoe.Common.Certificates.targets')" />
     <Import Project="$(NuGetPackageRoot)steeltoe.discovery.eureka/4.0.0/buildTransitive/net8.0/Steeltoe.Discovery.Eureka.targets" Condition="Exists('$(NuGetPackageRoot)steeltoe.discovery.eureka/4.0.0/buildTransitive/net8.0/Steeltoe.Discovery.Eureka.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.extensions.telemetry.abstractions/9.0.0/buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.telemetry.abstractions/9.0.0/buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.extensions.http.resilience/9.0.0/buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.http.resilience/9.0.0/buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets')" />
   </ImportGroup>
 </Project>

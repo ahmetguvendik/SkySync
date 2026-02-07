@@ -17,7 +17,6 @@ public static class CorsConfiguration
                         "http://localhost:3000",  // React/Next.js default
                         "http://localhost:4200",  // Angular default
                         "http://localhost:8080"  // Vue default
-                        //  // localtunnel frontend
                       )
                       .AllowAnyMethod()
                       .AllowAnyHeader()

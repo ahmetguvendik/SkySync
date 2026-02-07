@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Reflection;
 using Asp.Versioning;
 using FluentValidation;
@@ -6,6 +5,7 @@ using MassTransit.Logging;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using SkySync.Infrastructure.Logging;
 using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Flight.Application.Behaviors;
 using SkySync.Services.Flight.Application.Validators;
@@ -15,14 +15,8 @@ using SkySync.Services.Flight.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog: Configuration'dan oku, ServiceName ile zenginleştir, Console + Seq
-builder.Host.UseSerilog((ctx, lc) => lc
-    .ReadFrom.Configuration(ctx.Configuration)
-    .Enrich.FromLogContext()
-    .Enrich.WithEnvironmentName()
-    .Enrich.WithProperty("ServiceName", "Flight")
-    .WriteTo.Console()
-    .WriteTo.Seq(ctx.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341"));
+// Serilog: Merkezi konfigürasyon (SkySync.Infrastructure.Logging)
+builder.Host.UseSerilog((ctx, lc) => SerilogConfiguration.Configure(ctx, lc, "Flight"));
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -77,7 +71,14 @@ builder.Services.AddOpenTelemetry()
     .WithTracing(tracing =>
     {
         tracing
-            .AddAspNetCoreInstrumentation()      // Gelen HTTP istekleri
+            .AddAspNetCoreInstrumentation(o =>
+            {
+                o.EnrichWithHttpRequest = (activity, httpRequest) =>
+                {
+                    if (httpRequest.HttpContext != null)
+                        OpenTelemetryUserEnrichment.EnrichActivityWithUser(activity, httpRequest.HttpContext);
+                };
+            })      // Gelen HTTP istekleri
             .AddHttpClientInstrumentation()      // Giden HTTP çağrıları (RabbitMQ vb.)
             .AddEntityFrameworkCoreInstrumentation()  // EF Core sorguları
             .AddRedisInstrumentation(redis)      // Redis GET/SET/LOCK vb. - cache hit/miss görünür
@@ -99,6 +100,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCorrelationIdLogContext();
+app.UseUserLogContext();
 
 app.UseSerilogRequestLogging(options =>
 {

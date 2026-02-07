@@ -6,6 +6,7 @@ using MassTransit.Logging;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using SkySync.Infrastructure.Logging;
 using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Reservation.Application.Behaviors;
 using SkySync.Services.Reservation.Application.Validators;
@@ -13,13 +14,7 @@ using SkySync.Services.Reservation.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((ctx, lc) => lc
-    .ReadFrom.Configuration(ctx.Configuration)
-    .Enrich.FromLogContext()
-    .Enrich.WithEnvironmentName()
-    .Enrich.WithProperty("ServiceName", "Reservation")
-    .WriteTo.Console()
-    .WriteTo.Seq(ctx.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341"));
+builder.Host.UseSerilog((ctx, lc) => SerilogConfiguration.Configure(ctx, lc, "Reservation"));
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -64,7 +59,14 @@ builder.Services.AddOpenTelemetry()
     .WithTracing(tracing =>
     {
         tracing
-            .AddAspNetCoreInstrumentation()
+            .AddAspNetCoreInstrumentation(o =>
+            {
+                o.EnrichWithHttpRequest = (activity, httpRequest) =>
+                {
+                    if (httpRequest.HttpContext != null)
+                        OpenTelemetryUserEnrichment.EnrichActivityWithUser(activity, httpRequest.HttpContext);
+                };
+            })
             .AddHttpClientInstrumentation()
             .AddEntityFrameworkCoreInstrumentation()
             .AddSource(DiagnosticHeaders.DefaultListenerName)  // MassTransit mesaj trace
@@ -85,6 +87,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCorrelationIdLogContext();
+app.UseUserLogContext();
 
 app.UseSerilogRequestLogging(options =>
 {

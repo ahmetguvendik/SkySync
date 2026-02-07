@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Serilog.Context;
 
 namespace SkySync.Gateway.Middleware;
 
@@ -88,8 +89,12 @@ public class CorrelationIdMiddleware
 
         try
         {
-            // 8. Next middleware'e geç
-            await _next(context);
+            // 8. Serilog LogContext'e ekle - tüm downstream loglar otomatik CorrelationId/TransactionId alır
+            using (LogContext.PushProperty("CorrelationId", correlationId))
+            using (LogContext.PushProperty("TransactionId", transactionId))
+            {
+                await _next(context);
+            }
         }
         catch (Exception ex)
         {

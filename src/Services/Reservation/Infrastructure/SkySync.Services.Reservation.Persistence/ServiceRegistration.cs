@@ -1,4 +1,5 @@
 using MassTransit;
+using SkySync.Infrastructure.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -104,8 +105,8 @@ public static class ServiceRegistration
 
 
                 cfg.Host(connectionString);
+                cfg.UseConsumeFilter(typeof(CorrelationIdConsumeFilter<>), context);
 
-           
                 EndpointConvention.Map<ReserveSeatCommand>(new Uri($"queue:{RabbitMqSettings.FlightReserveSeatQueue}"));
                 EndpointConvention.Map<ProcessPaymentCommand>(new Uri($"queue:{RabbitMqSettings.PaymentProcessQueue}"));
                 EndpointConvention.Map<ReleaseSeatCommand>(new Uri($"queue:{RabbitMqSettings.FlightReleaseSeatQueue}"));

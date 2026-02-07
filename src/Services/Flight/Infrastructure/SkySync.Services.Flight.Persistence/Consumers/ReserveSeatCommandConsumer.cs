@@ -12,7 +12,7 @@ namespace SkySync.Services.Flight.Persistence.Consumers;
 
 /// <summary>
 /// Seat Reservation Consumer - Distributed Lock + Inbox Pattern
-/// ✅ Double Protection: Inbox Pattern (idempotency) + Redis Lock (race condition)
+/// Double Protection: Inbox Pattern (idempotency) + Redis Lock (race condition)
 /// </summary>
 public class ReserveSeatCommandConsumer : IConsumer<ReserveSeatCommand>
 {
@@ -40,10 +40,10 @@ public class ReserveSeatCommandConsumer : IConsumer<ReserveSeatCommand>
         var messageId = context.MessageId ?? Guid.NewGuid();
 
         _logger.LogInformation(
-            "💺 Seat reservation command received. MessageId: {MessageId}, FlightId: {FlightId}, SeatNumber: {SeatNumber}, CorrelationId: {CorrelationId}",
+            "Seat reservation command received. MessageId: {MessageId}, FlightId: {FlightId}, SeatNumber: {SeatNumber}, CorrelationId: {CorrelationId}",
             messageId, message.FlightId, message.SeatNumber, message.CorrelationId);
 
-        // ✅ INBOX PATTERN - Idempotency Check (ÖNCE kontrol et!)
+        // INBOX PATTERN - Idempotency Check
         var businessKey = $"{message.FlightId}:{message.SeatNumber}:{message.CorrelationId}";
         var markedSuccess = await _inboxService.MarkAsProcessedAsync(
             messageId,
@@ -55,16 +55,16 @@ public class ReserveSeatCommandConsumer : IConsumer<ReserveSeatCommand>
         {
             // Duplicate command blocked!
             _logger.LogWarning(
-                "🛑 Duplicate seat reservation command blocked! FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
+                "Duplicate seat reservation command blocked. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
                 message.FlightId, message.SeatNumber, messageId);
             return;
         }
 
         _logger.LogInformation(
-            "✅ Command locked for processing. FlightId: {FlightId}, SeatNumber: {SeatNumber}",
+            "Command locked for processing. FlightId: {FlightId}, SeatNumber: {SeatNumber}",
             message.FlightId, message.SeatNumber);
-        
-        // 🔒 Distributed Lock - Race Condition önleme (Inbox'tan sonra)
+
+        // Distributed Lock - Race condition prevention
         var lockKey = $"seat:{message.FlightId}:{message.SeatNumber}";
         
         _logger.LogInformation(
@@ -162,8 +162,8 @@ public class ReserveSeatCommandConsumer : IConsumer<ReserveSeatCommand>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, 
-                "❌ Error occurred while processing seat reservation. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
+            _logger.LogError(ex,
+                "Error occurred while processing seat reservation. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
                 message.FlightId, message.SeatNumber, messageId);
 
             await _inboxService.MarkAsFailedAsync(

@@ -38,7 +38,7 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
         var businessKey = msg.FlightId.ToString();
 
         _logger.LogInformation(
-            "📩 FlightCreated event received. MessageId: {MessageId}, FlightId: {FlightId}, FlightNumber: {FlightNumber}, Route: {Departure} → {Destination}",
+            "FlightCreated event received. MessageId: {MessageId}, FlightId: {FlightId}, FlightNumber: {FlightNumber}, Route: {Departure} to {Destination}",
             messageId, msg.FlightId, msg.FlightNumber, msg.Departure, msg.Destination);
 
         var processed = await _inboxService.TryProcessInTransactionAsync(
@@ -51,14 +51,14 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
 
         if (!processed)
         {
-            _logger.LogWarning("⏭️ Duplicate FlightCreated skipped. FlightId: {FlightId}, MessageId: {MessageId}", msg.FlightId, messageId);
+            _logger.LogWarning("Duplicate FlightCreated skipped. FlightId: {FlightId}, MessageId: {MessageId}", msg.FlightId, messageId);
         }
     }
 
     private async Task SendFlightCreatedEmailsAsync(FlightCreatedEvent msg, CancellationToken ct)
     {
         var adminEmails = GetAdminEmails();
-        _logger.LogInformation("🔍 Admin email count: {Count}, FlightId: {FlightId}", adminEmails.Count, msg.FlightId);
+        _logger.LogInformation("Admin email count: {Count}, FlightId: {FlightId}", adminEmails.Count, msg.FlightId);
 
         if (!adminEmails.Any())
         {
@@ -73,7 +73,7 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
         {
             ct.ThrowIfCancellationRequested();
             await _emailService.SendEmailAsync(adminEmail, subject, body);
-            _logger.LogInformation("✅ Flight creation notification sent to {Email}", adminEmail);
+            _logger.LogInformation("Flight creation notification sent to {Email}", adminEmail);
         }
     }
 

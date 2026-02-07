@@ -34,10 +34,10 @@ public class ReleaseSeatCommandConsumer : IConsumer<ReleaseSeatCommand>
         var messageId = context.MessageId ?? Guid.NewGuid();
 
         _logger.LogInformation(
-            "🔓 Seat release command received. MessageId: {MessageId}, FlightId: {FlightId}, SeatNumber: {SeatNumber}, CorrelationId: {CorrelationId}",
+            "Seat release command received. MessageId: {MessageId}, FlightId: {FlightId}, SeatNumber: {SeatNumber}, CorrelationId: {CorrelationId}",
             messageId, message.FlightId, message.SeatNumber, message.CorrelationId);
 
-        // ✅ INBOX PATTERN - Idempotency Check
+        // INBOX PATTERN - Idempotency Check
         var businessKey = $"{message.FlightId}:{message.SeatNumber}:{message.CorrelationId}";
         var markedSuccess = await _inboxService.MarkAsProcessedAsync(
             messageId,
@@ -49,13 +49,13 @@ public class ReleaseSeatCommandConsumer : IConsumer<ReleaseSeatCommand>
         {
             // Duplicate command blocked!
             _logger.LogWarning(
-                "🛑 Duplicate seat release command blocked! FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
+                "Duplicate seat release command blocked. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
                 message.FlightId, message.SeatNumber, messageId);
             return;
         }
 
         _logger.LogInformation(
-            "✅ Command locked for processing. FlightId: {FlightId}, SeatNumber: {SeatNumber}",
+            "Command locked for processing. FlightId: {FlightId}, SeatNumber: {SeatNumber}",
             message.FlightId, message.SeatNumber);
 
         try
@@ -70,20 +70,20 @@ public class ReleaseSeatCommandConsumer : IConsumer<ReleaseSeatCommand>
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation(
-                    "✅ Seat released successfully. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
+                    "Seat released successfully. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
                     message.FlightId, message.SeatNumber, messageId);
             }
             else
             {
                 _logger.LogWarning(
-                    "⚠️ Seat not found for release. FlightId: {FlightId}, SeatNumber: {SeatNumber}",
+                    "Seat not found for release. FlightId: {FlightId}, SeatNumber: {SeatNumber}",
                     message.FlightId, message.SeatNumber);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "❌ Error occurred while releasing seat. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
+                "Error occurred while releasing seat. FlightId: {FlightId}, SeatNumber: {SeatNumber}, MessageId: {MessageId}",
                 message.FlightId, message.SeatNumber, messageId);
 
             await _inboxService.MarkAsFailedAsync(

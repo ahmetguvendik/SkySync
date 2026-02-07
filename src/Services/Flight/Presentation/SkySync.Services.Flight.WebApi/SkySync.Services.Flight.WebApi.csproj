@@ -17,8 +17,6 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.15.0-beta.1" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
-    <PackageReference Include="Serilog.Sinks.Seq" Version="8.0.0" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
         <PackageReference Include="Steeltoe.Discovery.Eureka" Version="4.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
@@ -28,6 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Infrastructure.Logging\SkySync.Infrastructure.Logging.csproj" />
         <ProjectReference Include="..\..\Infrastructure\SkySync.Services.Flight.Persistence\SkySync.Services.Flight.Persistence.csproj" />
         <ProjectReference Include="..\..\Infrastructure\SkySync.Services.Flight.Infrastructure\SkySync.Services.Flight.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Core\SkySync.Services.Flight.Application\SkySync.Services.Flight.Application.csproj" />

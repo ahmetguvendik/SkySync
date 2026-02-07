@@ -62,7 +62,7 @@ internal static class OutboxPublishHelper
             }, cancellationToken);
 
             logger.LogInformation(
-                "✅ Event yayınlandı. Type: {Type}, MessageId: {MessageId} (OutboxMessage.Id)",
+                "Event published. Type: {Type}, MessageId: {MessageId}",
                 message.Type, message.Id);
 
             return true;

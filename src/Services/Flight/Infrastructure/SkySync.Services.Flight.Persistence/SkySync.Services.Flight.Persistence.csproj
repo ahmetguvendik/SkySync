@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Infrastructure.Logging\SkySync.Infrastructure.Logging.csproj" />
       <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />
       <ProjectReference Include="..\..\Core\SkySync.Services.Flight.Application\SkySync.Services.Flight.Application.csproj" />
       <ProjectReference Include="..\..\Core\SkySync.Services.Flight.Domain\SkySync.Services.Flight.Domain.csproj" />
