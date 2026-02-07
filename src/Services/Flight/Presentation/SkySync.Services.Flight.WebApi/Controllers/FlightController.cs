@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SkySync.Services.Flight.Application.Features.Commands.Flight.Requests;
@@ -8,7 +9,8 @@ using SkySync.Services.Flight.Application.Features.Queries.Flight.Responses;
 namespace SkySync.Services.Flight.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("1.0")]
 public class FlightController : ControllerBase
 {
     private readonly IMediator _mediator;

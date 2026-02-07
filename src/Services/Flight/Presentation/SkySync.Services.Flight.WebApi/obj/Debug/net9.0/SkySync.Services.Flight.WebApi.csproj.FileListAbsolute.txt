@@ -196,3 +196,7 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Instrumentation.EntityFrameworkCore.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Instrumentation.Http.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/OpenTelemetry.Instrumentation.StackExchangeRedis.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Abstractions.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Http.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Mvc.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Mvc.ApiExplorer.dll

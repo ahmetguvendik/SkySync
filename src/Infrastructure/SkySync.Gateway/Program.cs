@@ -119,14 +119,14 @@ app.MapGet("/", () => new
     Service = "SkySync API Gateway",
     Status = "Running",
     Environment = app.Environment.EnvironmentName,
-    Routes = new[]
-    {
-        "/api/auth",
-        "/api/flight",
-        "/api/reservation",
-        "/api/payment",
-        "/api/notification"
-    }
+Routes = new[]
+        {
+            "/api/v1/auth",
+            "/api/v1/flight",
+            "/api/v1/reservation",
+            "/api/v1/payment",
+            "/api/v1/notification"
+        }
 }).AllowAnonymous();
 
 app.Run();

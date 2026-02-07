@@ -457,6 +457,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Asp.Versioning.Mvc": {
+              "target": "Package",
+              "version": "[8.1.1, )"
+            },
+            "Asp.Versioning.Mvc.ApiExplorer": {
+              "target": "Package",
+              "version": "[8.1.1, )"
+            },
             "MassTransit.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.5.0, )"

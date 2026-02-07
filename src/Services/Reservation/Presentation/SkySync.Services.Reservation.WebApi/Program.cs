@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using Asp.Versioning;
 using FluentValidation;
 using MassTransit.Logging;
 using OpenTelemetry.Resources;
@@ -22,6 +23,16 @@ builder.Host.UseSerilog((ctx, lc) => lc
 
 // Add services to the container
 builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
