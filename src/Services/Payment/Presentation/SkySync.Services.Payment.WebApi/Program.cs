@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using MediatR;
 using Microsoft.OpenApi.Models;
 using MassTransit.Logging;
 using OpenTelemetry.Resources;
@@ -15,6 +16,9 @@ builder.Host.UseSerilog((ctx, lc) => SerilogConfiguration.Configure(ctx, lc, "Pa
 
 // Add Persistence & DB
 builder.Services.AddPersistenceServices(builder.Configuration);
+
+// Add MediatR (CQRS)
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SkySync.Services.Payment.Application.Features.Commands.Payment.Requests.ProcessPaymentCommandRequest).Assembly));
 
 // Add MassTransit with Consumers
 builder.Services.AddMassTransitService(builder.Configuration);

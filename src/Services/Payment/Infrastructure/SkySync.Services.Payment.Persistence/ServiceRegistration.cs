@@ -5,6 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SkySync.Services.Payment.Persistence.Contexts;
 using SkySync.Services.Payment.Persistence.Consumers;
+using SkySync.Services.Payment.Application.Interfaces;
+using SkySync.Services.Payment.Application.UnitOfWorks;
+using SkySync.Services.Payment.Persistence.Repositories;
+using SkySync.Services.Payment.Persistence.UnitOfWorks;
 using SkySync.Services.Payment.Persistence.Services;
 using SkySync.Shared;
 using SkySync.Shared.InboxPattern;
@@ -21,25 +25,26 @@ public static class ServiceRegistration
         
         // Inbox Service - Duplicate payment prevention (CRITICAL!)
         services.AddScoped<IInboxService, InboxService>();
+
+        // Generic Repository & Unit of Work
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Event Publisher
+        services.AddScoped<IEventPublisher, EventPublisher>();
     }
 
     public static void AddMassTransitService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMassTransit(x =>
         {
-            x.AddConsumer<ProcessPaymentConsumer>();
-
+            // ProcessPaymentConsumer kaldırıldı: Ödeme frontend'den POST /api/v1/payment/process ile tetiklenir
             x.UsingRabbitMq((context, cfg) =>
             {
                 var connectionString = configuration["RabbitMQ:ConnectionString"];
                 cfg.Host(connectionString);
-                cfg.UseConsumeFilter(typeof(CorrelationIdConsumeFilter<>), context);
-
-                cfg.ReceiveEndpoint(RabbitMqSettings.PaymentProcessQueue, e =>
-                {
-                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
-                    e.ConfigureConsumer<ProcessPaymentConsumer>(context);
-                });
+                // Saga (Reservation) ile aynı serializer - PaymentCompletedEvent / PaymentFailedEvent uyumluluğu
+                cfg.UseNewtonsoftJsonSerializer();
             });
         });
     }

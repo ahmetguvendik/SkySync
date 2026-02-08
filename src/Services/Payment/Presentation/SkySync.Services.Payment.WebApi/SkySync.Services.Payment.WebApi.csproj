@@ -23,6 +23,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MediatR" Version="14.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\SkySync.Services.Payment.Application\SkySync.Services.Payment.Application.csproj" />
       <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Infrastructure.Logging\SkySync.Infrastructure.Logging.csproj" />
       <ProjectReference Include="..\..\Infrastructure\SkySync.Services.Payment.Persistence\SkySync.Services.Payment.Persistence.csproj" />
       <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />

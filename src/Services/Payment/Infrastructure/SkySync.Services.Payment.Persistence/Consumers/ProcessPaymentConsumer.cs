@@ -42,6 +42,8 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
             _logger.LogWarning(
                 "Payment skipped - command expired (ValidUntil passed). ReservationId: {ReservationId}, MessageId: {MessageId}",
                 msg.ReservationId, messageId);
+            // Audit: Tabloya Expired kaydı yaz (traceability için)
+            await WriteExpiredTransactionAsync(msg, messageId, context.CancellationToken);
             return; // Ack - mesaj işlendi ama ödeme yapılmadı (timeout durumu)
         }
 
@@ -72,6 +74,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
             bool isSuccess = msg.Amount <= 2000;
             var authorizationId = Guid.NewGuid().ToString(); // Payment gateway'den gelen authorization ID
 
+            var now = DateTime.UtcNow;
             var paymentTransaction = new PaymentTransaction
             {
                 Id = Guid.NewGuid(),
@@ -81,7 +84,9 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
                 Status = isSuccess ? PaymentStatus.Pending : PaymentStatus.Failed, // Authorize için Pending
                 ExternalTransactionId = authorizationId,
                 ErrorMessage = isSuccess ? null : "2000 TL limit aşımı. Tutar: " + msg.Amount + " TL",
-                CreatedDate = DateTime.UtcNow
+                CreatedTime = now,
+                ModifiedTime = now,
+                IsDeleted = false,
             };
 
             await _context.PaymentTransactions.AddAsync(paymentTransaction);
@@ -133,5 +138,28 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
 
             throw;
         }
+    }
+
+    private async Task WriteExpiredTransactionAsync(ProcessPaymentCommand msg, Guid messageId, CancellationToken cancellationToken)
+    {
+        var exists = await _context.PaymentTransactions
+            .AnyAsync(t => t.ReservationId == msg.ReservationId && t.Status == PaymentStatus.Expired, cancellationToken);
+        if (exists)
+            return; // Duplicate skip (retry) - zaten yazılmış
+
+        var now = DateTime.UtcNow;
+        _context.PaymentTransactions.Add(new PaymentTransaction
+        {
+            Id = Guid.NewGuid(),
+            ReservationId = msg.ReservationId,
+            CorrelationId = msg.CorrelationId,
+            Amount = msg.Amount,
+            Status = PaymentStatus.Expired,
+            ErrorMessage = "Command expired (ValidUntil passed). Reservation timed out.",
+            CreatedTime = now,
+            ModifiedTime = now,
+            IsDeleted = false,
+        });
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

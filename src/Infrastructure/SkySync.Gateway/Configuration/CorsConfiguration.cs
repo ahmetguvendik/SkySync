@@ -20,6 +20,7 @@ public static class CorsConfiguration
                       )
                       .AllowAnyMethod()
                       .AllowAnyHeader()
+                      .WithExposedHeaders("traceparent", "tracestate", "X-Correlation-ID", "X-Transaction-ID")
                       .AllowCredentials();
             });
 
@@ -32,6 +33,7 @@ public static class CorsConfiguration
                 policy.WithOrigins(allowedOrigins)
                       .AllowAnyMethod()
                       .AllowAnyHeader()
+                      .WithExposedHeaders("traceparent", "tracestate", "X-Correlation-ID", "X-Transaction-ID")
                       .AllowCredentials();
             });
         });

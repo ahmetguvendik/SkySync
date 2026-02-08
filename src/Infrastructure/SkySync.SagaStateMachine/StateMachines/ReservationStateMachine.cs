@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkySync.Shared;
 using SkySync.Shared.Commands;
@@ -8,15 +9,16 @@ namespace SkySync.SagaStateMachine.StateMachines;
 
 /// <summary>
 /// Reservation Saga State Machine
-/// Zombi Rezervasyon önleme: 5 dk ödeme gelmezse timeout → koltuğu sal.
+/// Zombi Rezervasyon önleme: Payment:TimeoutMinutes içinde ödeme gelmezse timeout → koltuğu sal.
 /// </summary>
 public class ReservationStateMachine : MassTransitStateMachine<StateInstances.ReservationState>
 {
-    private const int PaymentTimeoutMinutes = 5;
+    private readonly int _paymentTimeoutMinutes;
     private readonly ILogger<ReservationStateMachine> _logger;
 
-    public ReservationStateMachine(ILogger<ReservationStateMachine> logger)
+    public ReservationStateMachine(IConfiguration configuration, ILogger<ReservationStateMachine> logger)
     {
+        _paymentTimeoutMinutes = int.TryParse(configuration["Payment:TimeoutMinutes"], out var mins) ? mins : 5;
         _logger = logger;
 
         InstanceState(x => x.CurrentState);
@@ -29,7 +31,7 @@ public class ReservationStateMachine : MassTransitStateMachine<StateInstances.Re
 
         Schedule(() => PaymentTimeout, instance => instance.TimeoutTokenId, s =>
         {
-            s.Delay = TimeSpan.FromMinutes(PaymentTimeoutMinutes);
+            s.Delay = TimeSpan.FromMinutes(_paymentTimeoutMinutes);
             s.Received = r => r.CorrelateById(context => context.Message.CorrelationId);
         });
 
@@ -69,23 +71,16 @@ public class ReservationStateMachine : MassTransitStateMachine<StateInstances.Re
                     state.FlightNumber = context.Message.FlightNumber;
                     state.Departure = context.Message.Departure;
                     state.Destination = context.Message.Destination;
-                    _logger.LogInformation("Seat Reserved. Processing payment for {ResId}", state.ReservationId);
+                    _logger.LogInformation("Seat Reserved. Awaiting payment from frontend for {ResId}", state.ReservationId);
                 })
-                .Publish(context => new ProcessPaymentCommand
-                {
-                    CorrelationId = context.Saga.CorrelationId,
-                    ReservationId = context.Saga.ReservationId,
-                    Amount = context.Saga.Price,
-                    PassengerEmail = context.Saga.PassengerEmail,
-                    ValidUntil = DateTime.UtcNow.AddMinutes(PaymentTimeoutMinutes)
-                })
+                // ProcessPaymentCommand KALDIRILDI: Ödeme frontend'den POST /api/v1/payment/process ile tetiklenir
                 .Schedule(PaymentTimeout, context => new PaymentTimeoutEvent
                 {
                     CorrelationId = context.Saga.CorrelationId,
                     ReservationId = context.Saga.ReservationId,
                     Amount = context.Saga.Price,
-                    TimeoutAt = DateTime.UtcNow.AddMinutes(PaymentTimeoutMinutes),
-                    Reason = "Ödeme 5 dakika içinde tamamlanmadı."
+                    TimeoutAt = DateTime.UtcNow.AddMinutes(_paymentTimeoutMinutes),
+                    Reason = $"Ödeme {_paymentTimeoutMinutes} dakika içinde tamamlanmadı."
                 })
                 .TransitionTo(AwaitingPayment),
 
@@ -149,7 +144,7 @@ public class ReservationStateMachine : MassTransitStateMachine<StateInstances.Re
                 {
                     CorrelationId = context.Saga.CorrelationId,
                     ReservationId = context.Saga.ReservationId,
-                    Reason = "Ödeme 5 dakika içinde tamamlanmadı.",
+                    Reason = $"Ödeme {_paymentTimeoutMinutes} dakika içinde tamamlanmadı.",
                     TimedOutAt = DateTime.UtcNow
                 })
                 .Send(new Uri($"queue:{RabbitMqSettings.FlightReleaseSeatQueue}"), context => new ReleaseSeatCommand

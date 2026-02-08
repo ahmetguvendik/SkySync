@@ -59,17 +59,20 @@ public class CorrelationIdMiddleware
         context.Items["CorrelationId"] = correlationId;
         context.Items["TransactionId"] = transactionId;
 
-        // 5. Response header'a ekle (client debugging için)
-        // Client bu ID'leri görebilir ve support'a bildirebilir
+        // 5. Response header'a ekle (client debugging + distributed tracing için)
+        // traceparent/tracestate: Frontend ödeme isteğinde gönderirse rezervasyon+ödeme aynı trace'te görünür
         context.Response.OnStarting(() =>
         {
             if (!context.Response.Headers.ContainsKey(CorrelationIdHeaderName))
-            {
                 context.Response.Headers[CorrelationIdHeaderName] = correlationId;
-            }
             if (!context.Response.Headers.ContainsKey(TransactionIdHeaderName))
-            {
                 context.Response.Headers[TransactionIdHeaderName] = transactionId;
+            // W3C Trace Context - frontend bunu okuyup ödeme isteğinde traceparent header olarak gönderir
+            if (activity != null && !context.Response.Headers.ContainsKey("traceparent") && !string.IsNullOrEmpty(activity.Id))
+            {
+                context.Response.Headers["traceparent"] = activity.Id;
+                if (!string.IsNullOrEmpty(activity.TraceStateString))
+                    context.Response.Headers["tracestate"] = activity.TraceStateString;
             }
             return Task.CompletedTask;
         });

@@ -34,7 +34,7 @@ namespace SkySync.Services.Payment.Persistence.Migrations
                     b.Property<Guid>("CorrelationId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ErrorMessage")
@@ -43,6 +43,12 @@ namespace SkySync.Services.Payment.Persistence.Migrations
                     b.Property<string>("ExternalTransactionId")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("ReservationId")
                         .HasColumnType("uuid");
 
@@ -50,9 +56,6 @@ namespace SkySync.Services.Payment.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

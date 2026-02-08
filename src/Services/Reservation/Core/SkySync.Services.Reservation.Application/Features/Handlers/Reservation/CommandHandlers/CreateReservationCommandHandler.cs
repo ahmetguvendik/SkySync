@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkySync.Services.Reservation.Application.Features.Commands.Reservation.Requests;
 using SkySync.Services.Reservation.Application.Features.Commands.Reservation.Responses;
@@ -23,17 +24,20 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
     private readonly IOutboxRepository _outboxRepository;
     private readonly IGenericRepository<ReservationEntity> _reservationRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<CreateReservationCommandHandler> _logger;
 
     public CreateReservationCommandHandler(
         IOutboxRepository outboxRepository,
         IGenericRepository<ReservationEntity> reservationRepository,
         IUnitOfWork unitOfWork,
+        IConfiguration configuration,
         ILogger<CreateReservationCommandHandler> logger)
     {
         _outboxRepository = outboxRepository;
         _reservationRepository = reservationRepository;
         _unitOfWork = unitOfWork;
+        _configuration = configuration;
         _logger = logger;
     }
 
@@ -136,10 +140,14 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
                 "Reservation created successfully. ReservationId: {ReservationId}, CorrelationId: {CorrelationId}, FlightId: {FlightId}, SeatNumber: {SeatNumber}",
                 reservationId, correlationId, request.FlightId, request.SeatNumber);
 
+            var timeoutMinutes = _configuration.GetValue("Payment:TimeoutMinutes", 5);
+            var expiresAt = DateTime.UtcNow.AddMinutes(timeoutMinutes); // Saga PaymentTimeoutMinutes ile uyumlu olmalı
             return new CreateReservationCommandResponse
             {
                 ReservationId = reservationId,
                 CorrelationId = correlationId,
+                Price = request.Price,
+                ExpiresAt = expiresAt,
                 IsSuccess = true,
                 Message = "Reservation created successfully"
             };
