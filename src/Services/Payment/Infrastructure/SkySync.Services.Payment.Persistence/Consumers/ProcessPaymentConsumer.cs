@@ -36,6 +36,15 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPaymentCommand>
             "Payment command received. MessageId: {MessageId}, ReservationId: {ReservationId}, Amount: {Amount}",
             messageId, msg.ReservationId, msg.Amount);
 
+        // ValidUntil: Komut kendi süresini taşır. Payment geç açılsa bile süre dolmuşsa işlenmez.
+        if (DateTime.UtcNow > msg.ValidUntil)
+        {
+            _logger.LogWarning(
+                "Payment skipped - command expired (ValidUntil passed). ReservationId: {ReservationId}, MessageId: {MessageId}",
+                msg.ReservationId, messageId);
+            return; // Ack - mesaj işlendi ama ödeme yapılmadı (timeout durumu)
+        }
+
         // INBOX PATTERN - Idempotency Marker (CRITICAL for payments)
         var businessKey = msg.ReservationId.ToString();
         var markedSuccess = await _inboxService.MarkAsProcessedAsync(

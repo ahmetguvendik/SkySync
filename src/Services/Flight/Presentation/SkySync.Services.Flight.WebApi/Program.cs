@@ -60,7 +60,7 @@ builder.Services.AddCacheService(builder.Configuration, redis);
 // Eureka Service Discovery - Register with Eureka
 builder.Services.AddEurekaDiscoveryClient();
 
-// OpenTelemetry - Distributed Tracing (Jaeger'a trace gönderir)
+// OpenTelemetry - Distributed Tracing (Jaegera trace gönderir)
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource
         .AddService(

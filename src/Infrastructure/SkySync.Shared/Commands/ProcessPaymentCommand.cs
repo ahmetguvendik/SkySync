@@ -10,4 +10,9 @@ public class ProcessPaymentCommand
     public Guid ReservationId { get; set; }
     public decimal Amount { get; set; }
     public string PassengerEmail { get; set; } = string.Empty;
+    /// <summary>
+    /// Ödeme bu zamana kadar tamamlanmalı. Aşılırsa komut geçersiz (timeout).
+    /// Sıra garantisi olmadan da çalışır - Payment geç açılsa bile.
+    /// </summary>
+    public DateTime ValidUntil { get; set; }
 }

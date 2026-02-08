@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkySync.Workers.Outbox")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2aeb3ff9a1c8569b0d01a261ce8c0945dd9adebb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+17b0d1ad70ec18df33e252bf6f5738b5cb576e78")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkySync.Workers.Outbox")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkySync.Workers.Outbox")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

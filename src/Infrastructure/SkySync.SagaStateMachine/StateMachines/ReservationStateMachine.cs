@@ -76,7 +76,8 @@ public class ReservationStateMachine : MassTransitStateMachine<StateInstances.Re
                     CorrelationId = context.Saga.CorrelationId,
                     ReservationId = context.Saga.ReservationId,
                     Amount = context.Saga.Price,
-                    PassengerEmail = context.Saga.PassengerEmail
+                    PassengerEmail = context.Saga.PassengerEmail,
+                    ValidUntil = DateTime.UtcNow.AddMinutes(PaymentTimeoutMinutes)
                 })
                 .Schedule(PaymentTimeout, context => new PaymentTimeoutEvent
                 {

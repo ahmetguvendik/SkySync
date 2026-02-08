@@ -128,6 +128,15 @@ app.UseCorrelationId();
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    // Proxied /api/* istekleri backend'de zaten loglanıyor; Gateway'de tekrar loglamayı atla (gereksiz tekrar önlenir)
+    options.GetLevel = (httpContext, elapsed, ex) =>
+    {
+        if (ex != null) return Serilog.Events.LogEventLevel.Error;
+        if (httpContext.Response.StatusCode >= 500) return Serilog.Events.LogEventLevel.Error;
+        if (httpContext.Request.Path.StartsWithSegments("/api"))
+            return Serilog.Events.LogEventLevel.Verbose; // Skip - backend zaten logluyor
+        return Serilog.Events.LogEventLevel.Information;
+    };
     options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
     {
         diagnosticContext.Set("RequestMethod", httpContext.Request.Method);

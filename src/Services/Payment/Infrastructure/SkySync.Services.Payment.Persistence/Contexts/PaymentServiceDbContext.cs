@@ -17,6 +17,7 @@ public class PaymentServiceDbContext : DbContext
     /// </summary>
     public DbSet<InboxMessage> InboxMessages { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -74,5 +75,6 @@ public class PaymentServiceDbContext : DbContext
             entity.HasIndex(i => new { i.EventType, i.BusinessKey })
                 .IsUnique();
         });
+
     }
 }
