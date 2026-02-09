@@ -15,7 +15,9 @@
         <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
     </ItemGroup>
 
+
     <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />
         <ProjectReference Include="..\..\Core\SkySync.Services.Identity.Application\SkySync.Services.Identity.Application.csproj" />
     </ItemGroup>
 

@@ -111,3 +111,11 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/Serilog.Sinks.Seq.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Infrastructure.Logging.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Infrastructure.Logging.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/BCrypt.Net-Next.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Identity.Application.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Identity.Domain.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Identity.Persistence.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Identity.Persistence.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Identity.Application.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Workers/SkySync.Workers.Outbox/bin/Debug/net9.0/SkySync.Services.Identity.Domain.pdb

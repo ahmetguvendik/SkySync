@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkySync.Services.Flight.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2b1802258a76a4c24b7fa4edd9345d1c59606879")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af23e853b437f91a9cf26d49648a25dd8cbc1591")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkySync.Services.Flight.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkySync.Services.Flight.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

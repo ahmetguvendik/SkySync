@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SkySync.Services.Identity.Domain.Entities;
+using SkySync.Shared.OutboxTable;
 
 namespace SkySync.Services.Identity.Persistence.Contexts;
 
@@ -10,6 +11,7 @@ public class IdentityServiceDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +28,18 @@ public class IdentityServiceDbContext : DbContext
 
             entity.HasIndex(u => u.Email).IsUnique();
             entity.HasIndex(u => new { u.Email, u.IsDeleted });
+        });
+
+        modelBuilder.Entity<OutboxMessage>(entity =>
+        {
+            entity.HasKey(o => o.Id);
+            entity.Property(o => o.Type).IsRequired().HasMaxLength(255);
+            entity.Property(o => o.Content).IsRequired();
+            entity.Property(o => o.OccurredOn).IsRequired();
+            entity.Property(o => o.RetryCount).IsRequired().HasDefaultValue(0);
+            entity.Property(o => o.IsFailed).IsRequired().HasDefaultValue(false);
+            entity.HasIndex(o => o.ProcessedOn);
+            entity.HasIndex(o => new { o.IsFailed, o.ProcessedOn });
         });
     }
 }

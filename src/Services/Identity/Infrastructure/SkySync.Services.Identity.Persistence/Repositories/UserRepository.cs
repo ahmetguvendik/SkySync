@@ -30,8 +30,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User> CreateAsync(User user, CancellationToken cancellationToken = default)
     {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.Users.AddAsync(user, cancellationToken);
         return user;
     }
 

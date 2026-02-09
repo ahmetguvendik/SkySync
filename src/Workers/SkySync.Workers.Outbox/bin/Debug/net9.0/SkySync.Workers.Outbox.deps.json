@@ -17,11 +17,20 @@
           "OpenTelemetry.Extensions.Hosting": "1.15.0",
           "OpenTelemetry.Instrumentation.EntityFrameworkCore": "1.15.0-beta.1",
           "SkySync.Services.Flight.Persistence": "1.0.0",
+          "SkySync.Services.Identity.Persistence": "1.0.0",
           "SkySync.Services.Reservation.Persistence": "1.0.0",
           "SkySync.Shared": "1.0.0"
         },
         "runtime": {
           "SkySync.Workers.Outbox.dll": {}
+        }
+      },
+      "BCrypt.Net-Next/4.0.3": {
+        "runtime": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "assemblyVersion": "4.0.3.0",
+            "fileVersion": "4.0.3.0"
+          }
         }
       },
       "FluentValidation/11.11.0": {
@@ -949,6 +958,18 @@
           }
         }
       },
+      "System.IdentityModel.Tokens.Jwt/8.2.1": {
+        "dependencies": {
+          "Microsoft.IdentityModel.JsonWebTokens": "8.14.0",
+          "Microsoft.IdentityModel.Tokens": "8.14.0"
+        },
+        "runtime": {
+          "lib/net9.0/System.IdentityModel.Tokens.Jwt.dll": {
+            "assemblyVersion": "8.2.1.0",
+            "fileVersion": "8.2.1.51115"
+          }
+        }
+      },
       "System.IO.Pipelines/8.0.0": {},
       "System.Threading.RateLimiting/8.0.0": {},
       "SkySync.Infrastructure.Logging/1.0.0": {
@@ -1031,6 +1052,48 @@
           }
         }
       },
+      "SkySync.Services.Identity.Application/1.0.0": {
+        "dependencies": {
+          "FluentValidation": "11.11.0",
+          "FluentValidation.DependencyInjectionExtensions": "11.11.0",
+          "MediatR": "14.0.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "SkySync.Services.Identity.Domain": "1.0.0",
+          "SkySync.Shared": "1.0.0"
+        },
+        "runtime": {
+          "SkySync.Services.Identity.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "SkySync.Services.Identity.Domain/1.0.0": {
+        "runtime": {
+          "SkySync.Services.Identity.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "SkySync.Services.Identity.Persistence/1.0.0": {
+        "dependencies": {
+          "BCrypt.Net-Next": "4.0.3",
+          "Microsoft.EntityFrameworkCore": "9.0.12",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.IdentityModel.Tokens": "8.14.0",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
+          "SkySync.Services.Identity.Application": "1.0.0",
+          "SkySync.Shared": "1.0.0",
+          "System.IdentityModel.Tokens.Jwt": "8.2.1"
+        },
+        "runtime": {
+          "SkySync.Services.Identity.Persistence.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "SkySync.Services.Reservation.Application/1.0.0": {
         "dependencies": {
           "FluentValidation": "11.11.0",
@@ -1098,6 +1161,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "BCrypt.Net-Next/4.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA==",
+      "path": "bcrypt.net-next/4.0.3",
+      "hashPath": "bcrypt.net-next.4.0.3.nupkg.sha512"
     },
     "FluentValidation/11.11.0": {
       "type": "package",
@@ -1638,6 +1708,13 @@
       "path": "system.diagnostics.eventlog/9.0.9",
       "hashPath": "system.diagnostics.eventlog.9.0.9.nupkg.sha512"
     },
+    "System.IdentityModel.Tokens.Jwt/8.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GVQmbjr2N8awFWPTWyThLxgKnFINObG1P+oX7vFrBY8um3V7V7Dh3wnxaGxNH6v6lSTeVQrY+SaUUBX9H3TPcw==",
+      "path": "system.identitymodel.tokens.jwt/8.2.1",
+      "hashPath": "system.identitymodel.tokens.jwt.8.2.1.nupkg.sha512"
+    },
     "System.IO.Pipelines/8.0.0": {
       "type": "package",
       "serviceable": true,
@@ -1673,6 +1750,21 @@
       "sha512": ""
     },
     "SkySync.Services.Flight.Persistence/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SkySync.Services.Identity.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SkySync.Services.Identity.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SkySync.Services.Identity.Persistence/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

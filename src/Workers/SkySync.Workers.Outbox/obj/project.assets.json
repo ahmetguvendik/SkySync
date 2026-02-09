@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net9.0": {
+      "BCrypt.Net-Next/4.0.3": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "FluentValidation/11.11.0": {
         "type": "package",
         "compile": {
@@ -1421,6 +1434,23 @@
           }
         }
       },
+      "System.IdentityModel.Tokens.Jwt/8.2.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.IdentityModel.JsonWebTokens": "8.2.1",
+          "Microsoft.IdentityModel.Tokens": "8.2.1"
+        },
+        "compile": {
+          "lib/net9.0/System.IdentityModel.Tokens.Jwt.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/System.IdentityModel.Tokens.Jwt.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "System.IO.Pipelines/8.0.0": {
         "type": "package",
         "compile": {
@@ -1546,6 +1576,54 @@
           "bin/placeholder/SkySync.Services.Flight.Persistence.dll": {}
         }
       },
+      "SkySync.Services.Identity.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "FluentValidation": "11.11.0",
+          "FluentValidation.DependencyInjectionExtensions": "11.11.0",
+          "MediatR": "14.0.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.0",
+          "SkySync.Services.Identity.Domain": "1.0.0",
+          "SkySync.Shared": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/SkySync.Services.Identity.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SkySync.Services.Identity.Application.dll": {}
+        }
+      },
+      "SkySync.Services.Identity.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/SkySync.Services.Identity.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SkySync.Services.Identity.Domain.dll": {}
+        }
+      },
+      "SkySync.Services.Identity.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "BCrypt.Net-Next": "4.0.3",
+          "Microsoft.EntityFrameworkCore": "9.0.1",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.0",
+          "Microsoft.IdentityModel.Tokens": "8.14.0",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.2",
+          "SkySync.Services.Identity.Application": "1.0.0",
+          "SkySync.Shared": "1.0.0",
+          "System.IdentityModel.Tokens.Jwt": "8.2.1"
+        },
+        "compile": {
+          "bin/placeholder/SkySync.Services.Identity.Persistence.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SkySync.Services.Identity.Persistence.dll": {}
+        }
+      },
       "SkySync.Services.Reservation.Application/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
@@ -1617,6 +1695,37 @@
     }
   },
   "libraries": {
+    "BCrypt.Net-Next/4.0.3": {
+      "sha512": "W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA==",
+      "type": "package",
+      "path": "bcrypt.net-next/4.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bcrypt.net-next.4.0.3.nupkg.sha512",
+        "bcrypt.net-next.nuspec",
+        "ico.png",
+        "lib/net20/BCrypt.Net-Next.dll",
+        "lib/net20/BCrypt.Net-Next.xml",
+        "lib/net35/BCrypt.Net-Next.dll",
+        "lib/net35/BCrypt.Net-Next.xml",
+        "lib/net462/BCrypt.Net-Next.dll",
+        "lib/net462/BCrypt.Net-Next.xml",
+        "lib/net472/BCrypt.Net-Next.dll",
+        "lib/net472/BCrypt.Net-Next.xml",
+        "lib/net48/BCrypt.Net-Next.dll",
+        "lib/net48/BCrypt.Net-Next.xml",
+        "lib/net5.0/BCrypt.Net-Next.dll",
+        "lib/net5.0/BCrypt.Net-Next.xml",
+        "lib/net6.0/BCrypt.Net-Next.dll",
+        "lib/net6.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.0/BCrypt.Net-Next.dll",
+        "lib/netstandard2.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.1/BCrypt.Net-Next.dll",
+        "lib/netstandard2.1/BCrypt.Net-Next.xml",
+        "readme.md"
+      ]
+    },
     "FluentValidation/11.11.0": {
       "sha512": "cyIVdQBwSipxWG8MA3Rqox7iNbUNUTK5bfJi9tIdm4CAfH71Oo5ABLP4/QyrUwuakqpUEPGtE43BDddvEehuYw==",
       "type": "package",
@@ -3593,6 +3702,30 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "System.IdentityModel.Tokens.Jwt/8.2.1": {
+      "sha512": "GVQmbjr2N8awFWPTWyThLxgKnFINObG1P+oX7vFrBY8um3V7V7Dh3wnxaGxNH6v6lSTeVQrY+SaUUBX9H3TPcw==",
+      "type": "package",
+      "path": "system.identitymodel.tokens.jwt/8.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net462/System.IdentityModel.Tokens.Jwt.dll",
+        "lib/net462/System.IdentityModel.Tokens.Jwt.xml",
+        "lib/net472/System.IdentityModel.Tokens.Jwt.dll",
+        "lib/net472/System.IdentityModel.Tokens.Jwt.xml",
+        "lib/net6.0/System.IdentityModel.Tokens.Jwt.dll",
+        "lib/net6.0/System.IdentityModel.Tokens.Jwt.xml",
+        "lib/net8.0/System.IdentityModel.Tokens.Jwt.dll",
+        "lib/net8.0/System.IdentityModel.Tokens.Jwt.xml",
+        "lib/net9.0/System.IdentityModel.Tokens.Jwt.dll",
+        "lib/net9.0/System.IdentityModel.Tokens.Jwt.xml",
+        "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.dll",
+        "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.xml",
+        "system.identitymodel.tokens.jwt.8.2.1.nupkg.sha512",
+        "system.identitymodel.tokens.jwt.nuspec"
+      ]
+    },
     "System.IO.Pipelines/8.0.0": {
       "sha512": "FHNOatmUq0sqJOkTx+UF/9YK1f180cnW5FVqnQMvYUN0elp6wFzbtPSiqbo1/ru8ICp43JM1i7kKkk6GsNGHlA==",
       "type": "package",
@@ -3676,6 +3809,21 @@
       "path": "../../Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/SkySync.Services.Flight.Persistence.csproj",
       "msbuildProject": "../../Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/SkySync.Services.Flight.Persistence.csproj"
     },
+    "SkySync.Services.Identity.Application/1.0.0": {
+      "type": "project",
+      "path": "../../Services/Identity/Core/SkySync.Services.Identity.Application/SkySync.Services.Identity.Application.csproj",
+      "msbuildProject": "../../Services/Identity/Core/SkySync.Services.Identity.Application/SkySync.Services.Identity.Application.csproj"
+    },
+    "SkySync.Services.Identity.Domain/1.0.0": {
+      "type": "project",
+      "path": "../../Services/Identity/Core/SkySync.Services.Identity.Domain/SkySync.Services.Identity.Domain.csproj",
+      "msbuildProject": "../../Services/Identity/Core/SkySync.Services.Identity.Domain/SkySync.Services.Identity.Domain.csproj"
+    },
+    "SkySync.Services.Identity.Persistence/1.0.0": {
+      "type": "project",
+      "path": "../../Services/Identity/Infrastructure/SkySync.Services.Identity.Persistence/SkySync.Services.Identity.Persistence.csproj",
+      "msbuildProject": "../../Services/Identity/Infrastructure/SkySync.Services.Identity.Persistence/SkySync.Services.Identity.Persistence.csproj"
+    },
     "SkySync.Services.Reservation.Application/1.0.0": {
       "type": "project",
       "path": "../../Services/Reservation/Core/SkySync.Services.Reservation.Application/SkySync.Services.Reservation.Application.csproj",
@@ -3708,6 +3856,7 @@
       "OpenTelemetry.Extensions.Hosting >= 1.15.0",
       "OpenTelemetry.Instrumentation.EntityFrameworkCore >= 1.15.0-beta.1",
       "SkySync.Services.Flight.Persistence >= 1.0.0",
+      "SkySync.Services.Identity.Persistence >= 1.0.0",
       "SkySync.Services.Reservation.Persistence >= 1.0.0",
       "SkySync.Shared >= 1.0.0"
     ]
@@ -3742,6 +3891,9 @@
             },
             "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/SkySync.Services.Flight.Persistence.csproj": {
               "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Infrastructure/SkySync.Services.Flight.Persistence/SkySync.Services.Flight.Persistence.csproj"
+            },
+            "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Identity/Infrastructure/SkySync.Services.Identity.Persistence/SkySync.Services.Identity.Persistence.csproj": {
+              "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Identity/Infrastructure/SkySync.Services.Identity.Persistence/SkySync.Services.Identity.Persistence.csproj"
             },
             "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Reservation/Infrastructure/SkySync.Services.Reservation.Persistence/SkySync.Services.Reservation.Persistence.csproj": {
               "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Reservation/Infrastructure/SkySync.Services.Reservation.Persistence/SkySync.Services.Reservation.Persistence.csproj"

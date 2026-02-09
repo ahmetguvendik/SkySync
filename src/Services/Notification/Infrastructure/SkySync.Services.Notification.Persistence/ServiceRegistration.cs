@@ -30,6 +30,7 @@ public static class ServiceRegistration
         {
             x.AddConsumer<ReservationConfirmedConsumer>();
             x.AddConsumer<FlightCreatedConsumer>();
+            x.AddConsumer<UserRegisteredConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
@@ -47,6 +48,12 @@ public static class ServiceRegistration
                 {
                     e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
                     e.ConfigureConsumer<FlightCreatedConsumer>(context);
+                });
+
+                cfg.ReceiveEndpoint(RabbitMqSettings.NotificationUserRegisteredQueue, e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+                    e.ConfigureConsumer<UserRegisteredConsumer>(context);
                 });
             });
         });

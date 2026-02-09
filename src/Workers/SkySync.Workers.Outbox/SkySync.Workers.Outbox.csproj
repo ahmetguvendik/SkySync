@@ -21,6 +21,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Services\Flight\Infrastructure\SkySync.Services.Flight.Persistence\SkySync.Services.Flight.Persistence.csproj" />
         <ProjectReference Include="..\..\Services\Reservation\Infrastructure\SkySync.Services.Reservation.Persistence\SkySync.Services.Reservation.Persistence.csproj" />
+        <ProjectReference Include="..\..\Services\Identity\Infrastructure\SkySync.Services.Identity.Persistence\SkySync.Services.Identity.Persistence.csproj" />
         <ProjectReference Include="..\..\Infrastructure\SkySync.Shared\SkySync.Shared.csproj" />
     </ItemGroup>
 </Project>

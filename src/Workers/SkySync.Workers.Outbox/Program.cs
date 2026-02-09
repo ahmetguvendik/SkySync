@@ -5,8 +5,10 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using FlightPersistence = SkySync.Services.Flight.Persistence;
 using ReservationPersistence = SkySync.Services.Reservation.Persistence;
+using IdentityPersistence = SkySync.Services.Identity.Persistence;
 using SkySync.Workers.Outbox.Jobs.Flight;
 using SkySync.Workers.Outbox.Jobs.Reservation;
+using SkySync.Workers.Outbox.Jobs.Identity;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -15,6 +17,9 @@ FlightPersistence.ServiceRegistration.AddPersistenceService(builder.Services, bu
 
 // Add Persistence Services (Reservation Service DbContext ve Repositories)
 ReservationPersistence.ServiceRegistration.AddPersistenceService(builder.Services, builder.Configuration);
+
+// Add Persistence Services (Identity Service DbContext ve Repositories)
+IdentityPersistence.ServiceRegistration.AddPersistenceServices(builder.Services, builder.Configuration);
 
 // Add MassTransit with RabbitMQ
 builder.Services.AddMassTransit(x =>
@@ -73,6 +78,7 @@ builder.Services.AddOpenTelemetry()
 // Add Outbox Workers (Flight ve Reservation için ayrı worker'lar)
 builder.Services.AddHostedService<FlightOutboxPublishWorker>();
 builder.Services.AddHostedService<ReservationOutboxPublishWorker>();
+builder.Services.AddHostedService<IdentityOutboxPublishWorker>();
 
 var host = builder.Build();
 host.Run();

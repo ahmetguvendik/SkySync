@@ -73,6 +73,55 @@ namespace SkySync.Services.Identity.Persistence.Migrations
 
                     b.ToTable("Users");
                 });
+
+            modelBuilder.Entity("SkySync.Shared.OutboxTable.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsFailed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("OccurredOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RetryCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Traceparent")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tracestate")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProcessedOn");
+
+                    b.HasIndex("IsFailed", "ProcessedOn");
+
+                    b.ToTable("OutboxMessages");
+                });
 #pragma warning restore 612, 618
         }
     }
