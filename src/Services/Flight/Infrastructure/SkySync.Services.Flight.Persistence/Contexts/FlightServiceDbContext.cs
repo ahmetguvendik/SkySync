@@ -87,6 +87,10 @@ public class FlightServiceDbContext : DbContext
                 .WithOne(s => s.Flight)
                 .HasForeignKey(s => s.FlightId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Search indexes for common filters
+            entity.HasIndex(f => f.DepartureTime);
+            entity.HasIndex(f => new { f.Departure, f.Destination, f.DepartureTime });
         });
 
         // Seat Configuration

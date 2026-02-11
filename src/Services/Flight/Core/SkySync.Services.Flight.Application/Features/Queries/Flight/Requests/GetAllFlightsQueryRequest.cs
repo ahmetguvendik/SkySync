@@ -1,3 +1,4 @@
+using System;
 using MediatR;
 using SkySync.Services.Flight.Application.Features.Queries.Flight.Responses;
 
@@ -8,9 +9,10 @@ namespace SkySync.Services.Flight.Application.Features.Queries.Flight.Requests;
 /// </summary>
 public class GetAllFlightsQueryRequest : IRequest<GetAllFlightsQueryResponse>
 {
-    // İleride filtreleme için parametreler eklenebilir
-    // public string? Departure { get; set; }
-    // public string? Destination { get; set; }
-    // public DateTime? DepartureDate { get; set; }
+    public string? Departure { get; set; }
+    public string? Destination { get; set; }
+    public DateOnly? DepartureDate { get; set; }
+    public DateOnly? ReturnDate { get; set; } // Round-trip planlandığında kullanılacak
     public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
 }

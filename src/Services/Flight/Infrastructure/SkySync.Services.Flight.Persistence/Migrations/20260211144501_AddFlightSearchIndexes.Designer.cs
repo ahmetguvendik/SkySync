@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SkySync.Services.Flight.Persistence.Contexts;
@@ -11,9 +12,11 @@ using SkySync.Services.Flight.Persistence.Contexts;
 namespace SkySync.Services.Flight.Persistence.Migrations
 {
     [DbContext(typeof(FlightServiceDbContext))]
-    partial class FlightServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260211144501_AddFlightSearchIndexes")]
+    partial class AddFlightSearchIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
