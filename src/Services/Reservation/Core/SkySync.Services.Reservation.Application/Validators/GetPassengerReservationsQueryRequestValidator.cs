@@ -10,5 +10,8 @@ public class GetPassengerReservationsQueryRequestValidator : AbstractValidator<G
         RuleFor(x => x.PassengerEmail)
             .NotEmpty().WithMessage("Yolcu e-posta adresi zorunludur.")
             .EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
+
+        RuleFor(x => x.Page)
+            .GreaterThan(0).WithMessage("Sayfa numarası 1 veya daha büyük olmalıdır.");
     }
 }

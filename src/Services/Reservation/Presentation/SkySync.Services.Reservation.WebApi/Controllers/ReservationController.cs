@@ -54,11 +54,15 @@ public class ReservationController : ControllerBase
     /// Yolcu rezervasyonlarını listele (Query)
     /// </summary>
     [HttpGet("passenger/{passengerEmail}")]
-    public async Task<IActionResult> GetPassengerReservations(string passengerEmail, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetPassengerReservations(string passengerEmail, [FromQuery] int page = 1, CancellationToken cancellationToken = default)
     {
         try
         {
-            var query = new GetPassengerReservationsQueryRequest { PassengerEmail = passengerEmail };
+            var query = new GetPassengerReservationsQueryRequest
+            {
+                PassengerEmail = passengerEmail,
+                Page = page > 0 ? page : 1
+            };
             var response = await _mediator.Send(query, cancellationToken);
 
             return Ok(response);

@@ -7,5 +7,9 @@ namespace SkySync.Services.Reservation.Application.Interfaces;
 /// </summary>
 public interface IPassengerReservationsRepository
 {
-    Task<List<ReservationDto>> GetByPassengerEmailAsync(string passengerEmail, CancellationToken cancellationToken = default);
+    Task<(List<ReservationDto> Reservations, int TotalCount)> GetByPassengerEmailAsync(
+        string passengerEmail,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
 }

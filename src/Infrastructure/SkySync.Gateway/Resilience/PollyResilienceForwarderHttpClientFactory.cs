@@ -155,6 +155,11 @@ public sealed class PollyResilienceForwarderHttpClientFactory(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            if (!IsSafeMethod(request.Method))
+            {
+                return await base.SendAsync(request, cancellationToken);
+            }
+
             var context = ResilienceContextPool.Shared.Get(cancellationToken);
             try
             {
@@ -174,5 +179,10 @@ public sealed class PollyResilienceForwarderHttpClientFactory(
         {
             return await base.SendAsync(request, cancellationToken);
         }
+
+        private static bool IsSafeMethod(HttpMethod method) =>
+            method == HttpMethod.Get ||
+            method == HttpMethod.Head ||
+            method == HttpMethod.Options;
     }
 }

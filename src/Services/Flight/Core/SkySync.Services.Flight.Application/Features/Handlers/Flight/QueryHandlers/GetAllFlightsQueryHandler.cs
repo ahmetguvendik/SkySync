@@ -22,6 +22,7 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
     private const string CacheKey = "flights:all";
     private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(30);
     private static readonly TimeSpan LockExpiration = TimeSpan.FromSeconds(10); // Lock için maksimum süre
+    private const int DefaultPageSize = 10;
 
     public GetAllFlightsQueryHandler(
         IGenericRepository<FlightEntity> flightRepository,
@@ -35,6 +36,8 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
 
     public async Task<GetAllFlightsQueryResponse> Handle(GetAllFlightsQueryRequest request, CancellationToken cancellationToken)
     {
+        var page = NormalizePage(request.Page);
+
         try
         {
             // CACHE ASIDE PATTERN: Önce cachee bak
@@ -43,12 +46,7 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
             if (cachedFlights != null && cachedFlights.Any())
             {
                 _logger.LogInformation("Flights retrieved from cache. Count: {Count}", cachedFlights.Count);
-                return new GetAllFlightsQueryResponse
-                {
-                    Flights = cachedFlights,
-                    IsFromCache = true,
-                    TotalCount = cachedFlights.Count
-                };
+                return BuildPagedResponse(cachedFlights, true, page);
             }
 
             // CACHE STAMPEDE ÖNLEME: Distributed Lock al
@@ -66,12 +64,7 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
                 if (cachedFlights != null && cachedFlights.Any())
                 {
                     _logger.LogInformation("Flights retrieved from cache after lock wait. Count: {Count}", cachedFlights.Count);
-                    return new GetAllFlightsQueryResponse
-                    {
-                        Flights = cachedFlights,
-                        IsFromCache = true,
-                        TotalCount = cachedFlights.Count
-                    };
+                    return BuildPagedResponse(cachedFlights, true, page);
                 }
             }
 
@@ -120,12 +113,7 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
 
                 _logger.LogInformation("Flights retrieved from database. Count: {Count}", flightDtos.Count);
                 
-                return new GetAllFlightsQueryResponse
-                {
-                    Flights = flightDtos,
-                    IsFromCache = false,
-                    TotalCount = flightDtos.Count
-                };
+                return BuildPagedResponse(flightDtos, false, page);
             }
             finally
             {
@@ -141,5 +129,23 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
             _logger.LogError(ex, "Error occurred while fetching flights");
             throw;
         }
+    }
+
+    private static int NormalizePage(int page) => page <= 0 ? 1 : page;
+
+    private static GetAllFlightsQueryResponse BuildPagedResponse(List<FlightDto> flights, bool isFromCache, int page)
+    {
+        var totalCount = flights.Count;
+        var skip = (page - 1) * DefaultPageSize;
+        var pagedFlights = flights.Skip(skip).Take(DefaultPageSize).ToList();
+
+        return new GetAllFlightsQueryResponse
+        {
+            Flights = pagedFlights,
+            IsFromCache = isFromCache,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = DefaultPageSize
+        };
     }
 }

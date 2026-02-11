@@ -6,4 +6,5 @@ namespace SkySync.Services.Reservation.Application.Features.Queries.Reservation.
 public class GetPassengerReservationsQueryRequest : IRequest<GetPassengerReservationsQueryResponse>
 {
     public string PassengerEmail { get; set; }
+    public int Page { get; set; } = 1;
 }

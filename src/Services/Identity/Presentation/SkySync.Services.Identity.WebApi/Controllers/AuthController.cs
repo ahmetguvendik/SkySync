@@ -64,6 +64,38 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Şifre sıfırlama bağlantısı gönderir (kullanıcı kayıtlıysa)
+    /// </summary>
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommandRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _mediator.Send(request, cancellationToken);
+        return Ok(new { message = response.Message });
+    }
+
+    /// <summary>
+    /// Şifreyi verilen token ile günceller
+    /// </summary>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommandRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _mediator.Send(request, cancellationToken);
+
+        if (!response.IsSuccess)
+            return BadRequest(new { message = response.Message, code = "RESET_PASSWORD_FAILED" });
+
+        return Ok(new { message = response.Message });
+    }
+
+    /// <summary>
     /// Kullanıcı profili - JWT gerekli
     /// </summary>
     [HttpGet("profile")]

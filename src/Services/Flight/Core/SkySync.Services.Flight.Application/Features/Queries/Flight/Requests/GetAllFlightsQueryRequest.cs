@@ -12,4 +12,5 @@ public class GetAllFlightsQueryRequest : IRequest<GetAllFlightsQueryResponse>
     // public string? Departure { get; set; }
     // public string? Destination { get; set; }
     // public DateTime? DepartureDate { get; set; }
+    public int Page { get; set; } = 1;
 }

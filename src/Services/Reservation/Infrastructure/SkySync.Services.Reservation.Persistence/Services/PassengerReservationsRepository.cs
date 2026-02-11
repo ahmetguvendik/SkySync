@@ -14,8 +14,16 @@ public class PassengerReservationsRepository : IPassengerReservationsRepository
         _db = db;
     }
 
-    public async Task<List<ReservationDto>> GetByPassengerEmailAsync(string passengerEmail, CancellationToken cancellationToken = default)
+    public async Task<(List<ReservationDto> Reservations, int TotalCount)> GetByPassengerEmailAsync(
+        string passengerEmail,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
+        var normalizedPage = page > 0 ? page : 1;
+        var normalizedPageSize = pageSize > 0 ? pageSize : 10;
+        var skip = (normalizedPage - 1) * normalizedPageSize;
+
         var query = from r in _db.Reservations.AsNoTracking()
                     where r.PassengerEmail == passengerEmail && !r.IsDeleted
                     join f in _db.FlightSummaries on r.FlightId equals f.FlightId into fj
@@ -38,6 +46,9 @@ public class PassengerReservationsRepository : IPassengerReservationsRepository
                         CreatedTime = r.CreatedTime
                     };
 
-        return await query.ToListAsync(cancellationToken);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var reservations = await query.Skip(skip).Take(normalizedPageSize).ToListAsync(cancellationToken);
+
+        return (reservations, totalCount);
     }
 }

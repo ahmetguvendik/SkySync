@@ -12,6 +12,7 @@ public class IdentityServiceDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -40,6 +41,23 @@ public class IdentityServiceDbContext : DbContext
             entity.Property(o => o.IsFailed).IsRequired().HasDefaultValue(false);
             entity.HasIndex(o => o.ProcessedOn);
             entity.HasIndex(o => new { o.IsFailed, o.ProcessedOn });
+        });
+
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.Token).IsRequired().HasMaxLength(200);
+            entity.Property(p => p.ExpiresAt).IsRequired();
+            entity.Property(p => p.IsUsed).IsRequired().HasDefaultValue(false);
+            entity.Property(p => p.UsedAt).IsRequired(false);
+
+            entity.HasIndex(p => p.Token).IsUnique();
+            entity.HasIndex(p => new { p.UserId, p.IsUsed });
+
+            entity.HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

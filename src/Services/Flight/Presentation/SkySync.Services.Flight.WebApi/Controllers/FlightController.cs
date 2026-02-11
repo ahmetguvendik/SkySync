@@ -74,11 +74,11 @@ public class FlightController : ControllerBase
     /// Adım 1: Uçuş arama - Kullanıcı tarih ve rota seçer, özet bilgileri görür
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> GetAllFlights(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllFlights([FromQuery] GetAllFlightsQueryRequest? request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = new GetAllFlightsQueryRequest();
+            var query = request ?? new GetAllFlightsQueryRequest();
             var response = await _mediator.Send(query, cancellationToken);
 
             return Ok(response);

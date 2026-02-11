@@ -14,6 +14,7 @@ public class GetPassengerReservationsQueryHandler : IRequestHandler<GetPassenger
 {
     private readonly IPassengerReservationsRepository _passengerReservationsRepository;
     private readonly ILogger<GetPassengerReservationsQueryHandler> _logger;
+    private const int DefaultPageSize = 10;
 
     public GetPassengerReservationsQueryHandler(
         IPassengerReservationsRepository passengerReservationsRepository,
@@ -27,8 +28,9 @@ public class GetPassengerReservationsQueryHandler : IRequestHandler<GetPassenger
     {
         try
         {
-            var reservationDtos = await _passengerReservationsRepository
-                .GetByPassengerEmailAsync(request.PassengerEmail, cancellationToken);
+            var page = request.Page > 0 ? request.Page : 1;
+            var (reservationDtos, totalCount) = await _passengerReservationsRepository
+                .GetByPassengerEmailAsync(request.PassengerEmail, page, DefaultPageSize, cancellationToken);
 
             _logger.LogInformation(
                 "Passenger reservations retrieved. Email: {Email}, Count: {Count}",
@@ -37,7 +39,9 @@ public class GetPassengerReservationsQueryHandler : IRequestHandler<GetPassenger
             return new GetPassengerReservationsQueryResponse
             {
                 Reservations = reservationDtos,
-                TotalCount = reservationDtos.Count
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = DefaultPageSize
             };
         }
         catch (Exception ex)

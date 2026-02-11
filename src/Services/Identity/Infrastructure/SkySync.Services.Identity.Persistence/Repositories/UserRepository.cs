@@ -39,4 +39,19 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .AnyAsync(u => u.Email == email && !u.IsDeleted, cancellationToken);
     }
+
+    public async Task<bool> UpdatePasswordHashAsync(Guid userId, string passwordHash, CancellationToken cancellationToken = default)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted, cancellationToken);
+
+        if (user == null)
+        {
+            return false;
+        }
+
+        user.PasswordHash = passwordHash;
+        user.ModifiedTime = DateTime.UtcNow;
+        return true;
+    }
 }
