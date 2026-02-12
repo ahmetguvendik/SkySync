@@ -33,6 +33,7 @@ Uçuş ve rezervasyon akışlarını yöneten, **.NET 9** tabanlı **microservic
 | **Cache-Aside (Redis)** | Uçuş listesi cache'lenir; uçuş oluşturulunca cache invalidate edilir |
 | **Correlation ID & Transaction ID** | Gateway'de header'lara eklenir; dağıtık istek takibi |
 | **Resilience** | Gateway'de timeout, retry (exponential backoff), circuit breaker, rate limiting |
+| **Eposta Hatırlatmaları** | Uçuşa 12 saat kala otomatik flight reminder maili gönderilir |
 
 ---
 
@@ -270,6 +271,7 @@ Gateway'de routes, rate limit, retry, circuit breaker değerleri `appsettings.js
 | Reservation | GET | `/api/reservation/passenger/{email}` | Yolcu rezervasyonları (Query) |
 | Identity | POST | `/api/auth/register`, `/api/auth/login` | Kayıt, giriş |
 | Identity | GET | `/api/auth/profile` | Profil (Query) |
+| Identity | POST | `/api/auth/verify-email` | Email doğrulama |
 
 Tüm API'ler Gateway üzerinden (`http://localhost:5000` veya konfigüre edilen port) erişilir. Detaylı request/response örnekleri: [API_ENDPOINTS.md](API_ENDPOINTS.md).
 

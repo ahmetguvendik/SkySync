@@ -44,6 +44,16 @@ public class LoginCommandHandler : IRequestHandler<LoginCommandRequest, LoginCom
             };
         }
 
+        if (!user.IsEmailConfirmed)
+        {
+            _logger.LogWarning("Login blocked - email not confirmed. Email: {Email}", request.Email);
+            return new LoginCommandResponse
+            {
+                IsSuccess = false,
+                Message = "Lütfen önce email adresinizi doğrulayın."
+            };
+        }
+
         var expiryStr = _configuration["JwtSettings:ExpirationMinutes"];
         var expiryMinutes = int.TryParse(expiryStr, out var m) ? m : 60;
         var expiresAt = DateTime.UtcNow.AddMinutes(expiryMinutes);

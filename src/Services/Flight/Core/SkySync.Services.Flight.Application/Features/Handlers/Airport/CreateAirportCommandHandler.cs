@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SkySync.Services.Flight.Application.Features.Commands.Airport.Requests;
 using SkySync.Services.Flight.Application.Features.Commands.Airport.Responses;
 using SkySync.Services.Flight.Application.Interfaces;
+using SkySync.Services.Flight.Application.UnitOfWorks;
 using AirportEntity = SkySync.Services.Flight.Domain.Entities.Airport;
 
 namespace SkySync.Services.Flight.Application.Features.Handlers.Airport;
@@ -10,13 +11,16 @@ namespace SkySync.Services.Flight.Application.Features.Handlers.Airport;
 public class CreateAirportCommandHandler : IRequestHandler<CreateAirportCommandRequest, CreateAirportCommandResponse>
 {
     private readonly IGenericRepository<AirportEntity> _airportRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateAirportCommandHandler> _logger;
 
     public CreateAirportCommandHandler(
         IGenericRepository<AirportEntity> airportRepository,
+        IUnitOfWork unitOfWork,
         ILogger<CreateAirportCommandHandler> logger)
     {
         _airportRepository = airportRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -35,24 +39,44 @@ public class CreateAirportCommandHandler : IRequestHandler<CreateAirportCommandR
             };
         }
 
-        var airport = new AirportEntity
+        try
         {
-            Id = Guid.NewGuid(),
-            Code = request.Code.ToUpperInvariant(),
-            Name = request.Name,
-            City = request.City,
-            Country = request.Country
-        };
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        await _airportRepository.CreateAsync(airport, cancellationToken);
+            var airport = new AirportEntity
+            {
+                Id = Guid.NewGuid(),
+                Code = request.Code.ToUpperInvariant(),
+                Name = request.Name,
+                City = request.City,
+                Country = request.Country
+            };
 
-        _logger.LogInformation("Airport created: {Code} - {Name}", airport.Code, airport.Name);
+            await _airportRepository.CreateAsync(airport, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-        return new CreateAirportCommandResponse
+            _logger.LogInformation("Airport created: {Code} - {Name}", airport.Code, airport.Name);
+
+            return new CreateAirportCommandResponse
+            {
+                AirportId = airport.Id,
+                IsSuccess = true,
+                Message = "Airport created successfully."
+            };
+        }
+        catch (Exception ex)
         {
-            AirportId = airport.Id,
-            IsSuccess = true,
-            Message = "Airport created successfully."
-        };
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while creating airport. Code: {Code}, Error: {Error}",
+                request.Code, ex.Message);
+
+            return new CreateAirportCommandResponse
+            {
+                AirportId = Guid.Empty,
+                IsSuccess = false,
+                Message = $"Error occurred while creating airport: {ex.Message}"
+            };
+        }
     }
 }

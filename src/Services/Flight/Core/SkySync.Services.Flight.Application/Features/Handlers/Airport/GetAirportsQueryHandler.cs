@@ -14,6 +14,8 @@ public class GetAirportsQueryHandler : IRequestHandler<GetAirportsQueryRequest, 
     private readonly IGenericRepository<AirportEntity> _airportRepository;
     private readonly ILogger<GetAirportsQueryHandler> _logger;
 
+    private const int PageSize = 10; // Her sayfada 10 havalimanı
+
     public GetAirportsQueryHandler(
         IGenericRepository<AirportEntity> airportRepository,
         ILogger<GetAirportsQueryHandler> logger)
@@ -24,6 +26,8 @@ public class GetAirportsQueryHandler : IRequestHandler<GetAirportsQueryRequest, 
 
     public async Task<GetAirportsQueryResponse> Handle(GetAirportsQueryRequest request, CancellationToken cancellationToken)
     {
+        var page = NormalizePage(request.Page);
+
         var query = _airportRepository
             .GetQueryable()
             .AsNoTracking()
@@ -32,11 +36,20 @@ public class GetAirportsQueryHandler : IRequestHandler<GetAirportsQueryRequest, 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             var search = request.Search.Trim().ToUpperInvariant();
-            query = query.Where(a => a.Code.ToUpper().Contains(search));
+            query = query.Where(a =>
+                a.Code.ToUpper().Contains(search) ||
+                a.Name.ToUpper().Contains(search) ||
+                a.City.ToUpper().Contains(search) ||
+                a.Country.ToUpper().Contains(search));
         }
 
+        var totalCount = await query.CountAsync(cancellationToken);
+
         var airports = await query
-            .OrderBy(a => a.Code)
+            .OrderBy(a => a.City)
+            .ThenBy(a => a.Name)
+            .Skip((page - 1) * PageSize)
+            .Take(PageSize)
             .ToListAsync(cancellationToken);
 
         var dtos = airports.Select(a => new AirportDto
@@ -48,8 +61,17 @@ public class GetAirportsQueryHandler : IRequestHandler<GetAirportsQueryRequest, 
             Country = a.Country
         }).ToList();
 
-        _logger.LogInformation("Airports fetched. Count: {Count}", dtos.Count);
+        _logger.LogInformation("Airports fetched. Count: {Count}, Total: {TotalCount}, Page: {Page}",
+            dtos.Count, totalCount, page);
 
-        return new GetAirportsQueryResponse { Airports = dtos };
+        return new GetAirportsQueryResponse
+        {
+            Airports = dtos,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = PageSize
+        };
     }
+
+    private static int NormalizePage(int page) => page <= 0 ? 1 : page;
 }

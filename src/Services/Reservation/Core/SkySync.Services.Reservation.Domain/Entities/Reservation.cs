@@ -19,4 +19,5 @@ public class Reservation : BaseEntity
     
     // Takip için Saga CorrelationId
     public Guid CorrelationId { get; set; }
+    public DateTime? ReminderSentAt { get; set; }
 }

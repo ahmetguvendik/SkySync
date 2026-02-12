@@ -17,6 +17,8 @@ public static class RabbitMqSettings
     public const string NotificationFlightCreatedQueue = "notification-flight-created-queue";
     public const string NotificationUserRegisteredQueue = "notification-user-registered-queue";
     public const string NotificationPasswordResetQueue = "notification-password-reset-queue";
+    public const string NotificationEmailVerificationQueue = "notification-email-verification-queue";
+    public const string NotificationFlightReminderQueue = "notification-flight-reminder-queue";
 
     // Reservation Service – Flight read model (FlightCreatedEvent consumer)
     public const string ReservationFlightCreatedQueue = "reservation-flight-created-queue";

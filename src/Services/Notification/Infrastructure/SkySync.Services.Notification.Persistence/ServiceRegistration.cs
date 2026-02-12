@@ -32,6 +32,8 @@ public static class ServiceRegistration
             x.AddConsumer<FlightCreatedConsumer>();
             x.AddConsumer<UserRegisteredConsumer>();
             x.AddConsumer<PasswordResetRequestedConsumer>();
+            x.AddConsumer<EmailVerificationRequestedConsumer>();
+            x.AddConsumer<FlightReminderConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
@@ -61,6 +63,18 @@ public static class ServiceRegistration
                 {
                     e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
                     e.ConfigureConsumer<PasswordResetRequestedConsumer>(context);
+                });
+
+                cfg.ReceiveEndpoint(RabbitMqSettings.NotificationEmailVerificationQueue, e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+                    e.ConfigureConsumer<EmailVerificationRequestedConsumer>(context);
+                });
+
+                cfg.ReceiveEndpoint(RabbitMqSettings.NotificationFlightReminderQueue, e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+                    e.ConfigureConsumer<FlightReminderConsumer>(context);
                 });
             });
         });

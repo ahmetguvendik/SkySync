@@ -29,6 +29,7 @@ public class ReservationServiceDbContext : DbContext
             entity.Property(r => r.PassengerSurname).IsRequired().HasMaxLength(100);
             entity.Property(r => r.PassengerEmail).IsRequired().HasMaxLength(255);
             entity.Property(r => r.Status).HasConversion<int>(); // Enum'u integer olarak sakla
+            entity.Property(r => r.ReminderSentAt).IsRequired(false);
             
             // Indexes
             entity.HasIndex(r => r.PassengerEmail);

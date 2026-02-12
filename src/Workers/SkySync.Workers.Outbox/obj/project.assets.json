@@ -1584,6 +1584,7 @@
           "FluentValidation.DependencyInjectionExtensions": "11.11.0",
           "MediatR": "14.0.0",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Configuration.Binder": "9.0.0",
           "SkySync.Services.Identity.Domain": "1.0.0",
           "SkySync.Shared": "1.0.0"
         },

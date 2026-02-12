@@ -13,6 +13,7 @@ using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Reservation.Application.Behaviors;
 using SkySync.Services.Reservation.Application.Validators;
 using SkySync.Services.Reservation.Persistence;
+using SkySync.Services.Reservation.Persistence.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,9 @@ builder.Services.AddPersistenceService(builder.Configuration);
 
 // Add MassTransit with RabbitMQ and Saga State Machine
 builder.Services.AddMassTransitService(builder.Configuration);
+
+builder.Services.Configure<FlightReminderOptions>(builder.Configuration.GetSection("FlightReminder"));
+builder.Services.AddHostedService<FlightReminderBackgroundService>();
 
 var secretKey = builder.Configuration["JwtSettings:SecretKey"] ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
     ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLongForProduction!";

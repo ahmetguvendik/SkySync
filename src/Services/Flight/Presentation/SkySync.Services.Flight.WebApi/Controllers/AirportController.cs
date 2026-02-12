@@ -23,9 +23,10 @@ public class AirportController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAirports([FromQuery] string? search, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAirports([FromQuery] GetAirportsQueryRequest? request, CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(new GetAirportsQueryRequest { Search = search }, cancellationToken);
+        var query = request ?? new GetAirportsQueryRequest();
+        var response = await _mediator.Send(query, cancellationToken);
         return Ok(response);
     }
 

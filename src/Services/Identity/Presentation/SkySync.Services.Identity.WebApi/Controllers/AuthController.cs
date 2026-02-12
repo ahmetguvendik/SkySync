@@ -96,6 +96,20 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Email doğrulama tokenını onaylar
+    /// </summary>
+    [HttpPost("verify-email")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailCommandRequest request, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
+        if (!response.IsSuccess)
+            return BadRequest(new { message = response.Message, code = "EMAIL_VERIFY_FAILED" });
+
+        return Ok(new { message = response.Message });
+    }
+
+    /// <summary>
     /// Kullanıcı profili - JWT gerekli
     /// </summary>
     [HttpGet("profile")]

@@ -94,6 +94,9 @@ namespace SkySync.Services.Reservation.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("ReminderSentAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("SeatNumber")
                         .IsRequired()
                         .HasMaxLength(10)

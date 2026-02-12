@@ -54,4 +54,11 @@ public class UserRepository : IUserRepository
         user.ModifiedTime = DateTime.UtcNow;
         return true;
     }
+
+    public Task UpdateAsync(User user, CancellationToken cancellationToken = default)
+    {
+        user.ModifiedTime = DateTime.UtcNow;
+        _context.Users.Update(user);
+        return Task.CompletedTask;
+    }
 }
