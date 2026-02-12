@@ -14,6 +14,7 @@ public class FlightServiceDbContext : DbContext
     public DbSet<SkySync.Services.Flight.Domain.Entities.Aircraft> Aircraft { get; set; }
     public DbSet<SkySync.Services.Flight.Domain.Entities.Flight> Flights { get; set; }
     public DbSet<SkySync.Services.Flight.Domain.Entities.Seat> Seats { get; set; }
+    public DbSet<SkySync.Services.Flight.Domain.Entities.Airport> Airports { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     
     /// <summary>
@@ -156,5 +157,18 @@ public class FlightServiceDbContext : DbContext
             entity.HasIndex(i => new { i.EventType, i.BusinessKey })
                 .IsUnique();
         });
+        
+        // Airport Configuration
+        modelBuilder.Entity<SkySync.Services.Flight.Domain.Entities.Airport>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.Code).IsRequired().HasMaxLength(10);
+            entity.Property(a => a.Name).IsRequired().HasMaxLength(150);
+            entity.Property(a => a.City).IsRequired().HasMaxLength(100);
+            entity.Property(a => a.Country).IsRequired().HasMaxLength(100);
+            entity.HasIndex(a => a.Code).IsUnique();
+        });
     }
+    
 }
+    

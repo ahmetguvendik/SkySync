@@ -22,7 +22,7 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
     
     private const string CacheKeyPrefix = "flights:search";
     private static readonly TimeSpan CacheAllExpiration = TimeSpan.FromMinutes(30);
-    private static readonly TimeSpan CacheFilteredExpiration = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan CacheFilteredExpiration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan LockExpiration = TimeSpan.FromSeconds(10); // Lock için maksimum süre
     private const int DefaultPageSize = 10;
     private const int MaxPageSize = 50;

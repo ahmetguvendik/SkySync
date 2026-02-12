@@ -1,11 +1,15 @@
+using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkySync.Services.Payment.Application.Features.Commands.Payment.Requests;
 
 namespace SkySync.Services.Payment.WebApi.Controllers;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[Authorize]
 public class PaymentController : ControllerBase
 {
     private readonly IMediator _mediator;

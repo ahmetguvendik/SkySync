@@ -1,7 +1,10 @@
 using System.Reflection;
+using System.Text;
 using Asp.Versioning;
 using FluentValidation;
 using MassTransit.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -47,6 +50,31 @@ builder.Services.AddPersistenceService(builder.Configuration);
 
 // Add MassTransit with Consumers
 builder.Services.AddMassTransitService(builder.Configuration);
+
+// JWT Authentication (Gateway ile aynı ayarlar kullanılmalı)
+var secretKey = builder.Configuration["JwtSettings:SecretKey"] ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+    ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
+var issuer = builder.Configuration["JwtSettings:Issuer"] ?? "SkySync";
+var audience = builder.Configuration["JwtSettings:Audience"] ?? "SkySyncUsers";
+
+if (secretKey.Length < 32)
+    throw new InvalidOperationException("JWT Secret Key must be at least 32 characters long.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        };
+    });
+builder.Services.AddAuthorization();
 
 // Redis - Multiplexer'ı OpenTelemetry Redis instrumentation için başta oluşturuyoruz
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis")
@@ -115,6 +143,7 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Tutarlı hata response: message, code (opsiyonel), errors (validasyon)

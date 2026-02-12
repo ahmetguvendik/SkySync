@@ -1,6 +1,8 @@
-using System.Collections.Generic;
 using System.Reflection;
-using MediatR;
+using System.Text;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MassTransit.Logging;
 using OpenTelemetry.Resources;
@@ -24,12 +26,46 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SkySy
 builder.Services.AddMassTransitService(builder.Configuration);
 
 builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SkySync Payment API", Version = "v1" });
 });
 builder.Services.AddHealthChecks();
+
+var secretKey = builder.Configuration["JwtSettings:SecretKey"] ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+    ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
+var issuer = builder.Configuration["JwtSettings:Issuer"] ?? "SkySync";
+var audience = builder.Configuration["JwtSettings:Audience"] ?? "SkySyncUsers";
+
+if (secretKey.Length < 32)
+    throw new InvalidOperationException("JWT Secret Key must be at least 32 characters long.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        };
+    });
+builder.Services.AddAuthorization();
 
 // Eureka Service Discovery - Register with Eureka
 builder.Services.AddEurekaDiscoveryClient();
@@ -84,6 +120,9 @@ app.UseSerilogRequestLogging(options =>
         diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
     };
 });
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Tutarlı hata response: message, code (tüm servislerle aynı format)
 app.UseExceptionHandler(appError =>

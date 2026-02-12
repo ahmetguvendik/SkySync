@@ -202,3 +202,7 @@
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Asp.Versioning.Mvc.ApiExplorer.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/SkySync.Infrastructure.Logging.dll
 /Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/SkySync.Infrastructure.Logging.pdb
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Flight/Presentation/SkySync.Services.Flight.WebApi/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll

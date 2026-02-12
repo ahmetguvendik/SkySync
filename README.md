@@ -264,6 +264,8 @@ Gateway'de routes, rate limit, retry, circuit breaker değerleri `appsettings.js
 | Flight | POST | `/api/flight` | Uçuş oluştur (Command, Outbox) |
 | Flight | GET | `/api/flight` | Tüm uçuşlar (Query, Cache-Aside) |
 | Flight | GET | `/api/flight/{id}/seats` | Uçuş koltukları (Query) |
+| Flight | GET | `/api/airports` | Havalimanlarını listele (Query) |
+| Flight | POST | `/api/airports` | Yeni havalimanı ekle (Command) |
 | Reservation | POST | `/api/reservation` | Rezervasyon oluştur (Saga tetiklenir) |
 | Reservation | GET | `/api/reservation/passenger/{email}` | Yolcu rezervasyonları (Query) |
 | Identity | POST | `/api/auth/register`, `/api/auth/login` | Kayıt, giriş |

@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkySync.Services.Reservation.Application.Features.Commands.Reservation.Requests;
 using SkySync.Services.Reservation.Application.Features.Queries.Reservation.Requests;
@@ -9,6 +10,7 @@ namespace SkySync.Services.Reservation.WebApi.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1.0")]
+[Authorize]
 public class ReservationController : ControllerBase
 {
     private readonly IMediator _mediator;
