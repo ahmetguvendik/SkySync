@@ -110,6 +110,52 @@ namespace SkySync.Services.Identity.Persistence.Migrations
                     b.ToTable("PasswordResetTokens");
                 });
 
+            modelBuilder.Entity("SkySync.Services.Identity.Domain.Entities.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("44e54b9f-0b4a-4fb6-8ac2-08f3ad85d3f1"),
+                            CreatedTime = new DateTime(2025, 2, 15, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            ModifiedTime = new DateTime(2025, 2, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("6be1578a-92c4-4a2d-9203-13dcf124bcaf"),
+                            CreatedTime = new DateTime(2025, 2, 15, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            ModifiedTime = new DateTime(2025, 2, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "User"
+                        });
+                });
+
             modelBuilder.Entity("SkySync.Services.Identity.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -150,12 +196,10 @@ namespace SkySync.Services.Identity.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
+                    b.Property<Guid>("RoleId")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("User");
+                        .HasColumnType("uuid")
+                        .HasDefaultValue(new Guid("6be1578a-92c4-4a2d-9203-13dcf124bcaf"));
 
                     b.HasKey("Id");
 
@@ -163,6 +207,8 @@ namespace SkySync.Services.Identity.Persistence.Migrations
                         .IsUnique();
 
                     b.HasIndex("Email", "IsDeleted");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -236,6 +282,22 @@ namespace SkySync.Services.Identity.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SkySync.Services.Identity.Domain.Entities.User", b =>
+                {
+                    b.HasOne("SkySync.Services.Identity.Domain.Entities.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("SkySync.Services.Identity.Domain.Entities.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

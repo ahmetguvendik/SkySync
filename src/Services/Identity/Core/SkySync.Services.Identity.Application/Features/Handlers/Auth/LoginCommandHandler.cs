@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SkySync.Services.Identity.Application.Features.Commands.Auth.Requests;
 using SkySync.Services.Identity.Application.Features.Commands.Auth.Responses;
 using SkySync.Services.Identity.Application.Interfaces;
+using SkySync.Services.Identity.Domain.Constants;
 using System.Security.Claims;
 
 namespace SkySync.Services.Identity.Application.Features.Handlers.Auth;
@@ -58,16 +59,18 @@ public class LoginCommandHandler : IRequestHandler<LoginCommandRequest, LoginCom
         var expiryMinutes = int.TryParse(expiryStr, out var m) ? m : 60;
         var expiresAt = DateTime.UtcNow.AddMinutes(expiryMinutes);
 
+        var roleName = user.Role?.Name ?? RoleConstants.User;
+
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role),
+            new Claim(ClaimTypes.Role, roleName),
             new Claim("firstName", user.FirstName),
             new Claim("lastName", user.LastName)
         };
 
-        var token = _tokenService.GenerateToken(user.Id, user.Email, user.Role, claims);
+        var token = _tokenService.GenerateToken(user.Id, user.Email, roleName, claims);
 
         _logger.LogInformation("User logged in successfully. UserId: {UserId}, Email: {Email}", user.Id, user.Email);
 
@@ -82,7 +85,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommandRequest, LoginCom
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Role = user.Role
+                Role = roleName
             }
         };
     }

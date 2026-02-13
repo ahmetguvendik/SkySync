@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkySync.Services.Identity.Application.Features.Commands.Auth.Requests;
 using SkySync.Services.Identity.Application.Features.Queries.Auth.Requests;
+using SkySync.Services.Identity.Application.Features.Queries.Users.Requests;
 using System.Security.Claims;
 
 namespace SkySync.Services.Identity.WebApi.Controllers;
@@ -23,6 +24,62 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Sistemdeki kullanıcıları listele (Admin)
+    /// </summary>
+    [HttpGet("users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetUsers([FromQuery] GetUsersQueryRequest request, CancellationToken cancellationToken)
+    {
+        var query = request ?? new GetUsersQueryRequest();
+        var response = await _mediator.Send(query, cancellationToken);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Profil bilgilerini güncelle (Ad, Soyad, E-posta)
+    /// </summary>
+    [HttpPut("profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommandRequest request, CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+            return Unauthorized(new { message = "Yetkisiz erişim.", code = "UNAUTHORIZED" });
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        request.UserId = userId;
+        var response = await _mediator.Send(request, cancellationToken);
+
+        if (!response.IsSuccess)
+            return BadRequest(new { message = response.Message, code = "PROFILE_UPDATE_FAILED" });
+
+        return Ok(new { message = response.Message });
+    }
+
+    /// <summary>
+    /// Şifreyi mevcut şifreyi doğrulayarak değiştir
+    /// </summary>
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommandRequest request, CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+            return Unauthorized(new { message = "Yetkisiz erişim.", code = "UNAUTHORIZED" });
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        request.UserId = userId;
+        var response = await _mediator.Send(request, cancellationToken);
+
+        if (!response.IsSuccess)
+            return BadRequest(new { message = response.Message, code = "PASSWORD_CHANGE_FAILED" });
+
+        return Ok(new { message = response.Message });
+    }
+
+    /// <summary>
     /// Yeni kullanıcı kaydı
     /// </summary>
     [HttpPost("register")]
@@ -38,6 +95,24 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = response.Message, code = "REGISTER_FAILED" });
 
         return CreatedAtAction(nameof(Register), new { userId = response.UserId }, response);
+    }
+
+    /// <summary>
+    /// Admin kullanıcı kaydı (sadece Admin yetkili)
+    /// </summary>
+    [HttpPost("register/admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RegisterAdmin([FromBody] CreateAdminCommandRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _mediator.Send(request, cancellationToken);
+
+        if (!response.IsSuccess)
+            return BadRequest(new { message = response.Message, code = "ADMIN_REGISTER_FAILED" });
+
+        return CreatedAtAction(nameof(RegisterAdmin), new { userId = response.UserId }, response);
     }
 
     /// <summary>
@@ -116,8 +191,7 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        if (!TryGetUserId(out var userId))
             return Unauthorized(new { message = "Yetkisiz erişim.", code = "UNAUTHORIZED" });
 
         var query = new GetProfileQueryRequest { UserId = userId };
@@ -127,5 +201,12 @@ public class AuthController : ControllerBase
             return NotFound(new { message = "Kullanıcı bulunamadı.", code = "USER_NOT_FOUND" });
 
         return Ok(response);
+    }
+
+    private bool TryGetUserId(out Guid userId)
+    {
+        userId = Guid.Empty;
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return !string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out userId);
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SkySync.Services.Identity.Domain.Constants;
 using SkySync.Services.Identity.Domain.Entities;
 using SkySync.Shared.OutboxTable;
 
@@ -11,6 +12,7 @@ public class IdentityServiceDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
@@ -19,6 +21,32 @@ public class IdentityServiceDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Name).IsRequired().HasMaxLength(50);
+            entity.HasIndex(r => r.Name).IsUnique();
+
+            var seedTime = new DateTime(2025, 02, 15, 0, 0, 0, DateTimeKind.Utc);
+            entity.HasData(
+                new Role
+                {
+                    Id = RoleConstants.AdminRoleId,
+                    Name = RoleConstants.Admin,
+                    CreatedTime = seedTime,
+                    ModifiedTime = seedTime,
+                    IsDeleted = false
+                },
+                new Role
+                {
+                    Id = RoleConstants.UserRoleId,
+                    Name = RoleConstants.User,
+                    CreatedTime = seedTime,
+                    ModifiedTime = seedTime,
+                    IsDeleted = false
+                });
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(u => u.Id);
@@ -26,11 +54,16 @@ public class IdentityServiceDbContext : DbContext
             entity.Property(u => u.PasswordHash).IsRequired().HasMaxLength(500);
             entity.Property(u => u.FirstName).IsRequired().HasMaxLength(100);
             entity.Property(u => u.LastName).IsRequired().HasMaxLength(100);
-            entity.Property(u => u.Role).IsRequired().HasMaxLength(50).HasDefaultValue("User");
+            entity.Property(u => u.RoleId).IsRequired().HasDefaultValue(RoleConstants.UserRoleId);
             entity.Property(u => u.IsEmailConfirmed).HasDefaultValue(false);
 
             entity.HasIndex(u => u.Email).IsUnique();
             entity.HasIndex(u => new { u.Email, u.IsDeleted });
+
+            entity.HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<OutboxMessage>(entity =>

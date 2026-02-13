@@ -31,6 +31,7 @@ public class AirportController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateAirport([FromBody] CreateAirportCommandRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)

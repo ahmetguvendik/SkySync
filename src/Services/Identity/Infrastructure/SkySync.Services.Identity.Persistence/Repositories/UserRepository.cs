@@ -18,6 +18,7 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .AsNoTracking()
+            .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted, cancellationToken);
     }
 
@@ -25,7 +26,25 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .AsNoTracking()
+            .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted, cancellationToken);
+    }
+
+    public async Task<(IReadOnlyList<User> Users, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Users
+            .AsNoTracking()
+            .Include(u => u.Role)
+            .Where(u => !u.IsDeleted);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var users = await query
+            .OrderByDescending(u => u.CreatedTime)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (users, totalCount);
     }
 
     public async Task<User> CreateAsync(User user, CancellationToken cancellationToken = default)
@@ -38,6 +57,12 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .AnyAsync(u => u.Email == email && !u.IsDeleted, cancellationToken);
+    }
+
+    public async Task<bool> ExistsByEmailExceptIdAsync(string email, Guid excludeUserId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .AnyAsync(u => u.Email == email && u.Id != excludeUserId && !u.IsDeleted, cancellationToken);
     }
 
     public async Task<bool> UpdatePasswordHashAsync(Guid userId, string passwordHash, CancellationToken cancellationToken = default)

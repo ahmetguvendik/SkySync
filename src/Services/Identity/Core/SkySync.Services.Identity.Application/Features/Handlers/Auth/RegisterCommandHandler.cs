@@ -5,6 +5,7 @@ using SkySync.Services.Identity.Application.Features.Commands.Auth.Requests;
 using SkySync.Services.Identity.Application.UnitOfWorks;
 using SkySync.Services.Identity.Application.Features.Commands.Auth.Responses;
 using SkySync.Services.Identity.Application.Interfaces;
+using SkySync.Services.Identity.Domain.Constants;
 using SkySync.Services.Identity.Domain.Entities;
 using SkySync.Shared.Events;
 using SkySync.Shared.OutboxTable;
@@ -61,7 +62,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommandRequest, Re
             PasswordHash = _passwordHasher.Hash(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Role = "User",
+            RoleId = RoleConstants.UserRoleId,
             IsEmailConfirmed = false,
             CreatedTime = now,
             ModifiedTime = now,

@@ -2,6 +2,7 @@ using MediatR;
 using SkySync.Services.Identity.Application.Features.Queries.Auth.Requests;
 using SkySync.Services.Identity.Application.Features.Queries.Auth.Responses;
 using SkySync.Services.Identity.Application.Interfaces;
+using SkySync.Services.Identity.Domain.Constants;
 
 namespace SkySync.Services.Identity.Application.Features.Handlers.Auth;
 
@@ -27,7 +28,7 @@ public class GetProfileQueryHandler : IRequestHandler<GetProfileQueryRequest, Ge
             Email = user.Email,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Role = user.Role
+            Role = user.Role?.Name ?? RoleConstants.User
         };
     }
 }

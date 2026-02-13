@@ -28,6 +28,7 @@ public class FlightController : ControllerBase
     /// Yeni uçuş oluştur (Command)
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateFlight([FromBody] CreateFlightCommandRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)

@@ -63,6 +63,7 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Public", policy => policy.RequireAssertion(_ => true));
     options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
 // -------------------- CORS --------------------
@@ -158,8 +159,13 @@ app.UseUserLogContext();
 
 app.MapHealthChecks("/health");
 
+app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok())
+    .AllowAnonymous()
+    .RequireCors(corsPolicy);
+
 // -------------------- REVERSE PROXY --------------------
-app.MapReverseProxy();
+app.MapReverseProxy()
+    .RequireCors(corsPolicy);
 
 // -------------------- INFO --------------------
 app.MapGet("/", () => new
@@ -175,6 +181,7 @@ Routes = new[]
             "/api/v1/payment",
             "/api/v1/notification"
         }
-}).AllowAnonymous();
+}).AllowAnonymous()
+  .RequireCors(corsPolicy);
 
 app.Run();
