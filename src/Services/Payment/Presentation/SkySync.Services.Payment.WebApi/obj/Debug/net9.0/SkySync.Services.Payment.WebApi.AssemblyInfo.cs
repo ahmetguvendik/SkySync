@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkySync.Services.Payment.WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ef8c31bf7ee36e65e062d81b49944a112d4c423")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d52116cc0cb79a73304ffcf55f3cacc954b414e6")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkySync.Services.Payment.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkySync.Services.Payment.WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

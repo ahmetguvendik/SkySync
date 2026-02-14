@@ -59,22 +59,6 @@ public class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommandR
             updatedFields.Add("LastName");
         }
 
-        var normalizedEmail = request.Email.ToLowerInvariant();
-        if (!string.Equals(user.Email, normalizedEmail, StringComparison.OrdinalIgnoreCase))
-        {
-            if (await _userRepository.ExistsByEmailExceptIdAsync(normalizedEmail, user.Id, cancellationToken))
-            {
-                return new UpdateProfileCommandResponse
-                {
-                    IsSuccess = false,
-                    Message = "Bu e-posta adresi başka bir kullanıcı tarafından kullanılıyor."
-                };
-            }
-
-            user.Email = normalizedEmail;
-            updatedFields.Add("Email");
-        }
-
         if (updatedFields.Count == 0)
         {
             return new UpdateProfileCommandResponse

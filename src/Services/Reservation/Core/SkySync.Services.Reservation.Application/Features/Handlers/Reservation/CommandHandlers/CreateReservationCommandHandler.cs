@@ -23,6 +23,7 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
 {
     private readonly IOutboxRepository _outboxRepository;
     private readonly IGenericRepository<ReservationEntity> _reservationRepository;
+    private readonly IFlightSummaryRepository _flightSummaryRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IConfiguration _configuration;
     private readonly ILogger<CreateReservationCommandHandler> _logger;
@@ -30,12 +31,14 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
     public CreateReservationCommandHandler(
         IOutboxRepository outboxRepository,
         IGenericRepository<ReservationEntity> reservationRepository,
+        IFlightSummaryRepository flightSummaryRepository,
         IUnitOfWork unitOfWork,
         IConfiguration configuration,
         ILogger<CreateReservationCommandHandler> logger)
     {
         _outboxRepository = outboxRepository;
         _reservationRepository = reservationRepository;
+        _flightSummaryRepository = flightSummaryRepository;
         _unitOfWork = unitOfWork;
         _configuration = configuration;
         _logger = logger;
@@ -45,6 +48,31 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
     {
         try
         {
+            var flightSummary = await _flightSummaryRepository.GetByFlightIdAsync(request.FlightId, cancellationToken);
+            if (flightSummary == null)
+            {
+                _logger.LogWarning("Flight not found for reservation. FlightId: {FlightId}", request.FlightId);
+                return new CreateReservationCommandResponse
+                {
+                    ReservationId = Guid.Empty,
+                    CorrelationId = Guid.Empty,
+                    IsSuccess = false,
+                    Message = "Flight not found or not available for reservation."
+                };
+            }
+
+            if (flightSummary.DepartureTime <= DateTime.UtcNow)
+            {
+                _logger.LogWarning("Flight departure passed. FlightId: {FlightId}, DepartureTime: {DepartureTime}", request.FlightId, flightSummary.DepartureTime);
+                return new CreateReservationCommandResponse
+                {
+                    ReservationId = Guid.Empty,
+                    CorrelationId = Guid.Empty,
+                    IsSuccess = false,
+                    Message = "Flight departure time has passed. Reservations are closed."
+                };
+            }
+
             // Transaction başlat
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 

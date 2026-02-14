@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Profil bilgilerini güncelle (Ad, Soyad, E-posta)
+    /// Profil bilgilerini güncelle (Ad, Soyad)
     /// </summary>
     [HttpPut("profile")]
     [Authorize]
