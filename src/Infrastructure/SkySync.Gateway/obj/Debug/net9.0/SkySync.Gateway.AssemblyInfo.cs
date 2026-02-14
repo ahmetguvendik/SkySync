@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkySync.Gateway")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d52116cc0cb79a73304ffcf55f3cacc954b414e6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41c305e154114dd9ee49a0e08cb822d9887366f0")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkySync.Gateway")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkySync.Gateway")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
