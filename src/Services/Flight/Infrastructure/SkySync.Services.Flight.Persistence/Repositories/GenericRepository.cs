@@ -6,8 +6,9 @@ using SkySync.Services.Flight.Persistence.Contexts;
 
 namespace SkySync.Services.Flight.Persistence.Repositories;
 
-public class GenericRepository<T> : IGenericRepository<T>  where T : BaseEntity{
-    private readonly FlightServiceDbContext  _context;
+public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
+{
+    private readonly FlightServiceDbContext _context;
     private readonly DbSet<T> _dbSet;
 
     public GenericRepository(FlightServiceDbContext context)
@@ -15,7 +16,7 @@ public class GenericRepository<T> : IGenericRepository<T>  where T : BaseEntity{
         _context = context;
         _dbSet = _context.Set<T>();
     }
-    
+
     public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
@@ -49,7 +50,7 @@ public class GenericRepository<T> : IGenericRepository<T>  where T : BaseEntity{
         _dbSet.Update(entity);
         return Task.CompletedTask;
     }
-    
+
     public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
     {
         entity.IsDeleted = true;
@@ -57,7 +58,7 @@ public class GenericRepository<T> : IGenericRepository<T>  where T : BaseEntity{
         _dbSet.Update(entity);
         return Task.CompletedTask;
     }
-    
+
     /// <summary>
     /// Soft delete edilen bir kaydı geri yükler
     /// </summary>
@@ -68,13 +69,13 @@ public class GenericRepository<T> : IGenericRepository<T>  where T : BaseEntity{
         {
             return null;
         }
-        
+
         entity.IsDeleted = false;
         entity.ModifiedTime = DateTime.UtcNow;
         _dbSet.Update(entity);
         return entity;
     }
-    
+
     /// <summary>
     /// Soft delete edilen tüm kayıtları getirir
     /// </summary>
@@ -82,7 +83,7 @@ public class GenericRepository<T> : IGenericRepository<T>  where T : BaseEntity{
     {
         return await _dbSet.IgnoreQueryFilters().Where(x => x.IsDeleted).AsNoTracking().ToListAsync(cancellationToken);
     }
-    
+
 
     public IQueryable<T> GetQueryable()
     {

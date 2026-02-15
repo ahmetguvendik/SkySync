@@ -23,39 +23,39 @@ public class InboxMessage
     /// Unique message identifier from MassTransit (Primary Key)
     /// </summary>
     public Guid MessageId { get; set; }
-    
+
     /// <summary>
     /// Business-level unique key (e.g., ReservationId, FlightId)
     /// Used for idempotency check with EventType
     /// Unique constraint: (EventType, BusinessKey)
     /// </summary>
     public string BusinessKey { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Event/Command type name (e.g., ProcessPaymentCommand, ReserveSeatCommand)
     /// </summary>
     public string EventType { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// JSON payload of the event (for debugging/auditing)
     /// </summary>
     public string? EventPayload { get; set; }
-    
+
     /// <summary>
     /// Processing status (Processed, Failed, Skipped)
     /// </summary>
     public InboxStatus Status { get; set; } = InboxStatus.Processed;
-    
+
     /// <summary>
     /// When the message was processed
     /// </summary>
     public DateTime ProcessedAt { get; set; }
-    
+
     /// <summary>
     /// Error message if processing failed
     /// </summary>
     public string? ErrorMessage { get; set; }
-    
+
     /// <summary>
     /// Retry count for failed messages
     /// </summary>

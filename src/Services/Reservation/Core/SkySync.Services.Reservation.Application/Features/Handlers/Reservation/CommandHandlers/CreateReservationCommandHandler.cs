@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Text.Json;
 using MediatR;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SkySync.Services.Reservation.Application.Features.Commands.Reservation.Requests;
 using SkySync.Services.Reservation.Application.Features.Commands.Reservation.Responses;
 using SkySync.Services.Reservation.Application.Interfaces;
@@ -11,6 +11,7 @@ using SkySync.Services.Reservation.Domain.Entities;
 using SkySync.Services.Reservation.Domain.Enums;
 using SkySync.Shared.Events;
 using SkySync.Shared.OutboxTable;
+using SkySync.Shared.Options;
 using ReservationEntity = SkySync.Services.Reservation.Domain.Entities.Reservation;
 
 namespace SkySync.Services.Reservation.Application.Features.Handlers.Reservation.CommandHandlers;
@@ -25,7 +26,7 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
     private readonly IGenericRepository<ReservationEntity> _reservationRepository;
     private readonly IFlightSummaryRepository _flightSummaryRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IConfiguration _configuration;
+    private readonly PaymentOptions _paymentOptions;
     private readonly ILogger<CreateReservationCommandHandler> _logger;
 
     public CreateReservationCommandHandler(
@@ -33,14 +34,14 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
         IGenericRepository<ReservationEntity> reservationRepository,
         IFlightSummaryRepository flightSummaryRepository,
         IUnitOfWork unitOfWork,
-        IConfiguration configuration,
+        IOptions<PaymentOptions> paymentOptions,
         ILogger<CreateReservationCommandHandler> logger)
     {
         _outboxRepository = outboxRepository;
         _reservationRepository = reservationRepository;
         _flightSummaryRepository = flightSummaryRepository;
         _unitOfWork = unitOfWork;
-        _configuration = configuration;
+        _paymentOptions = paymentOptions?.Value ?? new PaymentOptions();
         _logger = logger;
     }
 
@@ -49,28 +50,10 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
         try
         {
             var flightSummary = await _flightSummaryRepository.GetByFlightIdAsync(request.FlightId, cancellationToken);
-            if (flightSummary == null)
+            var flightValidationResult = ValidateFlightAvailability(request, flightSummary);
+            if (flightValidationResult is not null)
             {
-                _logger.LogWarning("Flight not found for reservation. FlightId: {FlightId}", request.FlightId);
-                return new CreateReservationCommandResponse
-                {
-                    ReservationId = Guid.Empty,
-                    CorrelationId = Guid.Empty,
-                    IsSuccess = false,
-                    Message = "Flight not found or not available for reservation."
-                };
-            }
-
-            if (flightSummary.DepartureTime <= DateTime.UtcNow)
-            {
-                _logger.LogWarning("Flight departure passed. FlightId: {FlightId}, DepartureTime: {DepartureTime}", request.FlightId, flightSummary.DepartureTime);
-                return new CreateReservationCommandResponse
-                {
-                    ReservationId = Guid.Empty,
-                    CorrelationId = Guid.Empty,
-                    IsSuccess = false,
-                    Message = "Flight departure time has passed. Reservations are closed."
-                };
+                return flightValidationResult;
             }
 
             // Transaction başlat
@@ -79,8 +62,8 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
             // 0. ADIM: LOCK KONTROLÜ - Aynı koltuğun zaten rezerve edilip edilmediğini kontrol et
             // Senior Level: Pessimistic Locking - Concurrent reservation prevention
             var existingReservations = await _reservationRepository.GetAllAsync(
-                r => r.FlightId == request.FlightId 
-                     && r.SeatNumber == request.SeatNumber 
+                r => r.FlightId == request.FlightId
+                     && r.SeatNumber == request.SeatNumber
                      && (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed),
                 cancellationToken);
 
@@ -93,13 +76,7 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
 
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
 
-                return new CreateReservationCommandResponse
-                {
-                    ReservationId = Guid.Empty,
-                    CorrelationId = Guid.Empty,
-                    IsSuccess = false,
-                    Message = $"Seat {request.SeatNumber} on flight {request.FlightId} is already reserved or pending confirmation."
-                };
+                return CreateFailureResponse($"Seat {request.SeatNumber} on flight {request.FlightId} is already reserved or pending confirmation.");
             }
 
             var reservationId = Guid.NewGuid();
@@ -168,7 +145,7 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
                 "Reservation created successfully. ReservationId: {ReservationId}, CorrelationId: {CorrelationId}, FlightId: {FlightId}, SeatNumber: {SeatNumber}",
                 reservationId, correlationId, request.FlightId, request.SeatNumber);
 
-            var timeoutMinutes = _configuration.GetValue("Payment:TimeoutMinutes", 5);
+            var timeoutMinutes = GetPaymentTimeoutMinutes();
             var expiresAt = DateTime.UtcNow.AddMinutes(timeoutMinutes); // Saga PaymentTimeoutMinutes ile uyumlu olmalı
             return new CreateReservationCommandResponse
             {
@@ -188,20 +165,44 @@ public class CreateReservationCommandHandler : IRequestHandler<CreateReservation
                 errorMessage += $" Inner Exception: {ex.InnerException.Message}";
             }
 
-            _logger.LogError(ex, 
+            _logger.LogError(ex,
                 "Error occurred while creating reservation. FlightId: {FlightId}, SeatNumber: {SeatNumber}, Error: {Error}",
                 request.FlightId, request.SeatNumber, errorMessage);
 
             // Transaction'ı rollback et
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
 
-            return new CreateReservationCommandResponse
-            {
-                ReservationId = Guid.Empty,
-                CorrelationId = Guid.Empty,
-                IsSuccess = false,
-                Message = $"Error occurred while creating reservation: {errorMessage}"
-            };
+            return CreateFailureResponse($"Error occurred while creating reservation: {errorMessage}");
         }
     }
+
+    private CreateReservationCommandResponse? ValidateFlightAvailability(CreateReservationCommandRequest request, FlightSummary? flightSummary)
+    {
+        if (flightSummary == null)
+        {
+            _logger.LogWarning("Flight not found for reservation. FlightId: {FlightId}", request.FlightId);
+            return CreateFailureResponse("Flight not found or not available for reservation.");
+        }
+
+        if (flightSummary.DepartureTime <= DateTime.UtcNow)
+        {
+            _logger.LogWarning("Flight departure passed. FlightId: {FlightId}, DepartureTime: {DepartureTime}",
+                request.FlightId, flightSummary.DepartureTime);
+            return CreateFailureResponse("Flight departure time has passed. Reservations are closed.");
+        }
+
+        return null;
+    }
+
+    private static CreateReservationCommandResponse CreateFailureResponse(string message) => new()
+    {
+        ReservationId = Guid.Empty,
+        CorrelationId = Guid.Empty,
+        IsSuccess = false,
+        Message = message
+    };
+
+    private int GetPaymentTimeoutMinutes() => _paymentOptions.TimeoutMinutes > 0
+        ? _paymentOptions.TimeoutMinutes
+        : 5;
 }

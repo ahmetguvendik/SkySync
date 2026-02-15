@@ -22,7 +22,7 @@ public static class ServiceRegistration
         // Database - PostgreSQL (Inbox Pattern için)
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<PaymentServiceDbContext>(opt => opt.UseNpgsql(connectionString));
-        
+
         // Inbox Service - Duplicate payment prevention (CRITICAL!)
         services.AddScoped<IInboxService, InboxService>();
 

@@ -13,15 +13,19 @@ public class CreateAirportCommandHandler : IRequestHandler<CreateAirportCommandR
     private readonly IGenericRepository<AirportEntity> _airportRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateAirportCommandHandler> _logger;
+    private readonly ICacheService _cacheService;
+    private const string AirportsCacheKey = "airports:all";
 
     public CreateAirportCommandHandler(
         IGenericRepository<AirportEntity> airportRepository,
         IUnitOfWork unitOfWork,
-        ILogger<CreateAirportCommandHandler> logger)
+        ILogger<CreateAirportCommandHandler> logger,
+        ICacheService cacheService)
     {
         _airportRepository = airportRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<CreateAirportCommandResponse> Handle(CreateAirportCommandRequest request, CancellationToken cancellationToken)
@@ -55,6 +59,7 @@ public class CreateAirportCommandHandler : IRequestHandler<CreateAirportCommandR
             await _airportRepository.CreateAsync(airport, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            await _cacheService.RemoveAsync(AirportsCacheKey, cancellationToken);
 
             _logger.LogInformation("Airport created: {Code} - {Name}", airport.Code, airport.Name);
 

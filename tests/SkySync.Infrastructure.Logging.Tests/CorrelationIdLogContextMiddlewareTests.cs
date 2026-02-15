@@ -11,8 +11,8 @@ public class CorrelationIdLogContextMiddlewareTests
     public async Task InvokeAsync_UsesHeadersWhenTheyExist()
     {
         var context = new DefaultHttpContext();
-        context.Request.Headers["X-Correlation-ID"] = "corr-123";
-        context.Request.Headers["X-Transaction-ID"] = "txn-456";
+        context.Request.Headers[CorrelationHeaderNames.CorrelationId] = "corr-123";
+        context.Request.Headers[CorrelationHeaderNames.TransactionId] = "txn-456";
         var nextCalled = false;
         RequestDelegate next = _ =>
         {
@@ -25,8 +25,8 @@ public class CorrelationIdLogContextMiddlewareTests
         await middleware.InvokeAsync(context);
 
         nextCalled.Should().BeTrue();
-        context.Items["CorrelationId"].Should().Be("corr-123");
-        context.Items["TransactionId"].Should().Be("txn-456");
+        context.Items[CorrelationContextKeys.CorrelationId].Should().Be("corr-123");
+        context.Items[CorrelationContextKeys.TransactionId].Should().Be("txn-456");
     }
 
     [Fact]
@@ -55,17 +55,17 @@ public class CorrelationIdLogContextMiddlewareTests
         }
 
         nextCalled.Should().BeTrue();
-        context.Items["CorrelationId"].Should().Be(activity.Id);
-        context.Items["TransactionId"].Should().BeOfType<string>()
+        context.Items[CorrelationContextKeys.CorrelationId].Should().Be(activity.Id);
+        context.Items[CorrelationContextKeys.TransactionId].Should().BeOfType<string>()
             .Which.Should().NotBeNullOrWhiteSpace();
-        Guid.TryParse(context.Items["TransactionId"]?.ToString(), out _).Should().BeTrue();
+        Guid.TryParse(context.Items[CorrelationContextKeys.TransactionId]?.ToString(), out _).Should().BeTrue();
     }
 
     [Fact]
     public async Task InvokeAsync_UsesRequestIdHeaderWhenCorrelationHeaderMissing()
     {
         var context = new DefaultHttpContext();
-        context.Request.Headers["X-Request-ID"] = "req-123";
+        context.Request.Headers[CorrelationHeaderNames.RequestId] = "req-123";
         var nextCalled = false;
         RequestDelegate next = _ =>
         {
@@ -77,8 +77,8 @@ public class CorrelationIdLogContextMiddlewareTests
         await middleware.InvokeAsync(context);
 
         nextCalled.Should().BeTrue();
-        context.Items["CorrelationId"].Should().Be("req-123");
-        context.Items["TransactionId"].Should().BeOfType<string>()
+        context.Items[CorrelationContextKeys.CorrelationId].Should().Be("req-123");
+        context.Items[CorrelationContextKeys.TransactionId].Should().BeOfType<string>()
             .Which.Should().NotBeNullOrWhiteSpace();
     }
 
@@ -91,8 +91,8 @@ public class CorrelationIdLogContextMiddlewareTests
 
         await middleware.InvokeAsync(context);
 
-        var correlationId = context.Items["CorrelationId"]?.ToString();
-        var transactionId = context.Items["TransactionId"]?.ToString();
+        var correlationId = context.Items[CorrelationContextKeys.CorrelationId]?.ToString();
+        var transactionId = context.Items[CorrelationContextKeys.TransactionId]?.ToString();
 
         correlationId.Should().NotBeNullOrWhiteSpace();
         transactionId.Should().NotBeNullOrWhiteSpace();

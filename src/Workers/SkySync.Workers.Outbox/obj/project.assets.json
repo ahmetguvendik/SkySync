@@ -1517,6 +1517,7 @@
           "Microsoft.EntityFrameworkCore": "9.0.1",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.1",
           "Microsoft.Extensions.Logging.Abstractions": "9.0.1",
+          "Microsoft.Extensions.Options": "9.0.1",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.2",
           "SkySync.Shared": "1.0.0"
         },
@@ -1635,6 +1636,7 @@
           "Microsoft.EntityFrameworkCore": "9.0.0",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.0",
           "Microsoft.Extensions.Configuration.Binder": "9.0.0",
+          "Microsoft.Extensions.Options": "9.0.0",
           "SkySync.Services.Reservation.Domain": "1.0.0",
           "SkySync.Shared": "1.0.0"
         },

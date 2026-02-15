@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Serilog.Context;
+using SkySync.Infrastructure.Logging;
 
 namespace SkySync.Gateway.Middleware;
 
@@ -25,11 +26,6 @@ public class CorrelationIdMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<CorrelationIdMiddleware> _logger;
 
-    // Standard header isimleri
-    private const string CorrelationIdHeaderName = "X-Correlation-ID";
-    private const string TransactionIdHeaderName = "X-Transaction-ID";
-    private const string RequestIdHeaderName = "X-Request-ID"; // Alternatif isim (bazı sistemler bunu kullanır)
-
     public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
     {
         _next = next;
@@ -40,11 +36,11 @@ public class CorrelationIdMiddleware
     {
         // 1. CORRELATION ID: Client'tan geliyorsa kullan, yoksa oluştur
         // Bu ID tüm sistem boyunca aynı kalacak
-        var correlationId = GetOrCreateCorrelationId(context);
+        var correlationId = CorrelationContextResolver.GetOrCreateCorrelationId(context, _logger);
 
         // 2. TRANSACTION ID: Her request için yeni bir ID
         // Bu ID sadece bu HTTP request için geçerli
-        var transactionId = Guid.NewGuid().ToString();
+        var transactionId = CorrelationContextResolver.GetOrCreateTransactionId(context, preferExisting: false);
 
         // 3. Activity (OpenTelemetry/Distributed Tracing için)
         // .NET'in built-in tracing mekanizması
@@ -56,31 +52,31 @@ public class CorrelationIdMiddleware
         }
 
         // 4. HttpContext.Items'a ekle (downstream middleware'ler ve controllerlar için)
-        context.Items["CorrelationId"] = correlationId;
-        context.Items["TransactionId"] = transactionId;
+        context.Items[CorrelationContextKeys.CorrelationId] = correlationId;
+        context.Items[CorrelationContextKeys.TransactionId] = transactionId;
 
         // 5. Response header'a ekle (client debugging + distributed tracing için)
         // traceparent/tracestate: Frontend ödeme isteğinde gönderirse rezervasyon+ödeme aynı trace'te görünür
         context.Response.OnStarting(() =>
         {
-            if (!context.Response.Headers.ContainsKey(CorrelationIdHeaderName))
-                context.Response.Headers[CorrelationIdHeaderName] = correlationId;
-            if (!context.Response.Headers.ContainsKey(TransactionIdHeaderName))
-                context.Response.Headers[TransactionIdHeaderName] = transactionId;
+            if (!context.Response.Headers.ContainsKey(CorrelationHeaderNames.CorrelationId))
+                context.Response.Headers[CorrelationHeaderNames.CorrelationId] = correlationId;
+            if (!context.Response.Headers.ContainsKey(CorrelationHeaderNames.TransactionId))
+                context.Response.Headers[CorrelationHeaderNames.TransactionId] = transactionId;
             // W3C Trace Context - frontend bunu okuyup ödeme isteğinde traceparent header olarak gönderir
-            if (activity != null && !context.Response.Headers.ContainsKey("traceparent") && !string.IsNullOrEmpty(activity.Id))
+            if (activity != null && !context.Response.Headers.ContainsKey(CorrelationHeaderNames.TraceParent) && !string.IsNullOrEmpty(activity.Id))
             {
-                context.Response.Headers["traceparent"] = activity.Id;
+                context.Response.Headers[CorrelationHeaderNames.TraceParent] = activity.Id;
                 if (!string.IsNullOrEmpty(activity.TraceStateString))
-                    context.Response.Headers["tracestate"] = activity.TraceStateString;
+                    context.Response.Headers[CorrelationHeaderNames.TraceState] = activity.TraceStateString;
             }
             return Task.CompletedTask;
         });
 
         // 6. Request header'a ekle (downstream servislere gönder)
         // YARP bu header'ları otomatik olarak mikroservislere iletir
-        context.Request.Headers[CorrelationIdHeaderName] = correlationId;
-        context.Request.Headers[TransactionIdHeaderName] = transactionId;
+        context.Request.Headers[CorrelationHeaderNames.CorrelationId] = correlationId;
+        context.Request.Headers[CorrelationHeaderNames.TransactionId] = transactionId;
 
         // 7. Log (Structured logging ile)
         _logger.LogInformation(
@@ -112,39 +108,6 @@ public class CorrelationIdMiddleware
         }
     }
 
-    /// <summary>
-    /// Correlation ID'yi client'tan al veya yeni oluştur
-    /// </summary>
-    private string GetOrCreateCorrelationId(HttpContext context)
-    {
-        // 1. Request header'dan al (client göndermiş)
-        if (context.Request.Headers.TryGetValue(CorrelationIdHeaderName, out var correlationId) 
-            && !string.IsNullOrWhiteSpace(correlationId))
-        {
-            _logger.LogDebug("Correlation ID received from client: {CorrelationId}", correlationId.ToString());
-            return correlationId.ToString();
-        }
-
-        // 2. Alternatif header isimlerini kontrol et (X-Request-ID)
-        if (context.Request.Headers.TryGetValue(RequestIdHeaderName, out var requestId) 
-            && !string.IsNullOrWhiteSpace(requestId))
-        {
-            _logger.LogDebug("Correlation ID received from client (X-Request-ID): {CorrelationId}", requestId.ToString());
-            return requestId.ToString();
-        }
-
-        // 3. Activity.Current.Id'yi kullan (ASP.NET Core otomatik oluşturur)
-        if (Activity.Current?.Id != null)
-        {
-            _logger.LogDebug("Correlation ID generated from Activity.Current: {CorrelationId}", Activity.Current.Id);
-            return Activity.Current.Id;
-        }
-
-        // 4. Yeni GUID oluştur (fallback)
-        var newCorrelationId = Guid.NewGuid().ToString();
-        _logger.LogDebug("New Correlation ID generated: {CorrelationId}", newCorrelationId);
-        return newCorrelationId;
-    }
 }
 
 /// <summary>

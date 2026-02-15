@@ -1,9 +1,10 @@
 using MassTransit;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SkySync.Shared;
 using SkySync.Shared.Commands;
 using SkySync.Shared.Events;
+using SkySync.Shared.Options;
 
 namespace SkySync.SagaStateMachine.StateMachines;
 
@@ -16,9 +17,11 @@ public class ReservationStateMachine : MassTransitStateMachine<StateInstances.Re
     private readonly int _paymentTimeoutMinutes;
     private readonly ILogger<ReservationStateMachine> _logger;
 
-    public ReservationStateMachine(IConfiguration configuration, ILogger<ReservationStateMachine> logger)
+    public ReservationStateMachine(IOptions<PaymentOptions> paymentOptions, ILogger<ReservationStateMachine> logger)
     {
-        _paymentTimeoutMinutes = int.TryParse(configuration["Payment:TimeoutMinutes"], out var mins) ? mins : 5;
+        _paymentTimeoutMinutes = paymentOptions?.Value?.TimeoutMinutes > 0
+            ? paymentOptions.Value.TimeoutMinutes
+            : 5;
         _logger = logger;
 
         InstanceState(x => x.CurrentState);
@@ -158,13 +161,13 @@ public class ReservationStateMachine : MassTransitStateMachine<StateInstances.Re
         SetCompletedWhenFinalized();
     }
 
-    public Schedule<StateInstances.ReservationState, PaymentTimeoutEvent> PaymentTimeout { get; private set; }
-    public State AwaitingFlightReservation { get; private set; }
-    public State AwaitingPayment { get; private set; }
+    public Schedule<StateInstances.ReservationState, PaymentTimeoutEvent> PaymentTimeout { get; private set; } = default!;
+    public State AwaitingFlightReservation { get; private set; } = default!;
+    public State AwaitingPayment { get; private set; } = default!;
 
-    public Event<ReservationStartedEvent> ReservationStarted { get; private set; }
-    public Event<FlightReservedEvent> FlightReserved { get; private set; }
-    public Event<FlightReservationFailedEvent> FlightReservationFailed { get; private set; }
-    public Event<PaymentCompletedEvent> PaymentCompleted { get; private set; }
-    public Event<PaymentFailedEvent> PaymentFailed { get; private set; }
+    public Event<ReservationStartedEvent> ReservationStarted { get; private set; } = default!;
+    public Event<FlightReservedEvent> FlightReserved { get; private set; } = default!;
+    public Event<FlightReservationFailedEvent> FlightReservationFailed { get; private set; } = default!;
+    public Event<PaymentCompletedEvent> PaymentCompleted { get; private set; } = default!;
+    public Event<PaymentFailedEvent> PaymentFailed { get; private set; } = default!;
 }

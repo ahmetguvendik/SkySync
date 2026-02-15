@@ -22,13 +22,13 @@ public static class ServiceRegistration
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         collection.AddDbContext<FlightServiceDbContext>(opt =>
             opt.UseNpgsql(connectionString));
-        
+
         //Repositories
         collection.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         collection.AddScoped<IAircraftRepository, AircraftRepository>();
         collection.AddScoped<IOutboxRepository, OutboxRepository>();
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
-        
+
         // Inbox Service - Idempotency for seat operations (critical!)
         collection.AddScoped<IInboxService, InboxService>();
     }

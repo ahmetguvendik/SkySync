@@ -19,7 +19,7 @@ public class GetAllFlightsQueryHandler : IRequestHandler<GetAllFlightsQueryReque
     private readonly IGenericRepository<FlightEntity> _flightRepository;
     private readonly ICacheService _cacheService;
     private readonly ILogger<GetAllFlightsQueryHandler> _logger;
-    
+
     private const string CacheKeyPrefix = "flights:search";
     private static readonly TimeSpan CacheAllExpiration = TimeSpan.FromMinutes(30);
     private static readonly TimeSpan CacheFilteredExpiration = TimeSpan.FromMinutes(5);

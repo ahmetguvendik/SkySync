@@ -15,19 +15,19 @@ public class ReservationStateMap : SagaClassMap<ReservationState>
     {
         entity.Property(x => x.CurrentState)
             .HasMaxLength(64);
-        
+
         entity.Property(x => x.SeatNumber)
             .HasMaxLength(10);
-        
+
         entity.Property(x => x.PassengerName)
             .HasMaxLength(100);
-        
+
         entity.Property(x => x.PassengerSurname)
             .HasMaxLength(100);
-        
+
         entity.Property(x => x.PassengerEmail)
             .HasMaxLength(255);
-        
+
         entity.Property(x => x.Price)
             .HasColumnType("decimal(18,2)");
     }

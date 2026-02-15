@@ -25,7 +25,7 @@ public static class CorsConfiguration
             });
 
             // Production: Restricted
-            var allowedOrigins = configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() 
+            var allowedOrigins = configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>()
                                  ?? new[] { "https://skysync.com" };
 
             options.AddPolicy("Production", policy =>

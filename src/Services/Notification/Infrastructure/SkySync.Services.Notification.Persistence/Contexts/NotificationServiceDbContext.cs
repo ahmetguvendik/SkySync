@@ -29,7 +29,7 @@ public class NotificationServiceDbContext : DbContext
             entity.Property(i => i.BusinessKey)
                 .IsRequired()
                 .HasMaxLength(255);
-            
+
             entity.Property(i => i.EventType)
                 .IsRequired()
                 .HasMaxLength(255);
@@ -57,7 +57,7 @@ public class NotificationServiceDbContext : DbContext
             entity.HasIndex(i => i.ProcessedAt);
             entity.HasIndex(i => new { i.EventType, i.ProcessedAt });
             entity.HasIndex(i => i.Status);
-            
+
             // ✅ Business Key index - Idempotency için kritik!
             entity.HasIndex(i => new { i.EventType, i.BusinessKey })
                 .IsUnique();

@@ -33,7 +33,7 @@ public class RedisCacheService : ICacheService
         try
         {
             var cachedValue = await _distributedCache.GetStringAsync(key, cancellationToken);
-            
+
             if (string.IsNullOrEmpty(cachedValue))
             {
                 _logger.LogDebug("Cache miss for key: {Key}", key);
@@ -86,10 +86,37 @@ public class RedisCacheService : ICacheService
 
     public async Task RemoveByPatternAsync(string pattern, CancellationToken cancellationToken = default)
     {
-        // StackExchange.Redis ile pattern matching için IDatabase kullanılabilir
-        // Şimdilik basit implementasyon, gerekirse genişletilebilir
-        _logger.LogWarning("RemoveByPatternAsync not fully implemented. Pattern: {Pattern}", pattern);
-        await Task.CompletedTask;
+        if (string.IsNullOrWhiteSpace(pattern))
+        {
+            _logger.LogWarning("RemoveByPatternAsync called with empty pattern.");
+            return;
+        }
+
+        try
+        {
+            var database = _redis.GetDatabase();
+            foreach (var endpoint in _redis.GetEndPoints())
+            {
+                var server = _redis.GetServer(endpoint);
+                if (!server.IsConnected || server.IsReplica)
+                    continue;
+
+                foreach (var key in server.Keys(pattern: pattern))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await database.KeyDeleteAsync(key);
+                    _logger.LogDebug("Cache key removed via pattern. Pattern={Pattern}, Key={Key}", pattern, key);
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing cache keys with pattern: {Pattern}", pattern);
+        }
     }
 
     public async Task<IDistributedLock?> AcquireLockAsync(string key, TimeSpan expiry, CancellationToken cancellationToken = default)
@@ -99,13 +126,13 @@ public class RedisCacheService : ICacheService
             var lockKey = $"lock:{key}";
             var lockValue = Guid.NewGuid().ToString();
             var database = _redis.GetDatabase();
-            
+
             // SET NX EX - Atomic lock acquisition
             var acquired = await database.StringSetAsync(
-                lockKey, 
-                lockValue, 
-                expiry, 
-                When.NotExists, 
+                lockKey,
+                lockValue,
+                expiry,
+                When.NotExists,
                 CommandFlags.None);
 
             if (acquired)

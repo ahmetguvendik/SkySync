@@ -28,10 +28,10 @@ builder.Services.AddMassTransit(x =>
     {
         // CRITICAL: .NET 9 uyumluluğu için Newtonsoft JSON serializer kullan
         cfg.UseNewtonsoftJsonSerializer();
-        
+
         // CloudAMQP connection string kullan
         var connectionString = builder.Configuration["RabbitMQ:ConnectionString"];
-        
+
         if (!string.IsNullOrEmpty(connectionString))
         {
             // CloudAMQP connection string formatı: amqps://username:password@host/vhost

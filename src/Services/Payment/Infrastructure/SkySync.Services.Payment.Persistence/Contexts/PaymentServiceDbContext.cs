@@ -11,7 +11,7 @@ public class PaymentServiceDbContext : DbContext
     }
 
     public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
-    
+
     /// <summary>
     /// Inbox Messages - Duplicate payment prevention (Shared'dan)
     /// </summary>
@@ -42,7 +42,7 @@ public class PaymentServiceDbContext : DbContext
             entity.Property(i => i.BusinessKey)
                 .IsRequired()
                 .HasMaxLength(255);
-            
+
             entity.Property(i => i.EventType)
                 .IsRequired()
                 .HasMaxLength(255);
@@ -70,7 +70,7 @@ public class PaymentServiceDbContext : DbContext
             entity.HasIndex(i => i.ProcessedAt);
             entity.HasIndex(i => new { i.EventType, i.ProcessedAt });
             entity.HasIndex(i => i.Status);
-            
+
             // ✅ KRITIK: Business Key unique constraint - Duplicate payment prevention!
             entity.HasIndex(i => new { i.EventType, i.BusinessKey })
                 .IsUnique();

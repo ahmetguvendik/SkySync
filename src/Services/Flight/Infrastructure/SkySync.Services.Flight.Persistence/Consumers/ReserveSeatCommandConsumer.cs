@@ -66,7 +66,7 @@ public class ReserveSeatCommandConsumer : IConsumer<ReserveSeatCommand>
 
         // Distributed Lock - Race condition prevention
         var lockKey = $"seat:{message.FlightId}:{message.SeatNumber}";
-        
+
         _logger.LogInformation(
             "Attempting to acquire lock for seat reservation. FlightId: {FlightId}, SeatNumber: {SeatNumber}",
             message.FlightId, message.SeatNumber);
@@ -119,8 +119,8 @@ public class ReserveSeatCommandConsumer : IConsumer<ReserveSeatCommand>
             }
 
             // Lock alındı, güvenli şekilde kontrol ve rezervasyon işlemi
-            var seat = await _context.Seats.FirstOrDefaultAsync(x => 
-                x.FlightId == message.FlightId && 
+            var seat = await _context.Seats.FirstOrDefaultAsync(x =>
+                x.FlightId == message.FlightId &&
                 x.SeatNumber == message.SeatNumber);
 
             if (seat == null || seat.IsReserved)

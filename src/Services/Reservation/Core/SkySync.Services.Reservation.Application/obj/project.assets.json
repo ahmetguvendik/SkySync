@@ -1059,6 +1059,7 @@
       "Microsoft.EntityFrameworkCore >= 9.0.0",
       "Microsoft.Extensions.Configuration.Abstractions >= 9.0.0",
       "Microsoft.Extensions.Configuration.Binder >= 9.0.0",
+      "Microsoft.Extensions.Options >= 9.0.0",
       "SkySync.Services.Reservation.Domain >= 1.0.0",
       "SkySync.Shared >= 1.0.0"
     ]
@@ -1134,6 +1135,10 @@
             "version": "[9.0.0, )"
           },
           "Microsoft.Extensions.Configuration.Binder": {
+            "target": "Package",
+            "version": "[9.0.0, )"
+          },
+          "Microsoft.Extensions.Options": {
             "target": "Package",
             "version": "[9.0.0, )"
           }

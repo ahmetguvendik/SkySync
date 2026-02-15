@@ -19,7 +19,7 @@ public class OutboxRepository : IOutboxRepository
         await _context.OutboxMessages.AddAsync(message, cancellationToken);
     }
 
-    
+
     public async Task<List<OutboxMessage>> GetUnprocessedMessagesAsync(CancellationToken cancellationToken = default)
     {
         return await _context.OutboxMessages

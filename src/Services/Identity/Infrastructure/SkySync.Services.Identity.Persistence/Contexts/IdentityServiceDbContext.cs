@@ -111,5 +111,6 @@ public class IdentityServiceDbContext : DbContext
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
     }
 }

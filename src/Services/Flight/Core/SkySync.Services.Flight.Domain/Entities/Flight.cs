@@ -12,6 +12,6 @@ public class Flight : BaseEntity
     public DateTime DepartureTime { get; set; }
     public DateTime ArrivalTime { get; set; } // Eklendi
     public decimal BasePrice { get; set; }
-    public FlightStatus Status { get; set; } 
+    public FlightStatus Status { get; set; }
     public ICollection<Seat> Seats { get; set; }
 }

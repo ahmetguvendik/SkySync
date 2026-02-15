@@ -60,8 +60,8 @@ public class ReleaseSeatCommandConsumer : IConsumer<ReleaseSeatCommand>
 
         try
         {
-            var seat = await _context.Seats.FirstOrDefaultAsync(x => 
-                x.FlightId == message.FlightId && 
+            var seat = await _context.Seats.FirstOrDefaultAsync(x =>
+                x.FlightId == message.FlightId &&
                 x.SeatNumber == message.SeatNumber);
 
             if (seat != null)

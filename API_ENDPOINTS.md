@@ -227,6 +227,77 @@
 }
 ```
 
+#### 4. Çıkış Yap
+- **Method:** `POST`
+- **Path:** `/api/auth/logout`
+- **Description:** Stateless çıkarma; sunucu sadece isteği doğrular ve istemciden mevcut JWT'yi temizlemesini ister. Token saklanmaz.
+- **Headers:** `Authorization: Bearer {token}`
+- **Response:** `200 OK`
+```json
+{
+  "message": "Oturum kapatıldı. Lütfen istemci tarafında JWT tokenını temizleyin.",
+  "code": "LOGOUT_SUCCESS"
+}
+```
+
+---
+
+## Airport Service
+**Base URL:** `http://localhost:5000/api/airport` (Gateway üzerinden)
+
+### Not
+- Havalimanı listesinin tamamı tek bir Redis anahtarında (`airports:all`) tutulur; ilk istek veritabanından yüklenir, sonraki ~6 saat boyunca combobox ve yönetim ekranları cache’den beslenir. Sunucu tarafındaki arama/paginasyon işlemleri bu snapshot üzerinde yapılır, isterseniz istemci tarafında da filtreleme uygulayabilirsiniz. Yeni havalimanı oluşturulduğunda bu anahtar temizlenir ve bir sonraki istekte liste yeniden yüklenir.
+
+### Endpoints
+
+#### 1. Havalimanı Listele
+- **Method:** `GET`
+- **Path:** `/api/airport`
+- **Query Params:**
+  - `search` (opsiyonel)
+  - `page` (varsayılan 1)
+  - `pageSize` (varsayılan 10, maks 50)
+- **Response:** `200 OK`
+```json
+{
+  "airports": [
+    {
+      "id": "guid",
+      "code": "IST",
+      "name": "Istanbul Airport",
+      "city": "Istanbul",
+      "country": "Türkiye"
+    }
+  ],
+  "isFromCache": true,
+  "totalCount": 45,
+  "page": 1,
+  "pageSize": 10
+}
+```
+
+#### 2. Havalimanı Ekle
+- **Method:** `POST`
+- **Path:** `/api/airport`
+- **Authorization:** Admin rolü
+- **Request Body:**
+```json
+{
+  "code": "NEW",
+  "name": "New Airport",
+  "city": "Ankara",
+  "country": "Türkiye"
+}
+```
+- **Response:** `201 Created`
+```json
+{
+  "airportId": "guid",
+  "isSuccess": true,
+  "message": "Airport created successfully."
+}
+```
+
 ---
 
 ## Payment Service

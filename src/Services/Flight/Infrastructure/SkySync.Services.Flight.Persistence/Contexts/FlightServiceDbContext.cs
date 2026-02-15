@@ -8,7 +8,7 @@ public class FlightServiceDbContext : DbContext
 {
     public FlightServiceDbContext(DbContextOptions<FlightServiceDbContext> options) : base(options)
     {
-        
+
     }
 
     public DbSet<SkySync.Services.Flight.Domain.Entities.Aircraft> Aircraft { get; set; }
@@ -16,7 +16,7 @@ public class FlightServiceDbContext : DbContext
     public DbSet<SkySync.Services.Flight.Domain.Entities.Seat> Seats { get; set; }
     public DbSet<SkySync.Services.Flight.Domain.Entities.Airport> Airports { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
-    
+
     /// <summary>
     /// Inbox Messages - Duplicate seat reservation prevention (Shared'dan)
     /// </summary>
@@ -124,7 +124,7 @@ public class FlightServiceDbContext : DbContext
             entity.Property(i => i.BusinessKey)
                 .IsRequired()
                 .HasMaxLength(255);
-            
+
             entity.Property(i => i.EventType)
                 .IsRequired()
                 .HasMaxLength(255);
@@ -152,12 +152,12 @@ public class FlightServiceDbContext : DbContext
             entity.HasIndex(i => i.ProcessedAt);
             entity.HasIndex(i => new { i.EventType, i.ProcessedAt });
             entity.HasIndex(i => i.Status);
-            
+
             // ✅ KRITIK: Business Key unique constraint - Duplicate seat reservation prevention!
             entity.HasIndex(i => new { i.EventType, i.BusinessKey })
                 .IsUnique();
         });
-        
+
         // Airport Configuration
         modelBuilder.Entity<SkySync.Services.Flight.Domain.Entities.Airport>(entity =>
         {
@@ -169,6 +169,6 @@ public class FlightServiceDbContext : DbContext
             entity.HasIndex(a => a.Code).IsUnique();
         });
     }
-    
+
 }
-    
+

@@ -13,7 +13,7 @@ public class UnitOfWork : IUnitOfWork
     {
         _dbContext = dbContext;
     }
-    
+
     public void Dispose()
     {
         _dbContextTransaction?.Dispose();
@@ -24,7 +24,7 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.SaveChangesAsync(cancellationToken); 
+        return await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

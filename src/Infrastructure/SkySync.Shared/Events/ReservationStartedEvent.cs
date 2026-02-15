@@ -9,10 +9,10 @@ public class ReservationStartedEvent
     public Guid ReservationId { get; set; }
     public Guid CorrelationId { get; set; }
     public Guid FlightId { get; set; }
-    public string SeatNumber { get; set; }
+    public string SeatNumber { get; set; } = string.Empty;
     public decimal Price { get; set; }
-    public string PassengerName { get; set; }
-    public string PassengerSurname { get; set; }
-    public string PassengerEmail { get; set; }
+    public string PassengerName { get; set; } = string.Empty;
+    public string PassengerSurname { get; set; } = string.Empty;
+    public string PassengerEmail { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 }

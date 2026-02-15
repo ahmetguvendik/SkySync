@@ -2,14 +2,14 @@ using System.Threading.Channels;
 using FluentAssertions;
 using MassTransit;
 using MassTransit.Saga;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Options;
 using SkySync.SagaStateMachine.StateInstances;
 using SkySync.SagaStateMachine.StateMachines;
 using SkySync.Shared;
 using SkySync.Shared.Commands;
 using SkySync.Shared.Events;
+using SkySync.Shared.Options;
 using Xunit;
 
 namespace SkySync.SagaStateMachine.Tests;
@@ -27,12 +27,8 @@ public class ReservationStateMachineTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var configuration = new TestConfiguration(new Dictionary<string, string?>
-        {
-            ["Payment:TimeoutMinutes"] = "1"
-        });
-
-        _stateMachine = new ReservationStateMachine(configuration, NullLogger<ReservationStateMachine>.Instance);
+        var paymentOptions = Options.Create(new PaymentOptions { TimeoutMinutes = 1 });
+        _stateMachine = new ReservationStateMachine(paymentOptions, NullLogger<ReservationStateMachine>.Instance);
         _repository = new InMemorySagaRepository<ReservationState>();
 
         _bus = MassTransit.Bus.Factory.CreateUsingInMemory(cfg =>
@@ -227,80 +223,5 @@ public class ReservationStateMachineTests : IAsyncLifetime
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         return await channel.Reader.ReadAsync(cts.Token);
-    }
-}
-
-internal sealed class TestConfiguration : IConfiguration
-{
-    private readonly Dictionary<string, string?> _values;
-
-    public TestConfiguration(IDictionary<string, string?> values)
-    {
-        _values = new Dictionary<string, string?>(values, StringComparer.OrdinalIgnoreCase);
-    }
-
-    public string? this[string key]
-    {
-        get => _values.TryGetValue(key, out var value) ? value : null;
-        set => _values[key] = value;
-    }
-
-    public IEnumerable<IConfigurationSection> GetChildren() => Array.Empty<IConfigurationSection>();
-
-    public IChangeToken GetReloadToken() => NoopChangeToken.Instance;
-
-    public IConfigurationSection GetSection(string key) => new TestConfigurationSection(key, this);
-
-    private sealed class TestConfigurationSection : IConfigurationSection
-    {
-        private readonly string _key;
-        private readonly TestConfiguration _parent;
-
-        public TestConfigurationSection(string key, TestConfiguration parent)
-        {
-            _key = key;
-            _parent = parent;
-        }
-
-        public string Key => _key;
-
-        public string Path => _key;
-
-        public string? Value
-        {
-            get => _parent[_key];
-            set => _parent[_key] = value;
-        }
-
-        public string? this[string key]
-        {
-            get => _parent[key];
-            set => _parent[key] = value;
-        }
-
-        public IEnumerable<IConfigurationSection> GetChildren() => Array.Empty<IConfigurationSection>();
-
-        public IChangeToken GetReloadToken() => NoopChangeToken.Instance;
-
-        public IConfigurationSection GetSection(string key) => new TestConfigurationSection(key, _parent);
-    }
-
-    private sealed class NoopChangeToken : IChangeToken
-    {
-        public static readonly IChangeToken Instance = new NoopChangeToken();
-
-        public bool HasChanged => false;
-
-        public bool ActiveChangeCallbacks => false;
-
-        public IDisposable RegisterChangeCallback(Action<object?> callback, object? state) => Disposable.Instance;
-
-        private sealed class Disposable : IDisposable
-        {
-            public static readonly Disposable Instance = new Disposable();
-            public void Dispose()
-            {
-            }
-        }
     }
 }

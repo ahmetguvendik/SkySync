@@ -8,7 +8,7 @@ public class PaymentCompletedEvent
     public Guid CorrelationId { get; set; }
     public Guid ReservationId { get; set; }
     public decimal Amount { get; set; }
-    public string PaymentMethod { get; set; }
-    public string TransactionId { get; set; }
+    public string PaymentMethod { get; set; } = string.Empty;
+    public string TransactionId { get; set; } = string.Empty;
     public DateTime CompletedAt { get; set; }
 }

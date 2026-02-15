@@ -82,7 +82,7 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
         // appsettings.json'dan admin email listesini oku
         // Format: "AdminNotificationEmails": ["admin@skysync.com", "operations@skysync.com"]
         var emailsConfig = _configuration.GetSection("AdminNotificationEmails").Get<string[]>();
-        
+
         if (emailsConfig != null && emailsConfig.Any())
         {
             return emailsConfig.ToList();

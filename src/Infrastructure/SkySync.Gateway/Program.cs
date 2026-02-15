@@ -143,8 +143,8 @@ app.UseSerilogRequestLogging(options =>
         diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
         diagnosticContext.Set("RequestPath", httpContext.Request.Path.Value);
         diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
-        var correlationId = httpContext.Items["CorrelationId"]?.ToString();
-        var transactionId = httpContext.Items["TransactionId"]?.ToString();
+        var correlationId = httpContext.Items[CorrelationContextKeys.CorrelationId]?.ToString();
+        var transactionId = httpContext.Items[CorrelationContextKeys.TransactionId]?.ToString();
         if (!string.IsNullOrEmpty(correlationId)) diagnosticContext.Set("CorrelationId", correlationId);
         if (!string.IsNullOrEmpty(transactionId)) diagnosticContext.Set("TransactionId", transactionId);
     };
@@ -173,7 +173,7 @@ app.MapGet("/", () => new
     Service = "SkySync API Gateway",
     Status = "Running",
     Environment = app.Environment.EnvironmentName,
-Routes = new[]
+    Routes = new[]
         {
             "/api/v1/auth",
             "/api/v1/flight",

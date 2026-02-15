@@ -25,11 +25,11 @@ public static class ServiceRegistration
     public static void AddPersistenceService(this IServiceCollection collection, IConfiguration configuration)
     {
         // Worker için ReservationConnection, Reservation Service için DefaultConnection kullan
-        var connectionString = configuration.GetConnectionString("ReservationConnection") 
+        var connectionString = configuration.GetConnectionString("ReservationConnection")
                                ?? configuration.GetConnectionString("DefaultConnection");
         collection.AddDbContext<ReservationServiceDbContext>(opt =>
             opt.UseNpgsql(connectionString));
-        
+
         // Repositories
         collection.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         collection.AddScoped<IFlightSummaryRepository, FlightSummaryRepository>();
@@ -51,9 +51,9 @@ public static class ServiceRegistration
     {
         // CRITICAL: ReservationStateDbContext'i DI container'a ekle
         // Saga State Machine'in state'leri kaydetmesi için gerekli
-        var sagaConnectionString = configuration.GetConnectionString("SagaConnection") 
+        var sagaConnectionString = configuration.GetConnectionString("SagaConnection")
             ?? configuration.GetConnectionString("DefaultConnection");
-        
+
         services.AddDbContext<ReservationStateDbContext>(options =>
         {
             options.UseNpgsql(sagaConnectionString);
@@ -71,10 +71,10 @@ public static class ServiceRegistration
                 {
                     // PostgreSQL için Optimistic locking kullan (Pessimistic SQL Server syntax'ı kullanır)
                     r.ConcurrencyMode = ConcurrencyMode.Optimistic;
-                    
+
                     // PostgreSQL için pessimistic locking gerekirse:
                     // r.LockStatementProvider = new PostgresLockStatementProvider();
-                    
+
                     r.ExistingDbContext<ReservationStateDbContext>();
                 });
 
@@ -97,7 +97,7 @@ public static class ServiceRegistration
 
 
                 var connectionString = configuration["RabbitMQ:ConnectionString"];
-                
+
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     throw new InvalidOperationException(

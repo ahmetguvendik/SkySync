@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,65 +18,138 @@ public class GetAirportsQueryHandler : IRequestHandler<GetAirportsQueryRequest, 
 {
     private readonly IGenericRepository<AirportEntity> _airportRepository;
     private readonly ILogger<GetAirportsQueryHandler> _logger;
+    private readonly ICacheService _cacheService;
 
-    private const int PageSize = 10; // Her sayfada 10 havalimanı
+    private const int DefaultPageSize = 10;
+    private const int MaxPageSize = 50;
+    private const string AirportsCacheKey = "airports:all";
+    private static readonly TimeSpan CacheExpiration = TimeSpan.FromHours(6);
+    private static readonly TimeSpan LockExpiration = TimeSpan.FromSeconds(5);
 
     public GetAirportsQueryHandler(
         IGenericRepository<AirportEntity> airportRepository,
-        ILogger<GetAirportsQueryHandler> logger)
+        ILogger<GetAirportsQueryHandler> logger,
+        ICacheService cacheService)
     {
         _airportRepository = airportRepository;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<GetAirportsQueryResponse> Handle(GetAirportsQueryRequest request, CancellationToken cancellationToken)
     {
         var page = NormalizePage(request.Page);
+        var pageSize = NormalizePageSize(request.PageSize);
+        var normalizedSearch = NormalizeSearch(request.Search);
+        var (airportsSnapshot, isFromCache) = await GetAirportsSnapshotAsync(cancellationToken);
 
-        var query = _airportRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .Where(a => !a.IsDeleted);
-
-        if (!string.IsNullOrWhiteSpace(request.Search))
-        {
-            var search = request.Search.Trim().ToUpperInvariant();
-            query = query.Where(a =>
-                a.Code.ToUpper().Contains(search) ||
-                a.Name.ToUpper().Contains(search) ||
-                a.City.ToUpper().Contains(search) ||
-                a.Country.ToUpper().Contains(search));
-        }
-
-        var totalCount = await query.CountAsync(cancellationToken);
-
-        var airports = await query
-            .OrderBy(a => a.City)
-            .ThenBy(a => a.Name)
-            .Skip((page - 1) * PageSize)
-            .Take(PageSize)
-            .ToListAsync(cancellationToken);
-
-        var dtos = airports.Select(a => new AirportDto
-        {
-            Id = a.Id,
-            Code = a.Code,
-            Name = a.Name,
-            City = a.City,
-            Country = a.Country
-        }).ToList();
-
-        _logger.LogInformation("Airports fetched. Count: {Count}, Total: {TotalCount}, Page: {Page}",
-            dtos.Count, totalCount, page);
+        var filteredAirports = FilterAirports(airportsSnapshot, normalizedSearch);
+        var totalCount = filteredAirports.Count;
+        var pagedAirports = ApplyPaging(filteredAirports, page, pageSize);
 
         return new GetAirportsQueryResponse
         {
-            Airports = dtos,
+            Airports = pagedAirports,
             TotalCount = totalCount,
             Page = page,
-            PageSize = PageSize
+            PageSize = pageSize,
+            IsFromCache = isFromCache
         };
     }
 
+    private async Task<(IReadOnlyList<AirportDto> Airports, bool IsFromCache)> GetAirportsSnapshotAsync(CancellationToken cancellationToken)
+    {
+        var cachedAirports = await _cacheService.GetAsync<List<AirportDto>>(AirportsCacheKey, cancellationToken);
+        if (cachedAirports != null)
+        {
+            _logger.LogDebug("Airport cache hit. Count={Count}", cachedAirports.Count);
+            return (cachedAirports, true);
+        }
+
+        var lockKey = $"{AirportsCacheKey}:lock";
+        var distributedLock = await _cacheService.AcquireLockAsync(lockKey, LockExpiration, cancellationToken);
+
+        if (distributedLock == null || !distributedLock.IsAcquired)
+        {
+            _logger.LogDebug("Airport cache lock not acquired. Waiting briefly...");
+            await Task.Delay(50, cancellationToken);
+            cachedAirports = await _cacheService.GetAsync<List<AirportDto>>(AirportsCacheKey, cancellationToken);
+            if (cachedAirports != null)
+            {
+                return (cachedAirports, true);
+            }
+        }
+
+        try
+        {
+            var airports = await _airportRepository
+                .GetQueryable()
+                .AsNoTracking()
+                .Where(a => !a.IsDeleted)
+                .OrderBy(a => a.City)
+                .ThenBy(a => a.Name)
+                .ToListAsync(cancellationToken);
+
+            var dtos = airports.Select(a => new AirportDto
+            {
+                Id = a.Id,
+                Code = a.Code,
+                Name = a.Name,
+                City = a.City,
+                Country = a.Country
+            }).ToList();
+
+            await _cacheService.SetAsync(AirportsCacheKey, dtos, CacheExpiration, cancellationToken);
+            _logger.LogInformation("Airport cache refreshed from database. Count={Count}", dtos.Count);
+
+            return (dtos, false);
+        }
+        finally
+        {
+            if (distributedLock != null && distributedLock.IsAcquired)
+                await _cacheService.ReleaseLockAsync(distributedLock, cancellationToken);
+        }
+    }
+
     private static int NormalizePage(int page) => page <= 0 ? 1 : page;
+
+    private static int NormalizePageSize(int pageSize)
+    {
+        if (pageSize <= 0)
+            return DefaultPageSize;
+
+        return Math.Min(pageSize, MaxPageSize);
+    }
+
+    private static string? NormalizeSearch(string? search)
+    {
+        return string.IsNullOrWhiteSpace(search)
+            ? null
+            : search.Trim();
+    }
+
+    private static List<AirportDto> FilterAirports(IEnumerable<AirportDto> airports, string? normalizedSearch)
+    {
+        if (string.IsNullOrWhiteSpace(normalizedSearch))
+            return airports.ToList();
+
+        return airports.Where(a =>
+                a.Code.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase) ||
+                a.City.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase) ||
+                a.Country.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private static List<AirportDto> ApplyPaging(List<AirportDto> airports, int page, int pageSize)
+    {
+        var skip = (page - 1) * pageSize;
+        if (skip < 0)
+            skip = 0;
+
+        return airports
+            .Skip(skip)
+            .Take(pageSize)
+            .ToList();
+    }
 }

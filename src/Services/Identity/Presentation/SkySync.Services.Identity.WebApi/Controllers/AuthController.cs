@@ -139,6 +139,28 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Oturumu sonlandır (stateless - istemci tokenı temizlemeli)
+    /// </summary>
+    [HttpPost("logout")]
+    [Authorize]
+    public IActionResult Logout()
+    {
+        if (!TryGetUserId(out var userId))
+            return Unauthorized(new { message = "Yetkisiz erişim.", code = "UNAUTHORIZED" });
+
+        _logger.LogInformation("User logged out. UserId: {UserId}", userId);
+
+        Response.Headers["Cache-Control"] = "no-store";
+        Response.Headers["Pragma"] = "no-cache";
+
+        return Ok(new
+        {
+            message = "Oturum kapatıldı. Lütfen istemci tarafında JWT tokenını temizleyin.",
+            code = "LOGOUT_SUCCESS"
+        });
+    }
+
+    /// <summary>
     /// Şifre sıfırlama bağlantısı gönderir (kullanıcı kayıtlıysa)
     /// </summary>
     [HttpPost("forgot-password")]

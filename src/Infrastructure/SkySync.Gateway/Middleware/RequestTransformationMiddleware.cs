@@ -27,12 +27,12 @@ public class RequestTransformationMiddleware
         {
             context.Request.Headers["X-Gateway-Version"] = "1.0.0";
         }
-        
+
         if (!context.Request.Headers.ContainsKey("X-Gateway-Timestamp"))
         {
             context.Request.Headers["X-Gateway-Timestamp"] = requestStartTime.ToString("O");
         }
-        
+
         // Original IP'yi koru (X-Forwarded-For)
         var originalIp = context.Connection.RemoteIpAddress?.ToString();
         if (!string.IsNullOrEmpty(originalIp) && !context.Request.Headers.ContainsKey("X-Forwarded-For"))
@@ -48,7 +48,7 @@ public class RequestTransformationMiddleware
             {
                 context.Response.Headers["X-Gateway-Processed"] = "true";
             }
-            
+
             if (!context.Response.Headers.ContainsKey("X-Response-Time"))
             {
                 var responseTime = DateTime.UtcNow;
