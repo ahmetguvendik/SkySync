@@ -10,5 +10,7 @@ public class UserRegisteredEvent
     public string Email { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
+    public bool ReceivesOperationalEmails { get; set; }
     public DateTime RegisteredAt { get; set; }
 }

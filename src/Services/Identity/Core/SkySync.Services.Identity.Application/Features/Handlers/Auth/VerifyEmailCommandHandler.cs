@@ -4,6 +4,7 @@ using SkySync.Services.Identity.Application.Features.Commands.Auth.Requests;
 using SkySync.Services.Identity.Application.Features.Commands.Auth.Responses;
 using SkySync.Services.Identity.Application.Interfaces;
 using SkySync.Services.Identity.Application.UnitOfWorks;
+using SkySync.Services.Identity.Domain.Constants;
 using SkySync.Shared.Events;
 using SkySync.Shared.OutboxTable;
 using System.Diagnostics;
@@ -79,13 +80,18 @@ public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommandReque
 
             await _emailVerificationTokenRepository.MarkAsUsedAsync(token.Id, cancellationToken);
 
+            var eventTimestamp = DateTime.UtcNow;
+            var roleName = user.Role?.Name ?? (user.RoleId == RoleConstants.AdminRoleId ? RoleConstants.Admin : RoleConstants.User);
+            var receivesOperationalEmails = true;
             var welcomeEvent = new UserRegisteredEvent
             {
                 UserId = user.Id,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                RegisteredAt = DateTime.UtcNow
+                Role = roleName,
+                ReceivesOperationalEmails = receivesOperationalEmails,
+                RegisteredAt = eventTimestamp
             };
 
             var activity = Activity.Current;
@@ -94,7 +100,7 @@ public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommandReque
                 Id = Guid.NewGuid(),
                 Type = nameof(UserRegisteredEvent),
                 Content = JsonSerializer.Serialize(welcomeEvent),
-                OccurredOn = DateTime.UtcNow,
+                OccurredOn = eventTimestamp,
                 Traceparent = activity?.Id,
                 Tracestate = activity?.TraceStateString
             };

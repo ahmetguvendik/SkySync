@@ -188,7 +188,11 @@
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/SkySync.Services.Notification.Domain.csproj": {
+                "projectPath": "/Users/ahmetguvendik/Desktop/Asp.NetProject/SkySync/src/Services/Notification/Core/SkySync.Services.Notification.Domain/SkySync.Services.Notification.Domain.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -206,6 +210,16 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "MediatR": {
+              "target": "Package",
+              "version": "[14.0.0, )"
+            },
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[10.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

@@ -1,7 +1,9 @@
+using System;
 using System.Text.Json;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using SkySync.Services.Notification.Application.Interfaces;
+using SkySync.Services.Notification.Domain.Entities;
 using SkySync.Shared.Events;
 using SkySync.Shared.InboxPattern;
 
@@ -14,15 +16,18 @@ public class UserRegisteredConsumer : IConsumer<UserRegisteredEvent>
 {
     private readonly IEmailService _emailService;
     private readonly IInboxService _inboxService;
+    private readonly INotificationUserRepository _notificationUserRepository;
     private readonly ILogger<UserRegisteredConsumer> _logger;
 
     public UserRegisteredConsumer(
         IEmailService emailService,
         IInboxService inboxService,
+        INotificationUserRepository notificationUserRepository,
         ILogger<UserRegisteredConsumer> logger)
     {
         _emailService = emailService;
         _inboxService = inboxService;
+        _notificationUserRepository = notificationUserRepository;
         _logger = logger;
     }
 
@@ -41,7 +46,7 @@ public class UserRegisteredConsumer : IConsumer<UserRegisteredEvent>
             nameof(UserRegisteredEvent),
             businessKey,
             JsonSerializer.Serialize(message),
-            async ct => await SendWelcomeEmailAsync(message, ct),
+            async ct => await ProcessRegistrationAsync(message, ct),
             context.CancellationToken);
 
         if (!processed)
@@ -53,8 +58,23 @@ public class UserRegisteredConsumer : IConsumer<UserRegisteredEvent>
         }
     }
 
-    private async Task SendWelcomeEmailAsync(UserRegisteredEvent message, CancellationToken cancellationToken)
+    private async Task ProcessRegistrationAsync(UserRegisteredEvent message, CancellationToken cancellationToken)
     {
+        var notificationUser = new NotificationUser
+        {
+            UserId = message.UserId,
+            Email = message.Email,
+            FirstName = message.FirstName,
+            LastName = message.LastName,
+            Role = message.Role,
+            ReceivesOperationalEmails = message.ReceivesOperationalEmails,
+            RegisteredAt = message.RegisteredAt,
+            LastUpdatedAt = DateTime.UtcNow,
+            UnsubscribeToken = Guid.NewGuid()
+        };
+
+        await _notificationUserRepository.UpsertAsync(notificationUser, cancellationToken);
+
         var subject = "SkySync - Aramıza Hoş Geldiniz";
         var body = $@"
             <h1>Merhaba {message.FirstName} {message.LastName},</h1>

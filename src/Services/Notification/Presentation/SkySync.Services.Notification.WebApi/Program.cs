@@ -1,10 +1,15 @@
-using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
+using Asp.Versioning;
 using MassTransit.Logging;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using SkySync.Infrastructure.Logging;
+using SkySync.Services.Notification.Application.Features.NotificationPreferences.Commands.Unsubscribe;
 using Steeltoe.Discovery.Eureka;
 using SkySync.Services.Notification.Persistence;
 
@@ -14,6 +19,43 @@ builder.Host.UseSerilog((ctx, lc) => SerilogConfiguration.Configure(ctx, lc, "No
 
 // Add Notification Services (DI + MassTransit)
 builder.Services.AddNotificationServices(builder.Configuration);
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(UnsubscribeNotificationCommandRequest).Assembly));
+builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    })
+    .AddApiExplorer(options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
+
+var secretKey = builder.Configuration["JwtSettings:SecretKey"] ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+    ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLongForProduction!";
+var issuer = builder.Configuration["JwtSettings:Issuer"] ?? "SkySync";
+var audience = builder.Configuration["JwtSettings:Audience"] ?? "SkySyncUsers";
+
+if (secretKey.Length < 32)
+    throw new InvalidOperationException("JWT Secret Key must be at least 32 characters long.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        };
+    });
+builder.Services.AddAuthorization();
 
 // Eureka Service Discovery - Register with Eureka
 builder.Services.AddEurekaDiscoveryClient();
@@ -62,6 +104,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCorrelationIdLogContext();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSerilogRequestLogging(options =>
 {

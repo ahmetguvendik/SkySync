@@ -13,15 +13,18 @@ public class UserProfileUpdatedConsumer : IConsumer<UserProfileUpdatedEvent>
 {
     private readonly IEmailService _emailService;
     private readonly IInboxService _inboxService;
+    private readonly INotificationUserRepository _notificationUserRepository;
     private readonly ILogger<UserProfileUpdatedConsumer> _logger;
 
     public UserProfileUpdatedConsumer(
         IEmailService emailService,
         IInboxService inboxService,
+        INotificationUserRepository notificationUserRepository,
         ILogger<UserProfileUpdatedConsumer> logger)
     {
         _emailService = emailService;
         _inboxService = inboxService;
+        _notificationUserRepository = notificationUserRepository;
         _logger = logger;
     }
 
@@ -38,7 +41,7 @@ public class UserProfileUpdatedConsumer : IConsumer<UserProfileUpdatedEvent>
             nameof(UserProfileUpdatedEvent),
             businessKey,
             JsonSerializer.Serialize(message),
-            async ct => await SendProfileUpdatedEmailAsync(message, ct),
+            async ct => await HandleProfileUpdateAsync(message, ct),
             context.CancellationToken);
 
         if (!processed)
@@ -47,8 +50,16 @@ public class UserProfileUpdatedConsumer : IConsumer<UserProfileUpdatedEvent>
         }
     }
 
-    private async Task SendProfileUpdatedEmailAsync(UserProfileUpdatedEvent message, CancellationToken cancellationToken)
+    private async Task HandleProfileUpdateAsync(UserProfileUpdatedEvent message, CancellationToken cancellationToken)
     {
+        await _notificationUserRepository.UpdateProfileAsync(
+            message.UserId,
+            message.Email,
+            message.FirstName,
+            message.LastName,
+            message.UpdatedAt,
+            cancellationToken);
+
         var subject = "SkySync - Profiliniz güncellendi";
         var friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {

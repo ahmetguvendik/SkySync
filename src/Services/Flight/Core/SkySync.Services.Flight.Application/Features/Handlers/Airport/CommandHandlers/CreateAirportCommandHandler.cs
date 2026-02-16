@@ -6,7 +6,7 @@ using SkySync.Services.Flight.Application.Interfaces;
 using SkySync.Services.Flight.Application.UnitOfWorks;
 using AirportEntity = SkySync.Services.Flight.Domain.Entities.Airport;
 
-namespace SkySync.Services.Flight.Application.Features.Handlers.Airport;
+namespace SkySync.Services.Flight.Application.Features.Handlers.Airport.CommandHandlers;
 
 public class CreateAirportCommandHandler : IRequestHandler<CreateAirportCommandRequest, CreateAirportCommandResponse>
 {

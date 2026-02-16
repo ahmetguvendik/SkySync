@@ -74,6 +74,8 @@ public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommandReque
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                Role = RoleConstants.Admin,
+                ReceivesOperationalEmails = true,
                 RegisteredAt = now
             };
 

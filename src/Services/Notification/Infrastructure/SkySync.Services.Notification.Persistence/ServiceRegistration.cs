@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SkySync.Services.Notification.Application.Interfaces;
 using SkySync.Services.Notification.Persistence.Consumers;
 using SkySync.Services.Notification.Persistence.Contexts;
+using SkySync.Services.Notification.Persistence.Repositories;
 using SkySync.Services.Notification.Persistence.Services;
 using SkySync.Shared;
 using SkySync.Shared.InboxPattern;
@@ -24,6 +25,7 @@ public static class ServiceRegistration
         // Services
         services.AddScoped<IEmailService, GmailEmailService>();
         services.AddScoped<IInboxService, InboxService>();
+        services.AddScoped<INotificationUserRepository, NotificationUserRepository>();
 
         // MassTransit
         services.AddMassTransit(x =>

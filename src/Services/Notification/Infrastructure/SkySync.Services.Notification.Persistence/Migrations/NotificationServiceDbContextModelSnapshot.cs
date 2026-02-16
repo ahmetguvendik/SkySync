@@ -22,7 +22,57 @@ namespace SkySync.Services.Notification.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SkySync.Services.Notification.Domain.Entities.InboxMessage", b =>
+            modelBuilder.Entity("SkySync.Services.Notification.Domain.Entities.NotificationUser", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("ReceivesOperationalEmails")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("UnsubscribeToken")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("ReceivesOperationalEmails");
+
+                    b.HasIndex("UnsubscribeToken")
+                        .IsUnique();
+
+                    b.ToTable("NotificationUsers");
+                });
+
+            modelBuilder.Entity("SkySync.Shared.InboxPattern.InboxMessage", b =>
                 {
                     b.Property<Guid>("MessageId")
                         .ValueGeneratedOnAdd()
@@ -55,10 +105,8 @@ namespace SkySync.Services.Notification.Persistence.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("Processed");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("MessageId");
 

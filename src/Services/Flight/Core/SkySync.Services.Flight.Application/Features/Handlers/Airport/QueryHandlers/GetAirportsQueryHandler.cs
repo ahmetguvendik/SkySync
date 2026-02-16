@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,7 +7,7 @@ using SkySync.Services.Flight.Application.Features.Queries.Airport.Responses;
 using SkySync.Services.Flight.Application.Interfaces;
 using AirportEntity = SkySync.Services.Flight.Domain.Entities.Airport;
 
-namespace SkySync.Services.Flight.Application.Features.Handlers.Airport;
+namespace SkySync.Services.Flight.Application.Features.Handlers.Airport.QueryHandlers;
 
 public class GetAirportsQueryHandler : IRequestHandler<GetAirportsQueryRequest, GetAirportsQueryResponse>
 {

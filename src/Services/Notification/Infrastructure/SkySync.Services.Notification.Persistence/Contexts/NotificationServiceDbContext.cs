@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SkySync.Services.Notification.Domain.Entities;
 using SkySync.Shared.InboxPattern;
 
 namespace SkySync.Services.Notification.Persistence.Contexts;
@@ -16,6 +17,11 @@ public class NotificationServiceDbContext : DbContext
     /// Inbox Messages - Duplicate event handling için (Shared'dan)
     /// </summary>
     public DbSet<InboxMessage> InboxMessages { get; set; }
+
+    /// <summary>
+    /// Identity servisinden replike edilen kullanıcılar
+    /// </summary>
+    public DbSet<NotificationUser> NotificationUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -60,6 +66,37 @@ public class NotificationServiceDbContext : DbContext
 
             // ✅ Business Key index - Idempotency için kritik!
             entity.HasIndex(i => new { i.EventType, i.BusinessKey })
+                .IsUnique();
+        });
+
+        modelBuilder.Entity<NotificationUser>(entity =>
+        {
+            entity.HasKey(x => x.UserId);
+
+            entity.Property(x => x.Email)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            entity.Property(x => x.FirstName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(x => x.LastName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(x => x.Role)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(x => x.ReceivesOperationalEmails)
+                .HasDefaultValue(false);
+
+            entity.Property(x => x.UnsubscribeToken)
+                .IsRequired();
+
+            entity.HasIndex(x => x.ReceivesOperationalEmails);
+            entity.HasIndex(x => x.UnsubscribeToken)
                 .IsUnique();
         });
     }

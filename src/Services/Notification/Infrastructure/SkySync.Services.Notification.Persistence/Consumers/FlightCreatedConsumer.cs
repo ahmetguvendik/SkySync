@@ -1,8 +1,11 @@
+using System.Globalization;
+using System.Linq;
 using System.Text.Json;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkySync.Services.Notification.Application.Interfaces;
+using SkySync.Services.Notification.Domain.Entities;
 using SkySync.Shared.Events;
 using SkySync.Shared.InboxPattern;
 
@@ -17,18 +20,22 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
     private readonly IEmailService _emailService;
     private readonly IInboxService _inboxService;
     private readonly ILogger<FlightCreatedConsumer> _logger;
-    private readonly IConfiguration _configuration;
+    private readonly INotificationUserRepository _notificationUserRepository;
+    private readonly string _unsubscribeBaseUrl;
 
     public FlightCreatedConsumer(
         IEmailService emailService,
         IInboxService inboxService,
         ILogger<FlightCreatedConsumer> logger,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        INotificationUserRepository notificationUserRepository)
     {
         _emailService = emailService;
         _inboxService = inboxService;
         _logger = logger;
-        _configuration = configuration;
+        _notificationUserRepository = notificationUserRepository;
+        _unsubscribeBaseUrl = configuration["NotificationSettings:UnsubscribeBaseUrl"]
+            ?? "https://localhost:7000/api/v1/notification/preferences/unsubscribe";
     }
 
     public async Task Consume(ConsumeContext<FlightCreatedEvent> context)
@@ -57,54 +64,42 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
 
     private async Task SendFlightCreatedEmailsAsync(FlightCreatedEvent msg, CancellationToken ct)
     {
-        var adminEmails = GetAdminEmails();
-        _logger.LogInformation("Admin email count: {Count}, FlightId: {FlightId}", adminEmails.Count, msg.FlightId);
+        var recipients = await GetOperationalRecipientsAsync(ct);
+        _logger.LogInformation("Operational contact count: {Count}, FlightId: {FlightId}", recipients.Count, msg.FlightId);
 
-        if (!adminEmails.Any())
+        if (!recipients.Any())
         {
-            _logger.LogWarning("No admin emails configured for flight creation notifications.");
+            _logger.LogWarning("No operational contacts found for flight creation notifications.");
             return;
         }
 
         var subject = $"🛫 Yeni Uçuş Eklendi: {msg.FlightNumber}";
-        var body = GenerateEmailBody(msg);
 
-        foreach (var adminEmail in adminEmails)
+        foreach (var recipient in recipients)
         {
             ct.ThrowIfCancellationRequested();
-            await _emailService.SendEmailAsync(adminEmail, subject, body);
-            _logger.LogInformation("Flight creation notification sent to {Email}", adminEmail);
+            var body = GenerateEmailBody(msg, BuildUnsubscribeLink(recipient.UnsubscribeToken));
+            await _emailService.SendEmailAsync(recipient.Email, subject, body);
+            _logger.LogInformation("Flight creation notification sent to {Email}", recipient.Email);
         }
     }
 
-    private List<string> GetAdminEmails()
+    private async Task<IReadOnlyList<NotificationUser>> GetOperationalRecipientsAsync(CancellationToken cancellationToken)
     {
-        // appsettings.json'dan admin email listesini oku
-        // Format: "AdminNotificationEmails": ["admin@skysync.com", "operations@skysync.com"]
-        var emailsConfig = _configuration.GetSection("AdminNotificationEmails").Get<string[]>();
-
-        if (emailsConfig != null && emailsConfig.Any())
-        {
-            return emailsConfig.ToList();
-        }
-
-        // Fallback: Environment variable'dan oku (production için)
-        var envEmails = Environment.GetEnvironmentVariable("ADMIN_NOTIFICATION_EMAILS");
-        if (!string.IsNullOrEmpty(envEmails))
-        {
-            return envEmails.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                           .Select(e => e.Trim())
-                           .ToList();
-        }
-
-        // Default: Boş liste (loglama için)
-        return new List<string>();
+        return await _notificationUserRepository.GetOperationalContactsAsync(cancellationToken);
     }
 
-    private string GenerateEmailBody(FlightCreatedEvent flight)
+    private string BuildUnsubscribeLink(Guid token)
+    {
+        var baseUrl = _unsubscribeBaseUrl.TrimEnd('/');
+        return $"{baseUrl}/{token}";
+    }
+
+    private string GenerateEmailBody(FlightCreatedEvent flight, string unsubscribeLink)
     {
         var duration = flight.ArrivalTime - flight.DepartureTime;
         var durationText = $"{(int)duration.TotalHours}s {duration.Minutes}d";
+        var priceText = flight.BasePrice.ToString("N2", CultureInfo.GetCultureInfo("tr-TR"));
 
         return $@"
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
@@ -171,42 +166,10 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
                                 💰 Baz Fiyat
                             </td>
                             <td style='padding: 15px; border: 1px solid #ddd;'>
-                                <strong style='color: #27ae60; font-size: 18px;'>{flight.BasePrice:N2} TL</strong>
-                            </td>
-                        </tr>
-                        <tr style='background-color: #f9f9f9;'>
-                            <td style='padding: 15px; border: 1px solid #ddd; font-weight: bold;'>
-                                📊 Durum
-                            </td>
-                            <td style='padding: 15px; border: 1px solid #ddd;'>
-                                <span style='background-color: #27ae60; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;'>
-                                    {flight.Status}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr style='background-color: white;'>
-                            <td style='padding: 15px; border: 1px solid #ddd; font-weight: bold;'>
-                                🆔 Uçuş ID
-                            </td>
-                            <td style='padding: 15px; border: 1px solid #ddd; font-family: monospace; font-size: 12px;'>
-                                {flight.FlightId}
-                            </td>
-                        </tr>
-                        <tr style='background-color: #f9f9f9;'>
-                            <td style='padding: 15px; border: 1px solid #ddd; font-weight: bold;'>
-                                📅 Oluşturulma
-                            </td>
-                            <td style='padding: 15px; border: 1px solid #ddd;'>
-                                {flight.CreatedAt:dd MMMM yyyy HH:mm:ss}
+                                <strong style='color: #27ae60; font-size: 18px;'>{priceText} TL</strong>
                             </td>
                         </tr>
                     </table>
-
-                    <div style='margin-top: 30px; padding: 20px; background-color: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 5px;'>
-                        <p style='margin: 0; color: #1976d2;'>
-                            <strong>ℹ️ Bilgi:</strong> Bu uçuş sisteme eklenmiştir ve rezervasyonlara açıktır.
-                        </p>
-                    </div>
 
                     <div style='margin-top: 20px; text-align: center;'>
                         <a href='http://localhost:5000/api/flight/{flight.FlightId}' 
@@ -222,9 +185,10 @@ public class FlightCreatedConsumer : IConsumer<FlightCreatedEvent>
                     </p>
                     <p style='margin: 5px 0 0 0; font-size: 12px; color: #999;'>
                         Bu otomatik bir bildirimdir.
+                        Bildirim almak istemiyorsanız 
+                        <a href='{unsubscribeLink}' style='color:#fff;text-decoration:underline;'>buraya tıklayın</a>.
                     </p>
                 </div>
             </div>";
     }
 }
-
